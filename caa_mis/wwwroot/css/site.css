@@ -1,0 +1,39 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-floating {
+    margin-bottom: 1rem;
+}
+.navbar-expand-lg .navbar-nav .nav-link {
+    color: white !important;
+    font-weight: 600;
+}
+input[type=date], #Shipment, #Description {
+    padding: 8px 0px;
+}
+label {
+    font-weight: 600;
+}
+h1,h2,h3,h4 {
+    padding-top: 20px;
+}

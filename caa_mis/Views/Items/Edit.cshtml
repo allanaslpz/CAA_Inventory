@@ -1,0 +1,101 @@
+﻿@model caa_mis.Models.Item
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h4>Edit @Model.Name</h4>
+<hr />
+@{
+    var hasPicture = (Model.ItemPhoto?.Content != null);
+    if (hasPicture)
+        {
+            @:<div>
+                string imageBase64 = Convert.ToBase64String(Model.ItemPhoto.Content);
+                string imageSrc = string.Format("data:" + Model.ItemPhoto.MimeType + ";base64,{0}", imageBase64);
+                <img src="@imageSrc" alt="Photo of @Model.Name" title="Photo of @Model.Name" class="img-fluid rounded" />
+            @:</div><hr />
+        }
+    }
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ID" />
+            <div>
+                @{
+                    if (hasPicture)
+                    {
+                        <div class="row">
+                            <div class="form-check m-3">
+                                <input class="form-check-input" type="checkbox" id="chkRemoveImage" name="chkRemoveImage">
+                                <label class="form-check-label" for="chkRemoveImage">
+                                <strong>Check to remove Image</strong>
+                                </label>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Name<span style="color:red;">*</span></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="CategoryID" class="control-label"></label>
+                <select asp-for="CategoryID" class="form-control" asp-items="ViewBag.CategoryID"></select>
+                <span asp-validation-for="CategoryID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SKUNumber" class="control-label">SKU Number<span style="color:red;">*</span></label>
+                <input asp-for="SKUNumber" class="form-control" />
+                <span asp-validation-for="SKUNumber" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">Description<span style="color:red;">*</span></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Scale" class="control-label"></label>
+                <input asp-for="Scale" class="form-control" />
+                <span asp-validation-for="Scale" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cost" class="control-label">Cost<span style="color:red;">*</span></label>
+                <input asp-for="Cost" class="form-control" />
+                <span asp-validation-for="Cost" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Manufacturer" class="control-label"></label>
+                <input asp-for="Manufacturer" class="form-control" />
+                <span asp-validation-for="Manufacturer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ItemStatusID" class="control-label"></label>
+                <select asp-for="ItemStatusID" class="form-control" asp-items="ViewBag.ItemStatusID"></select>
+                <span asp-validation-for="ItemStatusID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label custom-file-label">Picture File:</label>
+                <div class="input-group mb-3">
+                    <input type="file" class="form-control" name="thePicture" id="thePicture">
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
