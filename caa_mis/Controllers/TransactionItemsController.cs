@@ -163,7 +163,7 @@ namespace caa_mis.Controllers
             }
             ViewData["TransactionName"] = TransactionName;
 
-            TransactionItem a = new TransactionItem()
+            TransactionItem a = new()
             {
                 TransactionID = TransactionID.GetValueOrDefault()
             };
@@ -244,8 +244,7 @@ namespace caa_mis.Controllers
                     {
                         throw;
                     }
-                }
-                return RedirectToAction(nameof(Index));
+                }                
             }
 
             PopulateDropDownLists(transactionItem);

@@ -6,23 +6,29 @@
 
 <h2>Stock Summary By Branch</h2>
 <p>
-    <a asp-action="DownloadStockItems" class="btn btn-info float-end">Download Stock Items</a>
+    <a asp-action="DownloadStockItems" class="btn btn-info float-end">Download Stock Products</a>
 </p>
 <form asp-controller="Items" asp-action="StockSummaryByBranch" method="get">
     <div class="form-horizontal">
-        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+        <button class="btn  @(ViewData["Filtering"]) btn-primary" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
             Filter/Search
         </button>
-        <div class="collapse @(ViewData["Filtering"])" id="collapseFilter">
+        <div class="collapse" id="collapseFilter">
             <div class="card card-body bg-light">
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label class="control-label">Filter by Branch:</label>
-                        @Html.DropDownList("BranchID", null, "All Branches", htmlAttributes: new { @class = "form-control" })
+                        <label class="control-label">Filter by Branches: (Ctrl + click to multiselect)</label>
+                        @Html.ListBox("BranchID", null, htmlAttributes: new { @class = "form-control p-0", size = "5"})  @*<=Branch Listbox Item Size *@
+
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label class="control-label">Search Product:</label>
+                        @Html.TextBox("SearchString", null, new { @class = "form-control p-2" })
                     </div>
                     <div class="form-group col-md-4 align-self-end">
                         <input type="submit" name="actionButton" value="Filter" class="btn btn-outline-primary" />
-                        <a asp-action="Index" class="btn btn-outline-dark">Clear</a>
+                        <a asp-action="StockSummaryByBranch" class="btn btn-outline-dark">Clear</a>
                     </div>
                 </div>
             </div>

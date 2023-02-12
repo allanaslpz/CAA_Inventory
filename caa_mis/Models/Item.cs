@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace caa_mis.Models
 {
@@ -7,8 +8,9 @@ namespace caa_mis.Models
         public int ID { get; set; }
 
         [Display(Name = "Category")]
-        [Required(ErrorMessage = "You cannot leave the category blank.")]
+        [Required(ErrorMessage = "You cannot leave the category blank.")]        
         public int CategoryID { get; set; }
+        [JsonIgnore]
         public Category Category { get; set; }
 
         [Display(Name = "SKU Number")]
@@ -39,6 +41,7 @@ namespace caa_mis.Models
         [Display(Name = "Status")]
         [Required]
         public int ItemStatusID { get; set; }
+        [JsonIgnore]
         public ItemStatus ItemStatus { get; set; }        
 
         public ICollection<BulkItem> BulkItems { get; set; } = new HashSet<BulkItem>();
