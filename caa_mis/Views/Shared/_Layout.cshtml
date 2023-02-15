@@ -21,11 +21,11 @@
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Transaction
+                                Inventory
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Items" asp-action="Index">Products</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Index">Transactions</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Index">Receiving/Transfer</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
@@ -37,9 +37,10 @@
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Employees" asp-action="Index">Employees</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="TransactionTypes" asp-action="Index">Event Types</a></li>
                                 <li><hr /></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="ItemStatus" asp-action="Index">Product Statuses</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="TransactionStatus" asp-action="Index">Inventory Statuses</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Categories" asp-action="Index">Product Categories</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="TransactionStatus" asp-action="Index">Transaction Statuses</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="ItemStatus" asp-action="Index">Product Statuses</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Suppliers" asp-action="Index">Vendors</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">

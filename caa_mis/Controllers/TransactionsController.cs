@@ -274,8 +274,7 @@ namespace caa_mis.Controllers
                     {
                         throw;
                     }
-                }
-                return RedirectToAction(nameof(Index));
+                }                
             }
             PopulateDropDownLists(transaction);
             return View(transaction);
@@ -362,7 +361,7 @@ namespace caa_mis.Controllers
         {
             var a = _context.TransactionTypes.Select(s => new
             {
-                ID = s.ID,
+                s.ID,
                 Name = s.Name + " - Stock " + s.InOut.ToString(),
                 Name2 = s.Name
             });
