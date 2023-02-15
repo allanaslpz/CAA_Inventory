@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+caa_mis/CaaInventory.db
+caa_mis/CaaInventory.db-shm
+caa_mis/CaaInventory.db-wal
