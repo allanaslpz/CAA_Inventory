@@ -36,7 +36,7 @@ namespace caa_mis.Controllers
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
 
             //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-secondary";
+            ViewData["Filtering"] = "btn-outline-primary";
 
             PopulateDropDownLists();
 
@@ -382,21 +382,13 @@ namespace caa_mis.Controllers
             return RedirectToAction(nameof(Index));
         }
         
-        public async Task<IActionResult> StockSummaryByBranch(int? page, int? pageSizeID, int[] BranchID, string SearchString)
+        public async Task<IActionResult> StockSummaryByBranch(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
+                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "BranchName")
         {
-            //stockItemBranchID = BranchID; //it will used in DownloadStockItems
+            //List of sort options.
+            //NOTE: make sure this array has matching values to the column headings
+            string[] sortOptions = new[] { "BranchName", "ItemName", "Quantity" };
 
-            //var sumQ = from s in _context.StockSummaryByBranch                        
-            //           where (BranchID != null && s.BranchID == BranchID) || (BranchID == null)
-            //           orderby s.BranchName, s.ItemName
-            //           select s;
-
-            //ViewData["BranchID"] = BranchList(BranchID);
-
-            //int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "StockItemSummary");
-            //ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
-            //var pagedData = await PaginatedList<StockSummaryByBranchVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
-            //return View(pagedData);
             IQueryable<StockSummaryByBranchVM> sumQ = _context.StockSummaryByBranch;
 
             if (BranchID != null && BranchID.Length > 0)
@@ -412,9 +404,90 @@ namespace caa_mis.Controllers
             }
 
             ViewData["BranchID"] = BranchList(BranchID);
-
             // Save filtered data to cookie
             CachingFilteredData(sumQ);
+
+            //Before we sort, see if we have called for a change of filtering or sorting
+            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
+            {
+                page = 1;//Reset page to start
+
+                if (sortOptions.Contains(actionButton))//Change of sort is requested
+                {
+                    if (actionButton == sortField) //Reverse order on same field
+                    {
+                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
+                    }
+                    sortField = actionButton;//Sort by the button clicked
+                }
+                else //Sort by the controls in the filter area
+                {
+                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
+                    sortField = sortFieldID;
+                }
+            }
+
+            //Now we know which field and direction to sort by
+            if (sortField == "BranchName")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.BranchName);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.BranchName);
+                }
+            }
+            else if (sortField == "ItemName")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.ItemName);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.ItemName);
+                }
+            }
+            else if (sortField == "Quantity")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.Quantity);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.Quantity);
+                }
+            }
+            else //Sorting by Name
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.ItemName)
+                        .ThenBy(p => p.Quantity);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.ItemName)
+                        .ThenByDescending(p => p.Quantity);
+                }
+            }
+
+            //Set sort for next time
+            ViewData["sortField"] = sortField;
+            ViewData["sortDirection"] = sortDirection;
+            //SelectList for Sorting Options
+            //ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
 
             int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "StockItemSummary");
             ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
