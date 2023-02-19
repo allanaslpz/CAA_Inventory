@@ -9,8 +9,10 @@
     <a asp-action="DownloadStockItems" class="btn btn-info float-end">Download Stock Products</a>
 </p>
 <form asp-controller="Items" asp-action="StockSummaryByBranch" method="get">
+    <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
+    <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
     <div class="form-horizontal">
-        <button class="btn  @(ViewData["Filtering"]) btn-primary" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+        <button class="btn  @(ViewData["Filtering"]) btn-outline-primary" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
             Filter/Search
         </button>
         <div class="collapse" id="collapseFilter">
@@ -38,13 +40,13 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.BranchName)
+                    <input type="submit" name="actionButton" value="BranchName" class="btn btn-link" />
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.ItemName)
+                    <input type="submit" name="actionButton" value="ItemName" class="btn btn-link" />
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Quantity)
+                    <input type="submit" name="actionButton" value="Quantity" class="btn btn-link" />
                 </th>
             </tr>
         </thead>
