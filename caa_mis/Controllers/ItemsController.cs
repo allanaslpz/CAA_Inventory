@@ -36,7 +36,7 @@ namespace caa_mis.Controllers
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
 
             //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-secondary";
+            ViewData["Filtering"] = "btn-outline-primary";
 
             PopulateDropDownLists();
 
