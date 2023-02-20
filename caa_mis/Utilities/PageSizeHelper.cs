@@ -38,7 +38,7 @@ namespace caa_mis.Utilities
                 //Get the saved defalult if there is one
                 pageSize = Convert.ToInt32(httpContext.Request.Cookies["DefaultpageSizeValue"]);
             }
-            return (pageSize == 0) ? 5 : pageSize;//Neither Selected or in Cookie so go with default
+            return (pageSize == 0) ? 10 : pageSize;//Neither Selected or in Cookie so go with default
         }
         /// <summary>
         /// Creates a SelectList for choices for page size
