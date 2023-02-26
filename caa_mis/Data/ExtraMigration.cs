@@ -9,7 +9,8 @@ namespace caa_mis.Data
             migrationBuilder.Sql(
              @"
                     Create View StockSummaryByBranch as
-                    SELECT s.ID, b.ID as BranchID, b.Name as BranchName, i.Name as ItemName, s.Quantity 
+                    SELECT s.ID, b.ID as BranchID, b.Name as BranchName, 
+                            i.Name as ItemName, i.Cost as ItemCost, s.Quantity, s.MinLevel                        
                     FROM Items i
                     LEFT JOIN Stocks s on i.ID = s.ItemID
                     INNER JOIN Branches b on s.BranchID = b.ID
