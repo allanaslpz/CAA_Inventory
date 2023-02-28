@@ -33,10 +33,10 @@
         </div>
         <div class="col mb-3">
             <div class="card">
-                <a href="@Url.Action("StockSummaryByBranch","Items")" class="btn btn-primary stretched-link">
+                <a href="@Url.Action("Index","Reports")" class="btn btn-primary stretched-link">
                 <div class="card-body">
                         <i class="fas  fa-chart-line  fa-4x"></i>
-                        <p class="card-text"><h5>Inventory</h5></p>
+                        <p class="card-text"><h5>Reports</h5></p>
                 </div>
                 </a>
             </div>
@@ -53,7 +53,9 @@
                     <thead style="text-align:center">
                         <tr>
                             <th scope="col">Product</th>
+                            <th scope="col">Minimum</th>
                             <th scope="col">Quantity</th>
+                            <th scope="col">%</th>
                         </tr>
                     </thead>
                     <tbody style="text-align:center">
@@ -62,20 +64,12 @@
                         {
                                 <tr>
                                     <td>@item.ItemName</td>
+                                    <td>@item.MinLevel</td>
                                     <td>@item.TotalStock</td>
+                                    <td>@item.Percentage.ToString("P")</td>
                                 </tr>
 
                         }
-                        
-                               @* var percent = (stock.Quantity - stock.MinLevel).ToString();
-                                var test = ((float.Parse(percent)/100)).ToString("00.00%");
-                                <tr>
-                            <td>@item.Name</td>
-                            <td>@stock.Quantity</td>
-                            <td>@stock.MinLevel</td>
-                            <td>@test</td>
-                            </tr>*@
-
                     </tbody>
                 </table>
             </div>

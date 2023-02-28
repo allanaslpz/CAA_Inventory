@@ -40,10 +40,12 @@ namespace caa_mis.Controllers
                              select new
                              {
                                  ItemName = t.Key,
-                                 TotalStock = t.Sum(s => s.Quantity)
+                                 MinLevel = t.Min(s => s.MinLevel),
+                                 TotalStock = t.Sum(s => s.Quantity),
+                                 Percentage = 1 - ((double)t.Min(s => s.MinLevel)/ (double)t.Sum(s => s.Quantity))
                              };
 
-            ViewBag.TableItem = tableItems.OrderBy(s => s.TotalStock).Take(5);
+            ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage).Take(5);
 
             //future use 
             //var tableItems = _inventoryContext.Items.Include(s => s.Stocks)
