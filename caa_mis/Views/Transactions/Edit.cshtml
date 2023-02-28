@@ -16,12 +16,12 @@
     <div class="row">
         <div class="col-md-4 mb-3">
             <label asp-for="EmployeeID" class="control-label"></label>
-            <select asp-for="EmployeeID" class="form-control" asp-items="ViewBag.EmployeeID"></select>
+            <select asp-for="EmployeeID" class="form-control form-select" asp-items="ViewBag.EmployeeID"></select>
 
         </div>
         <div class="col-md-4 mb-3">
             <label asp-for="TransactionTypeID" class="control-label"></label>
-            <select asp-for="TransactionTypeID" class="form-control" asp-items="ViewBag.TransactionTypeID"></select>
+            <select asp-for="TransactionTypeID" class="form-control form-select" asp-items="ViewBag.TransactionTypeID"></select>
 
         </div>
         <div class="col-md-4 mb-3">
@@ -34,7 +34,7 @@
         <div class="col-md-4 mb-3">
             <div class="form-group">
                 <label asp-for="OriginID" class="control-label"></label>
-                <select asp-for="OriginID" class="form-control" asp-items="ViewBag.OriginID"></select>
+                <select asp-for="OriginID" class="form-control form-select" asp-items="ViewBag.OriginID"></select>
                 <span asp-validation-for="OriginID" class="text-danger"></span>
             </div>
 
@@ -42,7 +42,7 @@
         <div class="col-md-4 mb-3">
             <div class="form-group">
                 <label asp-for="DestinationID" class="control-label"></label>
-                <select asp-for="DestinationID" class="form-control" asp-items="ViewBag.DestinationID"></select>
+                <select asp-for="DestinationID" class="form-control form-select" asp-items="ViewBag.DestinationID"></select>
                 <span asp-validation-for="DestinationID" class="text-danger"></span>
             </div>
 
