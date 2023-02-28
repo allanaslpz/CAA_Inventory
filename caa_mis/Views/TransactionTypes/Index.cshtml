@@ -4,18 +4,19 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Event Type</h1>
+<h1>Event Types</h1>
 
 <p>
     <a asp-action="Create" class="btn btn-primary float-left">Create New</a>
+    <button class="btn @(ViewData["Filtering"]) btn-outline-primary float-end" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+        Filter/Search
+    </button>
 </p>
+
 <form asp-action="Index" method="get">
     <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
     <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
     <div class="form-horizontal">
-        <button class="btn @(ViewData["Filtering"]) btn-outline-primary" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
-            Filter/Search
-        </button>
         <div class="collapse" id="collapseFilter">
             <div class="card card-body bg-light">
                 <div class="row">
@@ -30,7 +31,7 @@
                                                name="sortDirectionCheck" />&nbsp;&nbsp;Descending
                                     </div>
                                 </div>
-                                <select name="sortFieldID" class="form-control" asp-items="ViewBag.sortFieldID"></select>
+                                <select name="sortFieldID" class="form-control form-select" asp-items="ViewBag.sortFieldID"></select>
                             </div>
                         </div>
                     </div>
@@ -44,11 +45,11 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label class="control-label">In/Out:</label>
-                        @Html.DropDownList("InOutStatus", new SelectList(Enum.GetValues(typeof(InOut))), "-- Select --", htmlAttributes: new { @class = "form-control" })
+                        @Html.DropDownList("InOutStatus", new SelectList(Enum.GetValues(typeof(InOut))), "-- Select --", htmlAttributes: new { @class = "form-control form-select" })
                     </div>
                     <div class="form-group col-md-4">
                         <label class="control-label">Filter by Status:</label>
-                        @Html.DropDownList("Status", new SelectList(Enum.GetValues(typeof(Archived))), "-- Select --", htmlAttributes: new { @class = "form-control" })
+                        @Html.DropDownList("Status", new SelectList(Enum.GetValues(typeof(Archived))), "-- Select --", htmlAttributes: new { @class = "form-control form-select" })
                     </div>
                     <div class="form-group col-md-4 align-self-end">
                         <input type="submit" name="actionButton" value="Apply" class="btn btn-outline-primary" />
