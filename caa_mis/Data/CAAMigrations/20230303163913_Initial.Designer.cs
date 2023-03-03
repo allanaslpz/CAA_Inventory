@@ -11,7 +11,7 @@ using caa_mis.Data;
 namespace caa_mis.Data.CAAMigrations
 {
     [DbContext(typeof(InventoryContext))]
-    [Migration("20230215142827_Initial")]
+    [Migration("20230303163913_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -168,6 +168,9 @@ namespace caa_mis.Data.CAAMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("ManufacturerID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MinLevel")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")

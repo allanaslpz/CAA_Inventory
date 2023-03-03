@@ -168,6 +168,9 @@ namespace caa_mis.Data.CAAMigrations
                     b.Property<int?>("ManufacturerID")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("MinLevel")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(255)

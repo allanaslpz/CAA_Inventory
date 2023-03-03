@@ -219,7 +219,7 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,CategoryID,SKUNumber,Name,Description,Scale,Cost,ManufacturerID,ItemStatusID")] Item item, IFormFile thePicture)
+        public async Task<IActionResult> Create([Bind("ID,CategoryID,SKUNumber,Name,Description,Scale,Cost,MinLevel,ManufacturerID,ItemStatusID")] Item item, IFormFile thePicture)
         {
             ViewDataReturnURL();
 
@@ -296,7 +296,7 @@ namespace caa_mis.Controllers
             }
            
             if (await TryUpdateModelAsync<Item>(itemToUpdate, "",
-                i => i.CategoryID, i => i.SKUNumber, i => i.Name, i => i.Description, i => i.Scale, i => i.Cost, i => i.ManufacturerID, i => i.ItemStatusID))
+                i => i.CategoryID, i => i.SKUNumber, i => i.Name, i => i.Description, i => i.Scale, i => i.Cost, i => i.MinLevel, i => i.ManufacturerID, i => i.ItemStatusID))
             {
                 try
                 {

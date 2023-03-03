@@ -48,16 +48,17 @@ namespace caa_mis.Data
                 if (!context.TransactionTypes.Any())
                 {
                     context.TransactionTypes.AddRange(
+               
                     new TransactionType
                     {
-                        Name = "St. Catharines Christmas Expo",
-                        Description = "CAA Winter 2022",
+                        Name = "Stock In",
+                        Description = "Stock In",
                         InOut = InOut.In
                     },
                     new TransactionType
                     {
-                        Name = "Thorold Spring Break",
-                        Description = "CAA Spring 2023",
+                        Name = "Stock Out",
+                        Description = "Stock Out",
                         InOut = InOut.Out
                     },
                     new TransactionType
@@ -150,6 +151,13 @@ namespace caa_mis.Data
                 if (!context.Branches.Any())
                 {
                     context.Branches.AddRange(
+                    new Branch
+                    {
+                        Name = "Others (Supplier / Head Office)",
+                        Location = "NA",
+                        Address = "NA",
+                        PhoneNumber = "NA",
+                    },
                     new Branch
                     {
                         Name = "CAA Niagara Falls",
