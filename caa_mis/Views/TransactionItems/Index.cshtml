@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<caa_mis.Models.TransactionItem>
 
 @{
-    ViewData["Title"] = "Transaction Items";
+    ViewData["Title"] = "Receive / Transfer Items";
     caa_mis.Models.Transaction transaction = (caa_mis.Models.Transaction)ViewBag.Transactions;
 }
 <h1>Transaction Details</h1>
@@ -46,14 +46,14 @@
     <div class="col-6">
         <dl class="row">
             <dt class="col-md-4">
-                @Html.DisplayNameFor(model => transaction.TransactionDate)
+               Date
             </dt>
             <dd class="col-md-8">
                 @Html.DisplayFor(model => transaction.TransactionDate)
             </dd>
             
             <dt class="col-md-4">
-                @Html.DisplayNameFor(model => transaction.TransactionStatus)
+                Status
             </dt>
             <dd class="col-md-8">
                 @Html.DisplayFor(model => transaction.TransactionStatus.Name)
@@ -103,7 +103,7 @@
                     </div>
                     <div class="form-group col-md-4">
                         <label class="control-label">Select Product:</label>
-                        @Html.DropDownList("ItemID", null, "All Transactions", htmlAttributes: new { @class = "form-control" })
+                        @Html.DropDownList("ItemID", null, "All Products", htmlAttributes: new { @class = "form-control" })
                     </div>
                     <div class="form-group col-md-4 align-self-end">
                         <input type="submit" name="actionButton" value="Apply" class="btn btn-outline-primary" />

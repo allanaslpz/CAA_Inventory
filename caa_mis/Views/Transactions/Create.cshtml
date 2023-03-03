@@ -17,12 +17,12 @@
             
         </div>
         <div class="col-md-4 mb-3">
-            <label asp-for="TransactionTypeID" class="control-label"></label>
+            <label asp-for="TransactionTypeID" class="control-label">Type</label>
             <select asp-for="TransactionTypeID" class="form-control form-select" asp-items="ViewBag.TransactionTypeID"></select>
             
         </div>
         <div class="col-md-4 mb-3">
-                <label asp-for="TransactionDate" class="control-label"></label>
+                <label asp-for="TransactionDate" class="control-label">Date</label>
             <input asp-for="TransactionDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required/>
             <span asp-validation-for="TransactionDate" class="text-danger"></span>
         </div>
