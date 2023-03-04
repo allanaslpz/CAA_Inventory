@@ -4,7 +4,7 @@
     ViewData["Title"] = "Receive / Transfer Items";
     caa_mis.Models.Transaction transaction = (caa_mis.Models.Transaction)ViewBag.Transactions;
 }
-<h1>Transaction Details</h1>
+<h1>Receive / Transfer Details</h1>
 <hr />
 <div class="row">
     <div class="col-6">
@@ -77,12 +77,11 @@
 </div>
 
 <form asp-action="Index" method="get">
-    <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
-    <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
     <div class="form-horizontal">
+        <input type="hidden" name="TransactionID" value="@transaction.ID" />
         <button class="btn @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
-            Filter/Search
-        </button>
+                Filter/Search
+            </button>
         <div class="collapse" id="collapseFilter">
             <div class="card card-body bg-light">
                 <div class="row">
@@ -107,7 +106,7 @@
                     </div>
                     <div class="form-group col-md-4 align-self-end">
                         <input type="submit" name="actionButton" value="Apply" class="btn btn-outline-primary" />
-                        <a asp-action="Index" class="btn btn-outline-dark">Clear</a>
+                        <a asp-action="Index" asp-route-TransactionID="@transaction.ID" class="btn btn-outline-dark">Clear</a>
                     </div>
                 </div>
             </div>
@@ -145,6 +144,9 @@
         </form>
     </div>
 <form asp-action="Index" method="get">
+    <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
+    <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
+    <input type="hidden" name="TransactionID" value="@transaction.ID" />
     <div class="container-fluid d-block d-lg-none">
         <div class="row">
             @foreach (var item in Model)
@@ -180,6 +182,9 @@
                 <thead>
                     <tr>
                         <th>
+                            <input type="submit" name="actionButton" value="SKU" class="btn btn-link" />
+                        </th>
+                        <th>
                             <input type="submit" name="actionButton" value="Product Name" class="btn btn-link" />
                         </th>
                         <th>
@@ -195,6 +200,9 @@
                     {
                         <tr>
                             <td>
+                                @Html.DisplayFor(modelItem => item.Item.SKUNumber)
+                            </td>
+                            <td>
                                 @Html.DisplayFor(modelItem => item.Item.Name)
                             </td>
                             <td>
@@ -205,7 +213,7 @@
                                     <span class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Edit Item">&#x270D;</span>
                                 </a>
                                 <a asp-controller="TransactionItems" asp-action="Delete" asp-route-id="@item.ID">
-                                    <span class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Delete Appointment">&#x274C;</span>
+                                    <span class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Delete Item">&#x274C;</span>
                                 </a>
                             </td>
                         </tr>
@@ -217,8 +225,12 @@
     <partial name="_PagingNavBar" />
 </form>
 <div>
-    <a asp-action="Edit" asp-controller="Transactions" asp-route-id="@transaction.ID">Edit</a> |
-    <a asp-action="Index" asp-controller="Transactions">Back to Transaction List</a>
+    <p>
+    <a asp-action="Edit" asp-controller="Transactions" asp-route-id="@transaction.ID" class="btn btn-primary">Edit</a>
+    <a asp-action="Release" asp-controller="Transactions" asp-route-id="@transaction.ID" class="btn btn-info">Release</a>
+    
+    <a asp-action="Index" asp-controller="Transactions" class="btn btn-secondary">Back to Transaction List</a>
+    </p>
 </div>
 @section Scripts {
     <script type="text/javascript">

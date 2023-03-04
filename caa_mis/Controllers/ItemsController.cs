@@ -42,7 +42,7 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost" };
+            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost" }; 
 
             //by default we want to show the active
             
