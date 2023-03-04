@@ -10,7 +10,6 @@ namespace caa_mis.Data
             : base(options)
         {
         }
-
         public DbSet<TransactionStatus> TransactionStatuses { get; set; }
         public DbSet<TransactionType> TransactionTypes { get; set; }
 

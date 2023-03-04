@@ -466,7 +466,15 @@ namespace caa_mis.Controllers
                         .ThenByDescending(p => p.DestinationName);
                 }
             }
+            //Set sort for next time
+            ViewData["sortField"] = sortField;
+            ViewData["sortDirection"] = sortDirection;
 
+            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "TransactionSummary");
+            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
+            var pagedData = await PaginatedList<TransactionSummaryVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
+            return View(pagedData);
+        }
         // GET: Transactions/Release/5
         public async Task<IActionResult> Release(int? id)
         {
@@ -487,8 +495,8 @@ namespace caa_mis.Controllers
             var items = from a in _context.TransactionItems
                 .Include(t => t.Item)
                 .OrderBy(t => t.Item.Name)
-                where a.TransactionID == id.GetValueOrDefault()
-                select a;
+                        where a.TransactionID == id.GetValueOrDefault()
+                        select a;
 
             ViewBag.Items = items.AsNoTracking();
 
@@ -510,12 +518,12 @@ namespace caa_mis.Controllers
             {
                 return Problem("Entity set 'InventoryContext.Transactions'  is null.");
             }
-            
+
             var status = await _context.TransactionStatuses
                 .FirstOrDefaultAsync(m => m.Name == "Released");
 
             var trans = new Transaction { ID = id, TransactionStatusID = status.ID };
-           
+
 
             if (ModelState.IsValid)
             {
@@ -523,20 +531,8 @@ namespace caa_mis.Controllers
                 _context.SaveChanges();
                 return Redirect(ViewData["returnURL"].ToString());
             }
-            
+
             return RedirectToAction(nameof(Index));
-        }
-
-            //Set sort for next time
-            ViewData["sortField"] = sortField;
-            ViewData["sortDirection"] = sortDirection;
-            //SelectList for Sorting Options
-            //ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
-
-            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "TransactionSummary");
-            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
-            var pagedData = await PaginatedList<TransactionSummaryVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
-            return View(pagedData);
         }
         private bool TransactionExists(int id)
         {
