@@ -4,16 +4,16 @@
     ViewData["Title"] = "Transactions Index";
 }
 
-<h1>Transactions</h1>
+<h1>Receiving/Transfer</h1>
 
 <p>
-    <a asp-action="Create">Create New Transaction</a>
+    <a asp-action="Create"class="btn btn-primary float-left">Create New Receiving/Transfer</a>
 </p>
 <form asp-action="Index" method="get">
     <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
     <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
     <div class="form-horizontal">
-        <button class="btn @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+        <button class="btn @(ViewData["Filtering"]) btn-outline-primary" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
             Filter/Search
         </button>
         <div class="collapse" id="collapseFilter">
@@ -35,7 +35,7 @@
                         </div>
                     </div>
                     <div class="form-group col-md-4">
-                        <label class="control-label">Select by Transaction Type:</label>
+                        <label class="control-label">Select by Type:</label>
                         @Html.DropDownList("TransactionTypeID", null, "All Transactions", htmlAttributes: new { @class = "form-control" })
                     </div>
                     <div class="form-group col-md-6">
@@ -44,13 +44,13 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="form-group col-md-4">
                         <label class="control-label">Filter by Destination:</label>
                         @Html.DropDownList("DestinationID", null, "All Destination", htmlAttributes: new { @class = "form-control" })
                     </div>
                     <div class="form-group col-md-4">
                         <label class="control-label">Search Description:</label>
-                        @Html.TextBox("SearchString", null, new { @class = "form-control" })
+                        @Html.TextBox("SearchString", null, htmlAttributes: new { @class = "form-control p-2" })
                     </div>
                     <div class="form-group col-md-4 align-self-end">
                         <input type="submit" name="actionButton" value="Apply" class="btn btn-outline-primary" />
@@ -94,7 +94,7 @@
                         </figure>
                         <div class="card-footer">
                             <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                            <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@item.ID">Transaction Details</a> |
+                            <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@item.ID">Details</a> |
                             <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
                         </div>
                     </div>
@@ -120,10 +120,10 @@
                             <input type="submit" name="actionButton" value="Destination" class="btn btn-link" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Transaction Date" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Date" class="btn btn-link" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Transaction Status" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Status" class="btn btn-link" />
                         </th>
                         <th></th>
                     </tr>
@@ -153,7 +153,7 @@
                             <td>
 
                                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                                <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@item.ID">Transaction Details</a> |
+                                <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@item.ID">Details</a> |
                                 <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
 
                             </td>

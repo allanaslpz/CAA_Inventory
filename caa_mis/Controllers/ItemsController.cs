@@ -16,17 +16,13 @@ using System.Drawing;
 using caa_mis.ViewModels;
 using Microsoft.CodeAnalysis.Operations;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
-
-// Michael Barde
-//email: michael.barde@gmail.com
-
+using Newtonsoft.Json;
 
 namespace caa_mis.Controllers
 {
     public class ItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
-        private static int? stockItemBranchID;
         public ItemsController(InventoryContext context)
         {
             _context = context;
@@ -40,13 +36,13 @@ namespace caa_mis.Controllers
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
 
             //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-secondary";
+            ViewData["Filtering"] = "btn-outline-primary";
 
             PopulateDropDownLists();
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost" };
+            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost" }; 
 
             //by default we want to show the active
             
@@ -171,6 +167,9 @@ namespace caa_mis.Controllers
             //SelectList for Sorting Options
             ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
 
+            // Save filtered data to cookie
+            CachingFilteredData(inventory);
+
             //Handle Paging
             int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "Items");
             ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
@@ -220,7 +219,7 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,CategoryID,SKUNumber,Name,Description,Scale,Cost,ManufacturerID,ItemStatusID")] Item item, IFormFile thePicture)
+        public async Task<IActionResult> Create([Bind("ID,CategoryID,SKUNumber,Name,Description,Scale,Cost,MinLevel,ManufacturerID,ItemStatusID")] Item item, IFormFile thePicture)
         {
             ViewDataReturnURL();
 
@@ -297,7 +296,7 @@ namespace caa_mis.Controllers
             }
            
             if (await TryUpdateModelAsync<Item>(itemToUpdate, "",
-                i => i.CategoryID, i => i.SKUNumber, i => i.Name, i => i.Description, i => i.Scale, i => i.Cost, i => i.ManufacturerID, i => i.ItemStatusID))
+                i => i.CategoryID, i => i.SKUNumber, i => i.Name, i => i.Description, i => i.Scale, i => i.Cost, i => i.MinLevel, i => i.ManufacturerID, i => i.ItemStatusID))
             {
                 try
                 {
@@ -383,16 +382,112 @@ namespace caa_mis.Controllers
             return RedirectToAction(nameof(Index));
         }
         
-        public async Task<IActionResult> StockSummaryByBranch(int? page, int? pageSizeID, int? BranchID)
+        public async Task<IActionResult> StockSummaryByBranch(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
+                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "BranchName")
         {
-            stockItemBranchID = BranchID; //it will used in DownloadStockItems
+            //List of sort options.
+            //NOTE: make sure this array has matching values to the column headings
+            string[] sortOptions = new[] { "BranchName", "ItemName", "Quantity" };
 
-            var sumQ = from s in _context.StockSummaryByBranch                        
-                       where (BranchID != null && s.BranchID == BranchID) || (BranchID == null)
-                       orderby s.BranchName, s.ItemName
-                       select s;
-            
+            IQueryable<StockSummaryByBranchVM> sumQ = _context.StockSummaryByBranch;
+
+            if (BranchID != null && BranchID.Length > 0)
+            {
+                sumQ = sumQ.Where(s => BranchID.Contains(s.BranchID));
+                ViewData["Filtering"] = "btn-danger";
+            }
+
+            if (!String.IsNullOrEmpty(SearchString))
+            {
+                sumQ = sumQ.Where(i => i.ItemName.ToUpper().Contains(SearchString.ToUpper()));
+                ViewData["Filtering"] = "btn-danger";
+            }
+
             ViewData["BranchID"] = BranchList(BranchID);
+            // Save filtered data to cookie
+            CachingFilteredData(sumQ);
+
+            //Before we sort, see if we have called for a change of filtering or sorting
+            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
+            {
+                page = 1;//Reset page to start
+
+                if (sortOptions.Contains(actionButton))//Change of sort is requested
+                {
+                    if (actionButton == sortField) //Reverse order on same field
+                    {
+                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
+                    }
+                    sortField = actionButton;//Sort by the button clicked
+                }
+                else //Sort by the controls in the filter area
+                {
+                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
+                    sortField = sortFieldID;
+                }
+            }
+
+            //Now we know which field and direction to sort by
+            if (sortField == "BranchName")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.BranchName);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.BranchName);
+                }
+            }
+            else if (sortField == "ItemName")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.ItemName);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.ItemName);
+                }
+            }
+            else if (sortField == "Quantity")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.Quantity);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.Quantity);
+                }
+            }
+            else //Sorting by Name
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.ItemName)
+                        .ThenBy(p => p.Quantity);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.ItemName)
+                        .ThenByDescending(p => p.Quantity);
+                }
+            }
+
+            //Set sort for next time
+            ViewData["sortField"] = sortField;
+            ViewData["sortDirection"] = sortDirection;
+            //SelectList for Sorting Options
+            //ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
 
             int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "StockItemSummary");
             ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
@@ -413,7 +508,7 @@ namespace caa_mis.Controllers
                 .OrderBy(m => m.Name), "ID", "Name", selectedId);
         }
 
-        private SelectList BranchList(int? selectedId)
+        private SelectList BranchList(int[] selectedId)
         {
             return new SelectList(_context.Branches
                 .OrderBy(d => d.Name), "ID", "Name", selectedId);
@@ -441,6 +536,11 @@ namespace caa_mis.Controllers
         private void ViewDataReturnURL()
         {
             ViewData["returnURL"] = MaintainURL.ReturnURL(HttpContext, ControllerName());
+        }
+
+        private void CachingFilteredData<T>(IQueryable<T> sumQ)
+        {
+            FilteredDataCaching.SaveFilteredData(HttpContext, "filteredData", sumQ, 120);
         }
         private async Task AddPicture(Item item, IFormFile thePicture)
         {
@@ -487,167 +587,154 @@ namespace caa_mis.Controllers
 
         public IActionResult DownloadItems()
         {
-            var items = from a in _context.Items
-                        .Include(a => a.Category)
-                        .Include(a => a.ItemStatus)
-                        .Include(a => a.Manufacturer)
+            //retrieving filtered data from cookie
+            var filteredData = JsonConvert.DeserializeObject<IEnumerable<Item>>(
+            Request.Cookies["filteredData"]);
+
+            var items = from a in filteredData
                         orderby a.Name ascending
                         select new
                         {
-                            ID = a.ID,
+                            a.ID,
                             SKU_Number = a.SKUNumber,
                             Item = a.Name,
-                            Description = a.Description,
-                            Category = a.Category.Name,                            
-                            Manufacturer = a.Manufacturer.Name,
-                            Cost = a.Cost,
+                            a.Description,
+                            a.CategoryID,
+                            a.ItemStatusID,
+                            a.Cost,
                         };
             int numRows = items.Count();
 
             if (numRows > 0)
             {
-                using (ExcelPackage excel = new ExcelPackage())
+                using ExcelPackage excel = new();
+                var workSheet = excel.Workbook.Worksheets.Add("Products");
+
+                workSheet.Cells[3, 1].LoadFromCollection(items, true);
+                //Style fee column for currency
+                workSheet.Column(7).Style.Numberformat.Format = "###,##0.00";
+
+                //Make Date and Item Bold
+                workSheet.Cells[4, 3, numRows + 3, 3].Style.Font.Bold = true;
+
+                using (ExcelRange totalcost = workSheet.Cells[numRows + 4, 7])
                 {
-                    var workSheet = excel.Workbook.Worksheets.Add("Items");
+                    totalcost.Formula = "Sum(" + workSheet.Cells[4, 7].Address + ":" + workSheet.Cells[numRows + 3, 7].Address + ")";
+                    totalcost.Style.Font.Bold = true;
+                    totalcost.Style.Numberformat.Format = "$###,##0.00";
+                }
 
-                    workSheet.Cells[3, 1].LoadFromCollection(items, true);
-                    //Style fee column for currency
-                    workSheet.Column(7).Style.Numberformat.Format = "###,##0.00";
+                //Set Style and backgound colour of headings
+                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 7])
+                {
+                    headings.Style.Font.Bold = true;
+                    var fill = headings.Style.Fill;
+                    fill.PatternType = ExcelFillStyle.Solid;
+                    fill.BackgroundColor.SetColor(Color.LightCyan);
+                }
 
-                    //Make Date and Item Bold
-                    workSheet.Cells[4, 3, numRows + 3, 3].Style.Font.Bold = true;
-
-                    using (ExcelRange totalcost = workSheet.Cells[numRows + 4, 7])
-                    {
-                        totalcost.Formula = "Sum(" + workSheet.Cells[4, 7].Address + ":" + workSheet.Cells[numRows + 3, 7].Address + ")";
-                        totalcost.Style.Font.Bold = true;
-                        totalcost.Style.Numberformat.Format = "$###,##0.00";
-                    }
-
-                    //Set Style and backgound colour of headings
-                    using (ExcelRange headings = workSheet.Cells[3, 1, 3, 7])
-                    {
-                        headings.Style.Font.Bold = true;
-                        var fill = headings.Style.Fill;
-                        fill.PatternType = ExcelFillStyle.Solid;
-                        fill.BackgroundColor.SetColor(Color.LightCyan);
-                    }
-
-                    //Autofit columns
-                    workSheet.Cells.AutoFitColumns();
+                //Autofit columns
+                workSheet.Cells.AutoFitColumns();
 
 
-                    //Add a title and timestamp at the top of the report
-                    workSheet.Cells[1, 1].Value = "Item Report";
-                    using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 7])
-                    {
-                        Rng.Merge = true; //Merge columns start and end range
-                        Rng.Style.Font.Bold = true; //Font should be bold
-                        Rng.Style.Font.Size = 18;
-                        Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                    }
-                    //Since the time zone where the server is running can be different, adjust to 
-                    //Local for us.
-                    DateTime utcDate = DateTime.UtcNow;
-                    TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-                    DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
-                    using (ExcelRange Rng = workSheet.Cells[2, 6])
-                    {
-                        Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
-                            localDate.ToShortDateString();
+                //Add a title and timestamp at the top of the report
+                workSheet.Cells[1, 1].Value = "Product Report";
+                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 7])
+                {
+                    Rng.Merge = true; //Merge columns start and end range
+                    Rng.Style.Font.Bold = true; //Font should be bold
+                    Rng.Style.Font.Size = 18;
+                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                }
+                //Since the time zone where the server is running can be different, adjust to 
+                //Local for us.
+                DateTime utcDate = DateTime.UtcNow;
+                TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+                DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
+                using (ExcelRange Rng = workSheet.Cells[2, 6])
+                {
+                    Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
+                        localDate.ToShortDateString();
 
-                        Rng.Style.Font.Size = 12;
-                        Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                    }
+                    Rng.Style.Font.Size = 12;
+                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                }
 
 
-                    try
-                    {
-                        Byte[] theData = excel.GetAsByteArray();
-                        string filename = "Items.xlsx";
-                        string mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                        return File(theData, mimeType, filename);
-                    }
-                    catch (Exception)
-                    {
-                        return BadRequest("Could not build and download the file.");
-                    }
+                try
+                {
+                    Byte[] theData = excel.GetAsByteArray();
+                    string filename = "Products.xlsx";
+                    string mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    return File(theData, mimeType, filename);
+                }
+                catch (Exception)
+                {
+                    return BadRequest("Could not build and download the file.");
                 }
             }
             return NotFound("No data.");
         }
         public IActionResult DownloadStockItems()
         {
-            var items = from a in _context.StockSummaryByBranch
-                        where (stockItemBranchID != null && a.BranchID == stockItemBranchID) || (stockItemBranchID == null)
-                        orderby a.BranchName, a.ItemName
-                        select new
-                        {
-                            ID = a.ID,
-                            BranchID = a.BranchID,
-                            BranchName = a.BranchName,
-                            ItemName = a.ItemName,
-                            Quantity = a.Quantity
-                        };
+            //retrieving filtered data from cookie
+            var items = JsonConvert.DeserializeObject<IEnumerable<StockSummaryByBranchVM>>(
+            Request.Cookies["filteredData"]);
 
             int numRows = items.Count();
 
             if (numRows > 0)
             {
-                using (ExcelPackage excel = new ExcelPackage())
+                using ExcelPackage excel = new();
+                var workSheet = excel.Workbook.Worksheets.Add("StockProducts");
+
+                workSheet.Cells[3, 1].LoadFromCollection(items, true);
+
+                //Set Style and backgound colour of headings
+                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 5])
                 {
-                    var workSheet = excel.Workbook.Worksheets.Add("StockItems");
+                    headings.Style.Font.Bold = true;
+                    var fill = headings.Style.Fill;
+                    fill.PatternType = ExcelFillStyle.Solid;
+                    fill.BackgroundColor.SetColor(Color.LightCyan);
+                }
 
-                    workSheet.Cells[3, 1].LoadFromCollection(items, true);
+                //Autofit columns
+                workSheet.Cells.AutoFitColumns();
 
-                    //Set Style and backgound colour of headings
-                    using (ExcelRange headings = workSheet.Cells[3, 1, 3, 5])
-                    {
-                        headings.Style.Font.Bold = true;
-                        var fill = headings.Style.Fill;
-                        fill.PatternType = ExcelFillStyle.Solid;
-                        fill.BackgroundColor.SetColor(Color.LightCyan);
-                    }
+                //Add a title and timestamp at the top of the report
+                workSheet.Cells[1, 1].Value = "Stock Product Report";
+                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 5])
+                {
+                    Rng.Merge = true; //Merge columns start and end range
+                    Rng.Style.Font.Bold = true; //Font should be bold
+                    Rng.Style.Font.Size = 18;
+                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                }
+                //Since the time zone where the server is running can be different, adjust to 
+                //Local for us.
+                DateTime utcDate = DateTime.UtcNow;
+                TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+                DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
+                using (ExcelRange Rng = workSheet.Cells[2, 5])
+                {
+                    Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
+                        localDate.ToShortDateString();
 
-                    //Autofit columns
-                    workSheet.Cells.AutoFitColumns();
+                    Rng.Style.Font.Size = 12;
+                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                }
 
-
-                    //Add a title and timestamp at the top of the report
-                    workSheet.Cells[1, 1].Value = "Stock Item Report";
-                    using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 5])
-                    {
-                        Rng.Merge = true; //Merge columns start and end range
-                        Rng.Style.Font.Bold = true; //Font should be bold
-                        Rng.Style.Font.Size = 18;
-                        Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                    }
-                    //Since the time zone where the server is running can be different, adjust to 
-                    //Local for us.
-                    DateTime utcDate = DateTime.UtcNow;
-                    TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-                    DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
-                    using (ExcelRange Rng = workSheet.Cells[2, 5])
-                    {
-                        Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
-                            localDate.ToShortDateString();
-
-                        Rng.Style.Font.Size = 12;
-                        Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                    }
-
-
-                    try
-                    {
-                        Byte[] theData = excel.GetAsByteArray();
-                        string filename = "StockItems.xlsx";
-                        string mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                        return File(theData, mimeType, filename);
-                    }
-                    catch (Exception)
-                    {
-                        return BadRequest("Could not build and download the file.");
-                    }
+                try
+                {
+                    Byte[] theData = excel.GetAsByteArray();
+                    string filename = "StockProducts.xlsx";
+                    string mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    return File(theData, mimeType, filename);
+                }
+                catch (Exception)
+                {
+                    return BadRequest("Could not build and download the file.");
                 }
             }
             return NotFound("No data.");

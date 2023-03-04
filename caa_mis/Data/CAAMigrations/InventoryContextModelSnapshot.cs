@@ -15,7 +15,7 @@ namespace caa_mis.Data.CAAMigrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.13");
 
             modelBuilder.Entity("caa_mis.Models.Branch", b =>
                 {
@@ -166,6 +166,9 @@ namespace caa_mis.Data.CAAMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("ManufacturerID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MinLevel")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")

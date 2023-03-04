@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using caa_mis.Data;
 using caa_mis.Models;
+using caa_mis.ViewModels;
 using caa_mis.Utilities;
 
 namespace caa_mis.Controllers
@@ -36,7 +37,7 @@ namespace caa_mis.Controllers
             }
 
             //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-secondary";
+            ViewData["Filtering"] = "btn-outline-primary";
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
@@ -163,7 +164,7 @@ namespace caa_mis.Controllers
             }
             ViewData["TransactionName"] = TransactionName;
 
-            TransactionItem a = new TransactionItem()
+            TransactionItem a = new()
             {
                 TransactionID = TransactionID.GetValueOrDefault()
             };
@@ -177,17 +178,24 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,ItemID,TransactionID,Quantity")] TransactionItem transactionItem)
+        public async Task<IActionResult> Create([Bind("ID,ProductID,TransactionID,Quantity")] TransactionItemVM transactionItem)
         {
             ViewDataReturnURL();
 
+            TransactionItem tI = new TransactionItem
+            {
+                ID = transactionItem.ID,
+                TransactionID = transactionItem.TransactionID,
+                ItemID = transactionItem.ProductID,
+                Quantity = transactionItem.Quantity
+            };
             if (ModelState.IsValid)
             {
-                _context.Add(transactionItem);
+                _context.Add(tI);
                 await _context.SaveChangesAsync();
                 return Redirect(ViewData["returnURL"].ToString());
             }
-            PopulateDropDownLists(transactionItem);
+            PopulateDropDownLists(tI);
             return View(transactionItem);
         }
 
@@ -244,8 +252,7 @@ namespace caa_mis.Controllers
                     {
                         throw;
                     }
-                }
-                return RedirectToAction(nameof(Index));
+                }                
             }
 
             PopulateDropDownLists(transactionItem);
@@ -303,6 +310,17 @@ namespace caa_mis.Controllers
             }
 
             return View(transactionItem);
+        }
+        
+        [Produces("application/json")]
+        public IActionResult SearchProduct(string term = null)
+        {
+
+            var result = _context.Items
+                .AsNoTracking()
+                .Where(p => p.Name.ToUpper().Contains(term.ToUpper()) || p.SKUNumber.Contains(term) );
+                
+            return Json(result);
         }
 
         private bool TransactionItemExists(int id)

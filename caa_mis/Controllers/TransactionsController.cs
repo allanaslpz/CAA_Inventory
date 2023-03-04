@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.Utilities;
+using caa_mis.ViewModels;
 
 namespace caa_mis.Controllers
 {
@@ -27,13 +28,14 @@ namespace caa_mis.Controllers
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
             //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-secondary";
+            ViewData["Filtering"] = "btn-outline-primary";
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
             string[] sortOptions = new[] { "Type", "Description", "Origin", "Destination", "Transaction Date", "Transaction Status" };
 
             PopulateDropDownLists();
+            ViewDataReturnURL();
 
             var inventory = _context.Transactions
                 .Include(t => t.Destination)
@@ -182,6 +184,8 @@ namespace caa_mis.Controllers
         // GET: Transactions/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            ViewDataReturnURL();
+
             if (id == null || _context.Transactions == null)
             {
                 return NotFound();
@@ -216,7 +220,7 @@ namespace caa_mis.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,EmployeeID,TransactionStatusID,TransactionTypeID,OriginID,DestinationID,TransactionDate,ReceivedDate,Description,Shipment")] Transaction transaction)
         {
-            
+            ViewDataReturnURL();
             if (ModelState.IsValid)
             {
                 _context.Add(transaction);
@@ -230,6 +234,7 @@ namespace caa_mis.Controllers
         // GET: Transactions/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            ViewDataReturnURL();
             if (id == null || _context.Transactions == null)
             {
                 return NotFound();
@@ -251,6 +256,7 @@ namespace caa_mis.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ID,EmployeeID,TransactionStatusID,TransactionTypeID,OriginID,DestinationID,TransactionDate,ReceivedDate,Description,Shipment")] Transaction transaction)
         {
+            ViewDataReturnURL();
             if (id != transaction.ID)
             {
                 return NotFound();
@@ -274,8 +280,7 @@ namespace caa_mis.Controllers
                     {
                         throw;
                     }
-                }
-                return RedirectToAction(nameof(Index));
+                }                
             }
             PopulateDropDownLists(transaction);
             return View(transaction);
@@ -284,6 +289,7 @@ namespace caa_mis.Controllers
         // GET: Transactions/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
+            ViewDataReturnURL();
             if (id == null || _context.Transactions == null)
             {
                 return NotFound();
@@ -309,6 +315,7 @@ namespace caa_mis.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            ViewDataReturnURL();
             if (_context.Transactions == null)
             {
                 return Problem("Entity set 'InventoryContext.Transactions'  is null.");
@@ -320,6 +327,66 @@ namespace caa_mis.Controllers
             }
             
             await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Transactions/Release/5
+        public async Task<IActionResult> Release(int? id)
+        {
+            ViewDataReturnURL();
+            if (id == null || _context.Transactions == null)
+            {
+                return NotFound();
+            }
+
+            var transaction = await _context.Transactions
+                .Include(t => t.Destination)
+                .Include(t => t.Employee)
+                .Include(t => t.Origin)
+                .Include(t => t.TransactionStatus)
+                .Include(t => t.TransactionType)
+                .FirstOrDefaultAsync(m => m.ID == id);
+
+            var items = from a in _context.TransactionItems
+                .Include(t => t.Item)
+                .OrderBy(t => t.Item.Name)
+                where a.TransactionID == id.GetValueOrDefault()
+                select a;
+
+            ViewBag.Items = items.AsNoTracking();
+
+            if (transaction == null)
+            {
+                return NotFound();
+            }
+
+            return View(transaction);
+        }
+
+        // POST: Transactions/Release/5
+        [HttpPost, ActionName("Release")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReleaseConfirmed(int id)
+        {
+            ViewDataReturnURL();
+            if (_context.Transactions == null)
+            {
+                return Problem("Entity set 'InventoryContext.Transactions'  is null.");
+            }
+            
+            var status = await _context.TransactionStatuses
+                .FirstOrDefaultAsync(m => m.Name == "Released");
+
+            var trans = new Transaction { ID = id, TransactionStatusID = status.ID };
+           
+
+            if (ModelState.IsValid)
+            {
+                _context.Transactions.Attach(trans).Property(x => x.TransactionStatusID).IsModified = true;
+                _context.SaveChanges();
+                return Redirect(ViewData["returnURL"].ToString());
+            }
+            
             return RedirectToAction(nameof(Index));
         }
 
@@ -362,7 +429,7 @@ namespace caa_mis.Controllers
         {
             var a = _context.TransactionTypes.Select(s => new
             {
-                ID = s.ID,
+                s.ID,
                 Name = s.Name + " - Stock " + s.InOut.ToString(),
                 Name2 = s.Name
             });

@@ -7,14 +7,14 @@
 <h1>Products</h1>
 
 <p>
-    <a asp-action="Create">Create New Product</a>
-    <a asp-action="DownloadItems" class="btn btn-info float-end">Download Item Report</a>
+    <a asp-action="Create" class="btn btn-primary float-left">Create New Product</a>
+    <a asp-action="DownloadItems" class="btn btn-info float-end">Download Product</a>
 </p>
 <form asp-action="Index" method="get">
     <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
     <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
     <div class="form-horizontal">
-        <button class="btn @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+        <button class="btn @(ViewData["Filtering"]) btn-outline-primary" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
             Filter/Search
         </button>
         <div class="collapse" id="collapseFilter">
@@ -47,11 +47,11 @@
                 <div class="row">
                     <div class="col-md-4">
                         <label class="control-label">Search SKU:</label>
-                        @Html.TextBox("SearchSKU", null, new { @class = "form-control" })
+                        @Html.TextBox("SearchSKU", null, new { @class = "form-control p-2" })
                     </div>
                     <div class="form-group col-md-4">
                         <label class="control-label">Search Product Name:</label>
-                        @Html.TextBox("SearchString", null, new { @class = "form-control" })
+                        @Html.TextBox("SearchString", null, new { @class = "form-control p-2" })
                     </div>
                     <div class="form-group col-md-4 align-self-end">
                         <input type="submit" name="actionButton" value="Apply" class="btn btn-outline-primary" />
