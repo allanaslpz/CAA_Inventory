@@ -19,23 +19,20 @@ namespace caa_mis.Data
 
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<TransactionItem> TransactionItems { get; set; }
-
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Branch> Branches { get; set; }
-
         public DbSet<Item> Items { get; set; }
-
         public DbSet<ItemSupplier> ItemSuppliers { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ItemStatus> ItemStatuses { get; set; }
         public DbSet<Manufacturer> Manufacturers { get; set; }
         public DbSet<ItemPhoto> ItemPhotos { get; set; }
-        public DbSet<ItemThumbnail> ItemThumbnails { get; set; }
-        
+        public DbSet<ItemThumbnail> ItemThumbnails { get; set; }        
         public DbSet<Employee> Employees { get; set; }
         public DbSet<StockSummaryByBranchVM> StockSummaryByBranch { get; set; }
         public DbSet<TransactionSummaryVM> TransactionSummary { get; set; }
+        public DbSet<TransactionItemSummaryVM> TransactionItemSummary { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Item>()
@@ -48,6 +45,16 @@ namespace caa_mis.Data
             modelBuilder
                 .Entity<StockSummaryByBranchVM>()
                 .ToView(nameof(StockSummaryByBranch))
+                .HasKey(a => a.ID);
+
+            modelBuilder
+                .Entity<TransactionSummaryVM>()
+                .ToView(nameof(TransactionSummary))
+                .HasKey(a => a.ID);
+
+            modelBuilder
+                .Entity<TransactionItemSummaryVM>()
+                .ToView(nameof(TransactionItemSummary))
                 .HasKey(a => a.ID);
 
             modelBuilder.Entity<TransactionStatus>()
