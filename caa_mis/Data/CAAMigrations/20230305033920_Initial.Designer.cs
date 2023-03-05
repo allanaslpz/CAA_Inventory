@@ -11,11 +11,7 @@ using caa_mis.Data;
 namespace caa_mis.Data.CAAMigrations
 {
     [DbContext(typeof(InventoryContext))]
-<<<<<<<< HEAD:caa_mis/Data/CAAMigrations/20230302185355_Initial.Designer.cs
-    [Migration("20230302185355_Initial")]
-========
-    [Migration("20230303163913_Initial")]
->>>>>>>> origin/DEV:caa_mis/Data/CAAMigrations/20230303163913_Initial.Designer.cs
+    [Migration("20230305033920_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
