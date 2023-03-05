@@ -41,6 +41,9 @@ namespace caa_mis.Models
         [Display(Name = "Status")]
         [Required]
         public int ItemStatusID { get; set; }
+        [Display(Name = "Minimum Stock Level")]
+        [Required]
+        public int MinLevel { get; set; }
         [JsonIgnore]
         public ItemStatus ItemStatus { get; set; }        
 
