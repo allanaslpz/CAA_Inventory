@@ -36,6 +36,8 @@ namespace caa_mis.Models
         [EmailAddress]
         public string Email { get; set; }
 
+        public Archived Status { get; set; }
+
         public ICollection<ItemSupplier> ItemSuppliers { get; set; } = new HashSet<ItemSupplier>();
 
     }

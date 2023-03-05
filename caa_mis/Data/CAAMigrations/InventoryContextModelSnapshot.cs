@@ -366,6 +366,9 @@ namespace caa_mis.Data.CAAMigrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("SupplierName")
                         .IsRequired()
                         .HasMaxLength(255)
