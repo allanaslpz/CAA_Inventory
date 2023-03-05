@@ -18,7 +18,7 @@ namespace caa_mis.Data
             try
             {
                 // Uncomment to Delete database and apply a new Migration //
-                context.Database.EnsureDeleted();
+                //context.Database.EnsureDeleted();
                 // Create database if it does not exist and apply the Migration //
                 context.Database.Migrate();
 
