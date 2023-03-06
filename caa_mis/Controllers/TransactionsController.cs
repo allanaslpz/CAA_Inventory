@@ -52,7 +52,7 @@ namespace caa_mis.Controllers
             }
             if (TransactionStatusID.HasValue)
             {
-                inventory = inventory.Where(p => p.TransactionTypeID == TransactionTypeID);
+                inventory = inventory.Where(p => p.TransactionStatusID == TransactionStatusID);
                 ViewData["Filtering"] = "btn-danger";
             }
             if (DestinationID.HasValue)
