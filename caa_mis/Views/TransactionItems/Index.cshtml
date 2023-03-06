@@ -115,34 +115,37 @@
 </form>
     <br />
     <hr />
-    <div id="productDetails">
-        <h5>Add Product</h5>
-        <form asp-action="Create">
-            <div class="row alert alert-light">
-                <div class="col-sm">
-                    <div class="form-group col-sm col-lg">
-                        <label for="ProductName" clas="bold">Product</label>
-                        <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Start typing a product..." required>
-                        <input type="hidden" name="ProductID" id="ProductID" />
-                    <input type="hidden" name="TransactionID" id="TransactionID" value="@transaction.ID" />
+    @if (transaction.TransactionStatus.Name == "Open")
+    {
+        <div id="productDetails">
+            <h5>Add Product</h5>
+            <form asp-action="Create">
+                <div class="row alert alert-light">
+                    <div class="col-sm">
+                        <div class="form-group col-sm col-lg">
+                            <label for="ProductName" clas="bold">Product</label>
+                            <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Start typing a product..." required>
+                            <input type="hidden" name="ProductID" id="ProductID" />
+                        <input type="hidden" name="TransactionID" id="TransactionID" value="@transaction.ID" />
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm">
-                    <div class="form-group col-sm col-lg">
-                        <label for="Quantity">Quantity</label>
+                    <div class="col-sm">
+                        <div class="form-group col-sm col-lg">
+                            <label for="Quantity">Quantity</label>
                        
-                        <input type="number" class="form-control" id="Quantity" name="Quantity" placeholder="1" value="1" required>
+                            <input type="number" class="form-control" id="Quantity" name="Quantity" placeholder="1" value="1" required>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group col-sm col-lg">
+                        <br />
+                            <input type="submit" value="Add Product" class="btn btn-primary" />
+                        </div>
                     </div>
                 </div>
-                <div class="col-sm">
-                    <div class="form-group col-sm col-lg">
-                    <br />
-                        <input type="submit" value="Add Product" class="btn btn-primary" />
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
+            </form>
+        </div>
+        }
 <form asp-action="Index" method="get">
     <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
     <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
@@ -167,9 +170,11 @@
                             </figcaption>
                         </figure>
                         <div class="card-footer">
-                            <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                            <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                            <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                            @if (transaction.TransactionStatus.Name == "Open")
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> 
+                                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                            }
                         </div>
                     </div>
                 </div>
@@ -190,9 +195,12 @@
                         <th>
                             <input type="submit" name="actionButton" value="Quantity" class="btn btn-link" />
                         </th>
-                        <th>
-                           Action
-                        </th>
+                        @if (transaction.TransactionStatus.Name == "Open")
+                        {
+                            <th>
+                                Action
+                            </th>
+                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -208,14 +216,19 @@
                             <td>
                                 @Html.DisplayFor(modelItem => item.Quantity)
                             </td>
+                            @if (transaction.TransactionStatus.Name == "Open")
+                            {
                             <td>
-                                <a asp-controller="TransactionItems" asp-action="Edit" asp-route-id="@item.ID">
-                                    <span class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Edit Item">&#x270D;</span>
-                                </a>
-                                <a asp-controller="TransactionItems" asp-action="Delete" asp-route-id="@item.ID">
-                                    <span class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Delete Item">&#x274C;</span>
-                                </a>
-                            </td>
+                                
+                                    <a asp-controller="TransactionItems" asp-action="Edit" asp-route-id="@item.ID">
+                                        <span class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Edit Item">&#x270D;</span>
+                                    </a>
+                                    <a asp-controller="TransactionItems" asp-action="Delete" asp-route-id="@item.ID">
+                                        <span class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Delete Item">&#x274C;</span>
+                                    </a>
+
+                                </td>
+                            }
                         </tr>
                     }
                 </tbody>
@@ -226,9 +239,12 @@
 </form>
 <div>
     <p>
-    <a asp-action="Edit" asp-controller="Transactions" asp-route-id="@transaction.ID" class="btn btn-primary">Edit</a>
-    <a asp-action="Release" asp-controller="Transactions" asp-route-id="@transaction.ID" class="btn btn-info">Release</a>
-    
+    @if (transaction.TransactionStatus.Name == "Open")
+    {
+            <a asp-action="Edit" asp-controller="Transactions" asp-route-id="@transaction.ID" class="btn btn-primary">Edit</a>
+            <a asp-action="Release" asp-controller="Transactions" asp-route-id="@transaction.ID" class="btn btn-info">Release</a>
+    }
+
     <a asp-action="Index" asp-controller="Transactions" class="btn btn-secondary">Back to Transaction List</a>
     </p>
 </div>
