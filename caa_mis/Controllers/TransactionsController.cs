@@ -9,6 +9,10 @@ using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.Utilities;
 using caa_mis.ViewModels;
+using Newtonsoft.Json;
+using OfficeOpenXml.Style;
+using OfficeOpenXml;
+using System.Drawing;
 
 namespace caa_mis.Controllers
 {
@@ -329,7 +333,148 @@ namespace caa_mis.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> TransactionSummary(int? page, int? pageSizeID, int[] OriginID, int[] DestinationID, string sortDirectionCheck,
+                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "OriginName")
+        {
+            //List of sort options.
+            //NOTE: make sure this array has matching values to the column headings
+            string[] sortOptions = new[] { "EmployeeName", "OriginName", "DestinationName", "TransactionStatusName", "TransactionTypeName",
+                                            "TransactionDate", "ReceivedDate", "Description", "Shipment"};
 
+            IQueryable<TransactionSummaryVM> sumQ = _context.TransactionSummary;
+
+            if (OriginID != null && OriginID.Length > 0)
+            {
+                sumQ = sumQ.Where(s => OriginID.Contains(s.OriginID));
+                ViewData["Filtering"] = "btn-danger";
+            }
+            if (DestinationID != null && DestinationID.Length > 0)
+            {
+                sumQ = sumQ.Where(s => DestinationID.Contains(s.OriginID));
+                ViewData["Filtering"] = "btn-danger";
+            }
+
+            if (!String.IsNullOrEmpty(SearchString))
+            {
+                sumQ = sumQ.Where(i => i.EmployeeName.ToUpper().Contains(SearchString.ToUpper()));
+                ViewData["Filtering"] = "btn-danger";
+            }
+
+            ViewData["OriginID"] = BranchList(OriginID);
+            ViewData["DestinationID"] = BranchList(DestinationID);
+            // Save filtered data to cookie
+            CachingFilteredData(sumQ);
+
+            //Before we sort, see if we have called for a change of filtering or sorting
+            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
+            {
+                page = 1;//Reset page to start
+
+                if (sortOptions.Contains(actionButton))//Change of sort is requested
+                {
+                    if (actionButton == sortField) //Reverse order on same field
+                    {
+                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
+                    }
+                    sortField = actionButton;//Sort by the button clicked
+                }
+                else //Sort by the controls in the filter area
+                {
+                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
+                    sortField = sortFieldID;
+                }
+            }
+
+            //Now we know which field and direction to sort by
+            if (sortField == "EmployeeName")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.EmployeeName);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.EmployeeName);
+                }
+            }
+            else if (sortField == "OriginName")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.OriginName);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.OriginName);
+                }
+            }
+            else if (sortField == "DestinationName")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.DestinationName);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.DestinationName);
+                }
+            }
+            else if (sortField == "TransactionStatusName")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.TransactionStatusName);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.TransactionStatusName);
+                }
+            }
+            else if (sortField == "TransactionTypeName")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.TransactionTypeName);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.TransactionTypeName);
+                }
+            }
+            else //Sorting by Name
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.OriginName)
+                        .ThenBy(p => p.DestinationName);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.OriginName)
+                        .ThenByDescending(p => p.DestinationName);
+                }
+            }
+            //Set sort for next time
+            ViewData["sortField"] = sortField;
+            ViewData["sortDirection"] = sortDirection;
+
+            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "TransactionSummary");
+            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
+            var pagedData = await PaginatedList<TransactionSummaryVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
+            return View(pagedData);
+        }
         // GET: Transactions/Release/5
         public async Task<IActionResult> Release(int? id)
         {
@@ -350,8 +495,8 @@ namespace caa_mis.Controllers
             var items = from a in _context.TransactionItems
                 .Include(t => t.Item)
                 .OrderBy(t => t.Item.Name)
-                where a.TransactionID == id.GetValueOrDefault()
-                select a;
+                        where a.TransactionID == id.GetValueOrDefault()
+                        select a;
 
             ViewBag.Items = items.AsNoTracking();
 
@@ -373,12 +518,12 @@ namespace caa_mis.Controllers
             {
                 return Problem("Entity set 'InventoryContext.Transactions'  is null.");
             }
-            
+
             var status = await _context.TransactionStatuses
                 .FirstOrDefaultAsync(m => m.Name == "Released");
 
             var trans = new Transaction { ID = id, TransactionStatusID = status.ID };
-           
+
 
             if (ModelState.IsValid)
             {
@@ -386,10 +531,9 @@ namespace caa_mis.Controllers
                 _context.SaveChanges();
                 return Redirect(ViewData["returnURL"].ToString());
             }
-            
+
             return RedirectToAction(nameof(Index));
         }
-
         private bool TransactionExists(int id)
         {
           return _context.Transactions.Any(e => e.ID == id);
@@ -439,6 +583,12 @@ namespace caa_mis.Controllers
                 .TransactionTypes
                 .OrderBy(m => m.Name), "ID", "Name", selectedId);*/
         }
+        private SelectList BranchList(int[] selectedId)
+        {
+            return new SelectList(_context.Branches
+                .OrderBy(d => d.Name), "ID", "Name", selectedId);
+        }
+
         private void PopulateDropDownLists(Transaction transaction = null)
         {
             ViewData["DestinationID"] = DestinationSelectList(transaction?.DestinationID);
@@ -447,5 +597,74 @@ namespace caa_mis.Controllers
             ViewData["TransactionStatusID"] = TransactionStatusList(transaction?.TransactionStatusID);
             ViewData["TransactionTypeID"] = TransactionTypeList(transaction?.TransactionTypeID);
         }
+        private void CachingFilteredData<T>(IQueryable<T> sumQ)
+        {
+            FilteredDataCaching.SaveFilteredData(HttpContext, "filteredData", sumQ, 120);
+        }
+        public IActionResult DownloadTransactions()
+        {
+            //retrieving filtered data from cookie
+            var items = JsonConvert.DeserializeObject<IEnumerable<TransactionSummaryVM>>(
+            Request.Cookies["filteredData"]);
+
+            int numRows = items.Count();
+
+            if (numRows > 0)
+            {
+                using ExcelPackage excel = new();
+                var workSheet = excel.Workbook.Worksheets.Add("ProductsTransaction");
+
+                workSheet.Cells[3, 1].LoadFromCollection(items, true);
+
+                //Set Style and backgound colour of headings
+                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 15])
+                {
+                    headings.Style.Font.Bold = true;
+                    var fill = headings.Style.Fill;
+                    fill.PatternType = ExcelFillStyle.Solid;
+                    fill.BackgroundColor.SetColor(Color.LightCyan);
+                }
+
+                //Autofit columns
+                workSheet.Cells.AutoFitColumns();
+
+                //Add a title and timestamp at the top of the report
+                workSheet.Cells[1, 1].Value = "Product Transaction Report";
+                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 15])
+                {
+                    Rng.Merge = true; //Merge columns start and end range
+                    Rng.Style.Font.Bold = true; //Font should be bold
+                    Rng.Style.Font.Size = 18;
+                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                }
+                //Since the time zone where the server is running can be different, adjust to 
+                //Local for us.
+                DateTime utcDate = DateTime.UtcNow;
+                TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+                DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
+                using (ExcelRange Rng = workSheet.Cells[2, 15])
+                {
+                    Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
+                        localDate.ToShortDateString();
+
+                    Rng.Style.Font.Size = 12;
+                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
+                }
+
+                try
+                {
+                    Byte[] theData = excel.GetAsByteArray();
+                    string filename = "ProductsTransaction.xlsx";
+                    string mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    return File(theData, mimeType, filename);
+                }
+                catch (Exception)
+                {
+                    return BadRequest("Could not build and download the file.");
+                }
+            }
+            return NotFound("No data.");
+        }
+
     }
 }
