@@ -10,8 +10,8 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace caa_mis.Data
 {
-	public static class CAAInitializer
-	{
+    public static class CAAInitializer
+    {
         public static void Seed(IApplicationBuilder applicationBuilder)
         {
             InventoryContext context = applicationBuilder.ApplicationServices.CreateScope()
@@ -22,13 +22,10 @@ namespace caa_mis.Data
                 //context.Database.EnsureDeleted();
                 // Create database if it does not exist and apply the Migration //
                 context.Database.Migrate();
-<<<<<<< HEAD
+
+                Random random = new Random();
 
                 // Inventory Status Seed Data //
-=======
-                Random random = new Random();
-                // Transaction Status Seed Data //
->>>>>>> origin/DEV
                 if (!context.TransactionStatuses.Any())
                 {
                     context.TransactionStatuses.AddRange(
@@ -63,7 +60,7 @@ namespace caa_mis.Data
                 if (!context.TransactionTypes.Any())
                 {
                     context.TransactionTypes.AddRange(
-               
+
                     new TransactionType
                     {
                         Name = "Stock In",
@@ -556,7 +553,7 @@ namespace caa_mis.Data
                         Quantity = 9,
                     });
                     context.SaveChanges();
-                }                
+                }
 
                 // Transaction Seed Data //
                 if (!context.Transactions.Any())
