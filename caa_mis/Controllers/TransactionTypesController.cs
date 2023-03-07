@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.Utilities;
-using System.Transactions;
 
 namespace caa_mis.Controllers
 {
@@ -35,7 +30,7 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "FirstName", "LastName", "In/Out", "Status" };
+            string[] sortOptions = new[] { "Name", "Description", "In/Out", "Status" };
 
             var transactionTypes = _context.TransactionTypes
                                     .AsNoTracking();
