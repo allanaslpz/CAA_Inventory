@@ -27,6 +27,8 @@
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Items" asp-action="Index">Products</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Index">Receiving/Transfer</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Index">Incomming Transfers</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Index">Initial Inventory</a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
@@ -50,6 +52,8 @@
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Items" asp-action="StockSummaryByBranch">Stock Summary By Branch</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="TransactionSummary">Transfer Summary</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="TransactionItems" asp-action="TransactionItemSummary">Transferred Product Summary</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">

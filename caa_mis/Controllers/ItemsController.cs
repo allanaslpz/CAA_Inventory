@@ -42,7 +42,7 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost" };
+            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost" }; 
 
             //by default we want to show the active
             
@@ -219,7 +219,7 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,CategoryID,SKUNumber,Name,Description,Scale,Cost,ManufacturerID,ItemStatusID")] Item item, IFormFile thePicture)
+        public async Task<IActionResult> Create([Bind("ID,CategoryID,SKUNumber,Name,Description,Scale,Cost,MinLevel,ManufacturerID,ItemStatusID")] Item item, IFormFile thePicture)
         {
             ViewDataReturnURL();
 
@@ -296,7 +296,7 @@ namespace caa_mis.Controllers
             }
            
             if (await TryUpdateModelAsync<Item>(itemToUpdate, "",
-                i => i.CategoryID, i => i.SKUNumber, i => i.Name, i => i.Description, i => i.Scale, i => i.Cost, i => i.ManufacturerID, i => i.ItemStatusID))
+                i => i.CategoryID, i => i.SKUNumber, i => i.Name, i => i.Description, i => i.Scale, i => i.Cost, i => i.MinLevel, i => i.ManufacturerID, i => i.ItemStatusID))
             {
                 try
                 {
@@ -387,7 +387,7 @@ namespace caa_mis.Controllers
         {
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "BranchName", "ItemName", "Quantity" };
+            string[] sortOptions = new[] { "BranchName", "ItemName", "ItemCost", "Quantity", "MinLevel" };
 
             IQueryable<StockSummaryByBranchVM> sumQ = _context.StockSummaryByBranch;
 
@@ -454,6 +454,19 @@ namespace caa_mis.Controllers
                         .OrderBy(p => p.ItemName);
                 }
             }
+            else if (sortField == "ItemCost")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.ItemCost);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.ItemCost);
+                }
+            }
             else if (sortField == "Quantity")
             {
                 if (sortDirection == "asc")
@@ -465,6 +478,19 @@ namespace caa_mis.Controllers
                 {
                     sumQ = sumQ
                         .OrderByDescending(p => p.Quantity);
+                }
+            }
+            else if (sortField == "MinLevel")
+            {
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.MinLevel);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.MinLevel);
                 }
             }
             else //Sorting by Name
@@ -691,7 +717,7 @@ namespace caa_mis.Controllers
                 workSheet.Cells[3, 1].LoadFromCollection(items, true);
 
                 //Set Style and backgound colour of headings
-                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 5])
+                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 7])
                 {
                     headings.Style.Font.Bold = true;
                     var fill = headings.Style.Fill;
@@ -704,7 +730,7 @@ namespace caa_mis.Controllers
 
                 //Add a title and timestamp at the top of the report
                 workSheet.Cells[1, 1].Value = "Stock Product Report";
-                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 5])
+                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 7])
                 {
                     Rng.Merge = true; //Merge columns start and end range
                     Rng.Style.Font.Bold = true; //Font should be bold
@@ -716,7 +742,7 @@ namespace caa_mis.Controllers
                 DateTime utcDate = DateTime.UtcNow;
                 TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
                 DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
-                using (ExcelRange Rng = workSheet.Cells[2, 5])
+                using (ExcelRange Rng = workSheet.Cells[2, 7])
                 {
                     Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
                         localDate.ToShortDateString();

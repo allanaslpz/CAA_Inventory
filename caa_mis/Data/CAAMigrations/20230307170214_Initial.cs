@@ -95,7 +95,8 @@ namespace caa_mis.Data.CAAMigrations
                     Province = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     PostalCode = table.Column<string>(type: "TEXT", maxLength: 6, nullable: false),
                     Phone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false)
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -146,7 +147,8 @@ namespace caa_mis.Data.CAAMigrations
                     Scale = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
                     Cost = table.Column<decimal>(type: "TEXT", nullable: false),
                     ManufacturerID = table.Column<int>(type: "INTEGER", nullable: true),
-                    ItemStatusID = table.Column<int>(type: "INTEGER", nullable: false)
+                    ItemStatusID = table.Column<int>(type: "INTEGER", nullable: false),
+                    MinLevel = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
