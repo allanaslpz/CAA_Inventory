@@ -95,7 +95,8 @@ namespace caa_mis.Data.CAAMigrations
                     Province = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     PostalCode = table.Column<string>(type: "TEXT", maxLength: 6, nullable: false),
                     Phone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false)
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -522,6 +523,7 @@ namespace caa_mis.Data.CAAMigrations
                 name: "IX_Transactions_TransactionTypeID",
                 table: "Transactions",
                 column: "TransactionTypeID");
+
             ExtraMigration.Steps(migrationBuilder);
         }
 
