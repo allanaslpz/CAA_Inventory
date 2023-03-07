@@ -285,6 +285,94 @@ namespace caa_mis.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        
+        // GET: Transactions/Release/5
+        public async Task<IActionResult> Release(int? id)
+        {
+            ViewDataReturnURL();
+            if (id == null || _context.Transactions == null)
+            {
+                return NotFound();
+            }
+
+            var transaction = await _context.Bulks
+                .Include(b => b.Branch)
+                .Include(b => b.Employee)
+                .Include(b => b.TransactionStatus)
+                .FirstOrDefaultAsync(m => m.ID == id);
+
+            var items = from a in _context.BulkItems
+                .Include(t => t.Item)
+                .OrderBy(t => t.Item.Name)
+                        where a.BulkID == id.GetValueOrDefault()
+                        select a;
+
+            ViewBag.Items = items.AsNoTracking();
+
+            if (transaction == null)
+            {
+                return NotFound();
+            }
+
+            return View(transaction);
+        }
+
+        // POST: Transactions/Release/5
+        [HttpPost, ActionName("Release")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReleaseConfirmed(int id)
+        {
+            ViewDataReturnURL();
+            if (_context.Bulks == null)
+            {
+                return Problem("Entity set 'InventoryContext.Bulk'  is null.");
+            }
+
+            var status = await _context.TransactionStatuses
+                .FirstOrDefaultAsync(m => m.Name == "Released");
+
+            var trans = new Bulk { ID = id, TransactionStatusID = status.ID };
+            ReleaseTransaction(id);
+            if (ModelState.IsValid)
+            {
+                _context.Bulks.Attach(trans).Property(x => x.TransactionStatusID).IsModified = true;
+                _context.SaveChanges();
+
+                return Redirect(ViewData["returnURL"].ToString());
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+        public void ReleaseTransaction(int id)
+        {
+            //get the transaction details
+            var bulk = _context.Bulks
+                .AsNoTracking()
+               .FirstOrDefault(m => m.ID == id);
+            //get the transaction items
+            var bulkItems = _context.BulkItems
+                .Where(m => m.BulkID == id)
+                .AsNoTracking();
+
+            //delete all in stocks in branch
+            var stocks = _context.Stocks
+                .Where(m => m.BranchID == bulk.BranchID)
+                .AsNoTracking();
+            _context.Stocks.RemoveRange(stocks);
+            
+            //insert bulk items to stocks using bulk.BranchID
+            foreach (var item in bulkItems)
+            {
+                var stock = new Stock
+                {
+                    ItemID = item.ItemID,
+                    Quantity = item.Quantity,
+                    BranchID = bulk.BranchID
+                };
+                _context.Stocks.Add(stock);
+            }
+            _context.SaveChanges(); 
+        }
 
         private bool BulkExists(int id)
         {

@@ -9,6 +9,7 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
+            <input type="hidden" name="BulkID" value="@Model.BulkID" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ID" />
             <div class="form-group">
@@ -16,11 +17,7 @@
                 <select asp-for="ItemID" class="form-control" asp-items="ViewBag.ItemID"></select>
                 <span asp-validation-for="ItemID" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="BulkID" class="control-label"></label>
-                <select asp-for="BulkID" class="form-control" asp-items="ViewBag.BulkID"></select>
-                <span asp-validation-for="BulkID" class="text-danger"></span>
-            </div>
+           
             <div class="form-group">
                 <label asp-for="Quantity" class="control-label"></label>
                 <input asp-for="Quantity" class="form-control" />
@@ -34,7 +31,7 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a href='@ViewData["returnURL"]'>Back to List</a>
 </div>
 
 @section Scripts {

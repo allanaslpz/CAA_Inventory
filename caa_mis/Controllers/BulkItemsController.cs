@@ -46,15 +46,17 @@ namespace caa_mis.Controllers
 
             PopulateDropDownLists();
             
-            var item = _context.BulkItems
+            var item = from a in _context.BulkItems
                 .Include(b => b.Bulk)
-                .Include(b => b.Item).
-                AsNoTracking();
-            
+                .Include(t => t.Item)
+                       where a.BulkID == BulkID.GetValueOrDefault()
+                       select a;
+
             var transactions = _context.Bulks
                 .Include(b => b.Branch)
                 .Include(b => b.Employee)
                 .Include(b => b.TransactionStatus)
+                .Where(p => p.ID == BulkID.GetValueOrDefault())
                 .AsNoTracking()
                 .FirstOrDefault();
 
@@ -227,6 +229,7 @@ namespace caa_mis.Controllers
                 {
                     _context.Update(bulkItem);
                     await _context.SaveChangesAsync();
+                    return Redirect(ViewData["returnURL"].ToString());
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -239,7 +242,7 @@ namespace caa_mis.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                
             }
             PopulateDropDownLists(bulkItem);
             return View(bulkItem);
