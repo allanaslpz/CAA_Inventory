@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using caa_mis.Data;
 
@@ -10,9 +11,14 @@ using caa_mis.Data;
 namespace caa_mis.Data.CAAMigrations
 {
     [DbContext(typeof(InventoryContext))]
-    partial class InventoryContextModelSnapshot : ModelSnapshot
+<<<<<<<< HEAD:caa_mis/Data/CAAMigrations/20230307225259_Initial.Designer.cs
+    [Migration("20230307225259_Initial")]
+========
+    [Migration("20230308112708_Initial")]
+>>>>>>>> origin/DEV:caa_mis/Data/CAAMigrations/20230308112708_Initial.Designer.cs
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.14");
