@@ -25,13 +25,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddControllersWithViews();
 
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-builder.Services.AddControllers()
-    .AddJsonOptions(o =>
-    {
-        o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-    });
-
+ 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
