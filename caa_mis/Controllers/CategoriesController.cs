@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.Utilities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace caa_mis.Controllers
 {
+    [Authorize(Roles = "Admin, Supervisor")]
     public class CategoriesController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -16,8 +18,8 @@ namespace caa_mis.Controllers
             _context = context;
         }
 
-        // GET: TransactionTypes
-        public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchName, string SearchDesc, InOut? InOutStatus, Archived? Status,
+        // GET: Categories
+        public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchName, string SearchDesc, Archived? Status,
             int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Name")
         {
             //Clear the sort/filter/paging URL Cookie for Controller
@@ -45,12 +47,12 @@ namespace caa_mis.Controllers
             {
                 category = category.Where(p => p.Description.ToUpper().Contains(SearchDesc.ToUpper()));
                 ViewData["Filtering"] = "btn-danger";
-            }        
-            //if (Status != null)
-            //{
-            //    category = category.Where(p => p.Status == Status);
-            //    ViewData["Filtering"] = "btn-danger";
-            //}
+            }
+            if (Status != null)
+            {
+                category = category.Where(p => p.Status == Status);
+                ViewData["Filtering"] = "btn-danger";
+            }
 
             //Before we sort, see if we have called for a change of filtering or sorting
             if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
@@ -98,20 +100,20 @@ namespace caa_mis.Controllers
                     category = category
                         .OrderBy(p => p.Description);
                 }
-            }           
-            //else if (sortField == "Status")
-            //{
-            //    if (sortDirection == "asc")
-            //    {
-            //        transactionTypes = transactionTypes
-            //            .OrderBy(p => p.Status);
-            //    }
-            //    else
-            //    {
-            //        transactionTypes = transactionTypes
-            //            .OrderByDescending(p => p.Status);
-            //    }
-            //}
+            }
+            else if (sortField == "Status")
+            {
+                if (sortDirection == "asc")
+                {
+                    category = category
+                        .OrderBy(p => p.Status);
+                }
+                else
+                {
+                    category = category
+                        .OrderByDescending(p => p.Status);
+                }
+            }
             else //Sorting by Name
             {
                 if (sortDirection == "asc")
@@ -142,70 +144,70 @@ namespace caa_mis.Controllers
             return View(pagedData);
         }
 
-        // GET: TransactionTypes/Details/5
+        // GET: Categories/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.TransactionTypes == null)
+            if (id == null || _context.Categories == null)
             {
                 return NotFound();
             }
 
-            var transactionType = await _context.TransactionTypes
+            var category = await _context.Categories
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (transactionType == null)
+            if (category == null)
             {
                 return NotFound();
             }
 
-            return View(transactionType);
+            return View(category);
         }
 
-        // GET: TransactionTypes/Create
+        // GET: Categories/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: TransactionTypes/Create
+        // POST: Categories/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Description,InOut")] TransactionType transactionType)
+        public async Task<IActionResult> Create([Bind("ID,Name,Description,InOut")] Category category)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(transactionType);
+                _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(transactionType);
+            return View(category);
         }
 
-        // GET: TransactionTypes/Edit/5
+        // GET: Categories/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.TransactionTypes == null)
+            if (id == null || _context.Categories == null)
             {
                 return NotFound();
             }
 
-            var transactionType = await _context.TransactionTypes.FindAsync(id);
-            if (transactionType == null)
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null)
             {
                 return NotFound();
             }
-            return View(transactionType);
+            return View(category);
         }
 
-        // POST: TransactionTypes/Edit/5
+        // POST: Category/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description,InOut,Status")] TransactionType transactionType)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description,InOut,Status")] Category category)
         {
-            if (id != transactionType.ID)
+            if (id != category.ID)
             {
                 return NotFound();
             }
@@ -214,12 +216,12 @@ namespace caa_mis.Controllers
             {
                 try
                 {
-                    _context.Update(transactionType);
+                    _context.Update(category);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TransactionTypeExists(transactionType.ID))
+                    if (!CategoryExists(category.ID))
                     {
                         return NotFound();
                     }
@@ -230,62 +232,52 @@ namespace caa_mis.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(transactionType);
+            return View(category);
         }
 
-        // GET: TransactionTypes/Archive/5
+        // GET: Categories/Archive/5
         public async Task<IActionResult> Archive(int? id)
         {
-            if (id == null || _context.TransactionTypes == null)
+            if (id == null || _context.Categories == null)
             {
                 return NotFound();
             }
 
-            var transactionType = await _context.TransactionTypes
+            var category = await _context.Categories
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (transactionType == null)
+            if (category == null)
             {
                 return NotFound();
             }
 
-            return View(transactionType);
+            return View(category);
         }
 
-        // POST: TransactionTypes/Archive/5
+        // POST: Categories/Archive/5
         [HttpPost, ActionName("Archive")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ArchiveConfirmed(int id)
         {
-            if (_context.TransactionTypes == null)
+            if (_context.Categories == null)
             {
-                return Problem("Entity set 'InventoryContext.TransactionTypes'  is null.");
+                return Problem("Entity set 'InventoryContext.Categories'  is null.");
             }
 
-            var transactionType = await _context.TransactionTypes.FindAsync(id);
+            var category = await _context.Categories.FindAsync(id);
 
-            if (transactionType != null)
+            if (category != null)
             {
-                transactionType.Status = Archived.Disabled;
+                category.Status = Archived.Disabled;
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TransactionTypeExists(int id)
+        private bool CategoryExists(int id)
         {
-            return _context.TransactionTypes.Any(e => e.ID == id);
+            return _context.Categories.Any(e => e.ID == id);
         }
-
-        private SelectList InOutSelectList(InOut selectedId)
-        {
-            return new SelectList(_context.TransactionTypes
-                .OrderBy(d => d.InOut), "ID", "In/Out", selectedId);
-        }
-
-        private void PopulateDropDownLists(TransactionType transaction = null)
-        {
-            ViewData["InOutStatus"] = InOutSelectList((InOut)(transaction?.InOut));
-        }
+        
     }
 }

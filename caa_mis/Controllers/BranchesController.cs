@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.Utilities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace caa_mis.Controllers
 {
+    [Authorize(Roles = "Admin, Supervisor")]
     public class BranchesController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -16,8 +18,8 @@ namespace caa_mis.Controllers
             _context = context;
         }
 
-        // GET: TransactionTypes
-        public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchName, string SearchDesc, Archived? Status,
+        // GET: Branch
+        public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchName, string SearchLoc, Archived? Status,
             int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Name")
         {
             //Clear the sort/filter/paging URL Cookie for Controller
@@ -41,9 +43,9 @@ namespace caa_mis.Controllers
                 branches = branches.Where(p => p.Name.ToUpper().Contains(SearchName.ToUpper()));
                 ViewData["Filtering"] = "btn-danger";
             }
-            if (!String.IsNullOrEmpty(SearchDesc))
+            if (!String.IsNullOrEmpty(SearchLoc))
             {
-                branches = branches.Where(p => p.Location.ToUpper().Contains(SearchDesc.ToUpper()));
+                branches = branches.Where(p => p.Location.ToUpper().Contains(SearchLoc.ToUpper()));
                 ViewData["Filtering"] = "btn-danger";
             }            
             if (Status != null)
@@ -142,70 +144,70 @@ namespace caa_mis.Controllers
             return View(pagedData);
         }
 
-        // GET: TransactionTypes/Details/5
+        // GET: Branch/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.TransactionTypes == null)
+            if (id == null || _context.Branches == null)
             {
                 return NotFound();
             }
 
-            var transactionType = await _context.TransactionTypes
+            var branches = await _context.Branches
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (transactionType == null)
+            if (branches == null)
             {
                 return NotFound();
             }
 
-            return View(transactionType);
+            return View(branches);
         }
 
-        // GET: TransactionTypes/Create
+        // GET: Branch/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: TransactionTypes/Create
+        // POST: Branch/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Description,InOut")] TransactionType transactionType)
+        public async Task<IActionResult> Create([Bind("ID,Name,Description,InOut")] Branch branches)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(transactionType);
+                _context.Add(branches);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(transactionType);
+            return View(branches);
         }
 
-        // GET: TransactionTypes/Edit/5
+        // GET: Branch/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.TransactionTypes == null)
+            if (id == null || _context.Branches == null)
             {
                 return NotFound();
             }
 
-            var transactionType = await _context.TransactionTypes.FindAsync(id);
-            if (transactionType == null)
+            var branches = await _context.Branches.FindAsync(id);
+            if (branches == null)
             {
                 return NotFound();
             }
-            return View(transactionType);
+            return View(branches);
         }
 
-        // POST: TransactionTypes/Edit/5
+        // POST: Branches/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description,InOut,Status")] TransactionType transactionType)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description,InOut,Status")] Branch branches)
         {
-            if (id != transactionType.ID)
+            if (id != branches.ID)
             {
                 return NotFound();
             }
@@ -214,12 +216,12 @@ namespace caa_mis.Controllers
             {
                 try
                 {
-                    _context.Update(transactionType);
+                    _context.Update(branches);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TransactionTypeExists(transactionType.ID))
+                    if (!BranchExists(branches.ID))
                     {
                         return NotFound();
                     }
@@ -230,51 +232,51 @@ namespace caa_mis.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(transactionType);
+            return View(branches);
         }
 
-        // GET: TransactionTypes/Archive/5
+        // GET: Branch/Archive/5
         public async Task<IActionResult> Archive(int? id)
         {
-            if (id == null || _context.TransactionTypes == null)
+            if (id == null || _context.Branches == null)
             {
                 return NotFound();
             }
 
-            var transactionType = await _context.TransactionTypes
+            var branches = await _context.Branches
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (transactionType == null)
+            if (branches == null)
             {
                 return NotFound();
             }
 
-            return View(transactionType);
+            return View(branches);
         }
 
-        // POST: TransactionTypes/Archive/5
+        // POST: Branch/Archive/5
         [HttpPost, ActionName("Archive")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ArchiveConfirmed(int id)
         {
-            if (_context.TransactionTypes == null)
+            if (_context.Branches == null)
             {
-                return Problem("Entity set 'InventoryContext.TransactionTypes'  is null.");
+                return Problem("Entity set 'InventoryContext.Branches'  is null.");
             }
 
-            var transactionType = await _context.TransactionTypes.FindAsync(id);
+            var branches = await _context.Branches.FindAsync(id);
 
-            if (transactionType != null)
+            if (branches != null)
             {
-                transactionType.Status = Archived.Disabled;
+                branches.Status = Archived.Disabled;
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TransactionTypeExists(int id)
+        private bool BranchExists(int id)
         {
-            return _context.TransactionTypes.Any(e => e.ID == id);
+            return _context.Branches.Any(e => e.ID == id);
         }
         
     }

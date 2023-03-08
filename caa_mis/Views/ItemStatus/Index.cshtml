@@ -79,12 +79,12 @@
                                 <dd class="col-9">
                                     @Html.DisplayFor(modelItem => item.Description)
                                 </dd>
-                        @*        <dt class="col-3 text-truncate">
+                                <dt class="col-3 text-truncate">
                                     @Html.DisplayNameFor(model => model.Status)
                                 </dt>
                                 <dd class="col-9">
                                     @Html.DisplayFor(modelItem => item.Status)
-                                </dd>*@
+                                </dd>
                             </dl>
                             <div class="card-footer">
                                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
@@ -101,14 +101,15 @@
                 <thead>
                     <tr>
                         <th>
-                            <input type="submit" name="actionButton" value="First Name" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Name" class="btn btn-link" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Last Name" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Description" class="btn btn-link" />
                         </th>
                         <th>
                             <input type="submit" name="actionButton" value="Status" class="btn btn-link" />
-                        </th>                      
+                        </th>
+                        <th>
                     </tr>
                 </thead>
                 <tbody>
@@ -119,6 +120,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
+            </td>
+             <td>
+                @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
