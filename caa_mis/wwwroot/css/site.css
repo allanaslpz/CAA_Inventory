@@ -37,3 +37,108 @@ label {
 h1,h2,h3,h4 {
     padding-top: 20px;
 }
+
+/*HelpBar*/
+main {
+    transition: transform .7s ease-in-out;
+}
+
+.move-to-left {
+    transform: translateX(-400px);
+}
+
+.move-to-left-partly {
+    transform: translateX(-200px);
+}
+
+.sidebar {
+    height: 100%;
+    width: 400px;
+    position: fixed;
+    top: 5rem;
+    z-index: 1;
+    right: -400px;
+    background-color: #FFF;
+    box-shadow: 0 1rem 5rem rgba(0, 0, 0, 0.4);
+    transition: transform .7s ease-in-out;
+    font-size: 15px;
+}
+
+.container-liner {
+    margin-left: .5rem;
+    margin-right: .5rem;
+}
+
+.sidebar-tab {
+    height: 100%;
+    width: 2rem;
+    position: fixed;
+    top: 5rem;
+    z-index: 1;
+    right: 0;
+    background-color: #FFF;
+    box-shadow: 0 1rem 5rem rgba(0, 0, 0, 0.4);
+    transition: transform .7s ease-in-out;
+    font-weight: bold;
+}
+
+#sidebar-tab-text {
+    width: 400px;
+}
+
+.vertical-text {
+    transform: rotate(90deg);
+    transform-origin: left 2rem;
+    vertical-align: middle;
+}
+
+.arrow {
+    box-sizing: border-box;
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    transform: rotate(0deg);
+    transition: all 0.5s ease-in-out;
+    width: 32px;
+    height: 32px;
+    z-index: 1;
+}
+
+    .arrow:after, .arrow:before {
+        content: "";
+        box-sizing: border-box;
+        display: block;
+        position: absolute;
+        transition: all 0.25s ease-in-out;
+        border-radius: 10px;
+        background: #000;
+        width: 16px;
+        height: 3.2px;
+        top: 14.4px;
+    }
+
+    .arrow:after {
+        transform: rotate(44deg);
+        left: 3.2px;
+    }
+
+    .arrow:before {
+        right: 3.2px;
+        transform: rotate(-44deg);
+    }
+
+    .arrow.active:after {
+        transform: rotate(-44deg);
+    }
+
+    .arrow.active:before {
+        transform: rotate(44deg);
+    }
+/* .card {
+  margin-right: 260px;
+  margin-left: 225px;
+  box-shadow: .5rem .5rem 2rem rgba(0, 0, 0, 0.4);
+} */
+.card-text {
+    color: #000;
+}

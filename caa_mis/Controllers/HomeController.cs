@@ -29,28 +29,18 @@ namespace caa_mis.Controllers
             var Stocklist = _inventoryContext.Stocks.Where(s => s.Quantity > 0).ToList();
             var Branch = _inventoryContext.Branches.ToList();
 
-            //Table information
-            //var tableItems = _inventoryContext.Items.Include(i => i.Stocks).ThenInclude(b => b.Branch)
-            //    .OrderBy(i => i.Stocks.Min(s => s.Quantity)).Take(5).ToList();
-            //ViewBag.TableItem = tableItems;
-
             var tableItems = from item in Item
                              join stock in Stocklist on item.ID equals stock.ItemID
                              group stock by item.Name into t
                              select new
                              {
                                  ItemName = t.Key,
-                                 TotalStock = t.Sum(s => s.Quantity)
+                                 MinLevel = t.Min(s => s.MinLevel),
+                                 TotalStock = t.Sum(s => s.Quantity),
+                                 Percentage = 1 - ((double)t.Min(s => s.MinLevel)/ (double)t.Sum(s => s.Quantity))
                              };
 
-            ViewBag.TableItem = tableItems.OrderBy(s => s.TotalStock).Take(5);
-
-            //future use 
-            //var tableItems = _inventoryContext.Items.Include(s => s.Stocks)
-            //    .OrderBy(s => s.Stocks.Min(q => (q.Quantity - q.MinLevel)))
-            //    .Take(5).ToList();
-
-
+            ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage).Take(5);
 
             //PieChart information
 

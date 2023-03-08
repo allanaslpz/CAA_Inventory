@@ -20,7 +20,7 @@
                 <div class="row">
                     <div class="form-group col-md-4">
                         <label class="control-label">Filter by Branches: (Ctrl + click to multiselect)</label>
-                        @Html.ListBox("BranchID", null, htmlAttributes: new { @class = "form-control p-0", size = "5"})  @*<=Branch Listbox Item Size *@
+                        @Html.ListBox("BranchID", null, htmlAttributes: new { @class = "form-select p-0", size = "5"})  @*<=Branch Listbox Item Size *@
 
                     </div>
 
@@ -40,13 +40,19 @@
         <thead>
             <tr>
                 <th>
-                    <input type="submit" name="actionButton" value="BranchName" class="btn btn-link" />
+                    <input type="submit" name="actionButton" value="Branch" class="btn btn-link" />
                 </th>
                 <th>
-                    <input type="submit" name="actionButton" value="ItemName" class="btn btn-link" />
+                    <input type="submit" name="actionButton" value="Item" class="btn btn-link" />
+                </th>
+                <th>
+                    <input type="submit" name="actionButton" value="Item Cost" class="btn btn-link" />
                 </th>
                 <th>
                     <input type="submit" name="actionButton" value="Quantity" class="btn btn-link" />
+                </th>
+                <th>
+                    <input type="submit" name="actionButton" value="Min Level" class="btn btn-link" />
                 </th>
             </tr>
         </thead>
@@ -61,7 +67,13 @@
                         @Html.DisplayFor(modelItem => item.ItemName)
                     </td>
                     <td>
+                        @Html.DisplayFor(modelItem => item.ItemCost)
+                    </td>
+                    <td>
                         @Html.DisplayFor(modelItem => item.Quantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MinLevel)
                     </td>
                 </tr>
             }

@@ -1,7 +1,7 @@
 ﻿@model caa_mis.Models.Supplier
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Archive";
 }
 
 <h1>Archive Vendor</h1>
@@ -60,9 +60,9 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete">
+    <form asp-action="Archive">
         <input type="hidden" asp-for="ID" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <input type="submit" value="Archive" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
 </div>

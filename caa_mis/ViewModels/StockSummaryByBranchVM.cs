@@ -12,6 +12,9 @@ namespace caa_mis.ViewModels
         [Display(Name = "Product")]
         public string ItemName { get; set; }
 
+        [Display(Name = "Product Cost")]
+        public double ItemCost { get; set; }
         public int Quantity { get; set; }
+        public int MinLevel { get; set; }
     }
 }
