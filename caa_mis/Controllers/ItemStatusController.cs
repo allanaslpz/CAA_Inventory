@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.Utilities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace caa_mis.Controllers
 {
+    [Authorize(Roles = "Admin, Supervisor")]
     public class ItemStatusController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -16,8 +18,8 @@ namespace caa_mis.Controllers
             _context = context;
         }
 
-        // GET: TransactionTypes
-        public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchName, string SearchDesc, InOut? InOutStatus, Archived? Status,
+        // GET: ItemStatuses
+        public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchName, string SearchDesc, Archived? Status,
             int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Name")
         {
             //Clear the sort/filter/paging URL Cookie for Controller
@@ -46,16 +48,11 @@ namespace caa_mis.Controllers
                 itemstatus = itemstatus.Where(p => p.Description.ToUpper().Contains(SearchDesc.ToUpper()));
                 ViewData["Filtering"] = "btn-danger";
             }
-            //if (InOutStatus != null)
-            //{
-            //    itemstatus = itemstatus.Where(p => p.InOut == InOutStatus);
-            //    ViewData["Filtering"] = "btn-danger";
-            //}
-            //if (Status != null)
-            //{
-            //    itemstatus = itemstatus.Where(p => p.Status == Status);
-            //    ViewData["Filtering"] = "btn-danger";
-            //}
+            if (Status != null)
+            {
+                itemstatus = itemstatus.Where(p => p.Status == Status);
+                ViewData["Filtering"] = "btn-danger";
+            }
 
             //Before we sort, see if we have called for a change of filtering or sorting
             if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
@@ -104,32 +101,19 @@ namespace caa_mis.Controllers
                         .OrderBy(p => p.Description);
                 }
             }
-            //else if (sortField == "In/Out")
-            //{
-            //    if (sortDirection == "asc")
-            //    {
-            //        transactionTypes = transactionTypes
-            //            .OrderBy(p => p.InOut);
-            //    }
-            //    else
-            //    {
-            //        transactionTypes = transactionTypes
-            //            .OrderByDescending(p => p.InOut);
-            //    }
-            //}
-            //else if (sortField == "Status")
-            //{
-            //    if (sortDirection == "asc")
-            //    {
-            //        transactionTypes = transactionTypes
-            //            .OrderBy(p => p.Status);
-            //    }
-            //    else
-            //    {
-            //        transactionTypes = transactionTypes
-            //            .OrderByDescending(p => p.Status);
-            //    }
-            //}
+            else if (sortField == "Status")
+            {
+                if (sortDirection == "asc")
+                {
+                    itemstatus = itemstatus
+                        .OrderBy(p => p.Status);
+                }
+                else
+                {
+                    itemstatus = itemstatus
+                        .OrderByDescending(p => p.Status);
+                }
+            }
             else //Sorting by Name
             {
                 if (sortDirection == "asc")
@@ -160,70 +144,70 @@ namespace caa_mis.Controllers
             return View(pagedData);
         }
 
-        // GET: TransactionTypes/Details/5
+        // GET: ItemStatuses/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.TransactionTypes == null)
+            if (id == null || _context.ItemStatuses == null)
             {
                 return NotFound();
             }
 
-            var transactionType = await _context.TransactionTypes
+            var itemstatus = await _context.ItemStatuses
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (transactionType == null)
+            if (itemstatus == null)
             {
                 return NotFound();
             }
 
-            return View(transactionType);
+            return View(itemstatus);
         }
 
-        // GET: TransactionTypes/Create
+        // GET: ItemStatuses/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: TransactionTypes/Create
+        // POST: ItemStatuses/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Description,InOut")] TransactionType transactionType)
+        public async Task<IActionResult> Create([Bind("ID,Name,Description,InOut")] ItemStatus itemstatus)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(transactionType);
+                _context.Add(itemstatus);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(transactionType);
+            return View(itemstatus);
         }
 
-        // GET: TransactionTypes/Edit/5
+        // GET: ItemStatuses/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.TransactionTypes == null)
+            if (id == null || _context.ItemStatuses == null)
             {
                 return NotFound();
             }
 
-            var transactionType = await _context.TransactionTypes.FindAsync(id);
-            if (transactionType == null)
+            var itemstatus = await _context.ItemStatuses.FindAsync(id);
+            if (itemstatus == null)
             {
                 return NotFound();
             }
-            return View(transactionType);
+            return View(itemstatus);
         }
 
-        // POST: TransactionTypes/Edit/5
+        // POST: ItemStatuses/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description,InOut,Status")] TransactionType transactionType)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description,InOut,Status")] ItemStatus itemstatus)
         {
-            if (id != transactionType.ID)
+            if (id != itemstatus.ID)
             {
                 return NotFound();
             }
@@ -232,12 +216,12 @@ namespace caa_mis.Controllers
             {
                 try
                 {
-                    _context.Update(transactionType);
+                    _context.Update(itemstatus);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TransactionTypeExists(transactionType.ID))
+                    if (!ItemStatusesExists(itemstatus.ID))
                     {
                         return NotFound();
                     }
@@ -248,62 +232,52 @@ namespace caa_mis.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(transactionType);
+            return View(itemstatus);
         }
 
-        // GET: TransactionTypes/Archive/5
+        // GET: ItemStatuses/Archive/5
         public async Task<IActionResult> Archive(int? id)
         {
-            if (id == null || _context.TransactionTypes == null)
+            if (id == null || _context.ItemStatuses == null)
             {
                 return NotFound();
             }
 
-            var transactionType = await _context.TransactionTypes
+            var itemstatus = await _context.ItemStatuses
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (transactionType == null)
+            if (itemstatus == null)
             {
                 return NotFound();
             }
 
-            return View(transactionType);
+            return View(itemstatus);
         }
 
-        // POST: TransactionTypes/Archive/5
+        // POST: ItemStatuses/Archive/5
         [HttpPost, ActionName("Archive")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ArchiveConfirmed(int id)
         {
-            if (_context.TransactionTypes == null)
+            if (_context.ItemStatuses == null)
             {
-                return Problem("Entity set 'InventoryContext.TransactionTypes'  is null.");
+                return Problem("Entity set 'InventoryContext.ItemStatuses'  is null.");
             }
 
-            var transactionType = await _context.TransactionTypes.FindAsync(id);
+            var itemstatus = await _context.ItemStatuses.FindAsync(id);
 
-            if (transactionType != null)
+            if (itemstatus != null)
             {
-                transactionType.Status = Archived.Disabled;
+                itemstatus.Status = Archived.Disabled;
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TransactionTypeExists(int id)
+        private bool ItemStatusesExists(int id)
         {
-            return _context.TransactionTypes.Any(e => e.ID == id);
+            return _context.ItemStatuses.Any(e => e.ID == id);
         }
-
-        private SelectList InOutSelectList(InOut selectedId)
-        {
-            return new SelectList(_context.TransactionTypes
-                .OrderBy(d => d.InOut), "ID", "In/Out", selectedId);
-        }
-
-        private void PopulateDropDownLists(TransactionType transaction = null)
-        {
-            ViewData["InOutStatus"] = InOutSelectList((InOut)(transaction?.InOut));
-        }
+               
     }
 }

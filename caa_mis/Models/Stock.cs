@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace caa_mis.Models
 {
@@ -8,10 +9,12 @@ namespace caa_mis.Models
 
         [Required]
         public int BranchID { get; set; }
+
         public Branch Branch { get; set; }
 
         [Required]
         public int? ItemID { get; set; }
+        [JsonIgnore]
         public Item Item { get; set; }
 
         [Required]
