@@ -39,13 +39,9 @@
                         @Html.TextBox("SearchName", null, new { @class = "form-control p-2" })
                     </div>
                     <div class="form-group col-md-4">
-                        <label class="control-label">Search Description:</label>
+                        <label class="control-label">Search Location:</label>
                         @Html.TextBox("SearchDesc", null, new { @class = "form-control p-2" })
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label class="control-label">In/Out:</label>
-                        @Html.DropDownList("InOutStatus", new SelectList(Enum.GetValues(typeof(InOut))), "-- Select --", htmlAttributes: new { @class = "form-control" })
-                    </div>
+                    </div>                    
                     <div class="form-group col-md-4">
                         <label class="control-label">Filter by Status:</label>
                         @Html.DropDownList("Status", new SelectList(Enum.GetValues(typeof(Archived))), "-- Select --", htmlAttributes: new { @class = "form-control" })
@@ -98,14 +94,20 @@
                 <thead>
                     <tr>
                         <th>
-                            <input type="submit" name="actionButton" value="First Name" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Name" class="btn btn-link" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Last Name" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Address" class="btn btn-link" />
+                        </th>
+                        <th>
+                            <input type="submit" name="actionButton" value="Location" class="btn btn-link" />
+                        </th>    
+                         <th>
+                            <input type="submit" name="actionButton" value="Phone Number" class="btn btn-link" />
                         </th>
                         <th>
                             <input type="submit" name="actionButton" value="Status" class="btn btn-link" />
-                        </th>                      
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -124,9 +126,11 @@
                 @Html.DisplayFor(modelItem => item.PhoneNumber)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a> 
             </td>
         </tr>
 }

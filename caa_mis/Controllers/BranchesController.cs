@@ -17,7 +17,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: TransactionTypes
-        public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchName, string SearchDesc, InOut? InOutStatus, Archived? Status,
+        public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchName, string SearchDesc, Archived? Status,
             int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Name")
         {
             //Clear the sort/filter/paging URL Cookie for Controller
@@ -30,7 +30,7 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Name", "Description", "In/Out", "Status" };
+            string[] sortOptions = new[] { "Name", "Location" };
 
             var branches = _context.Branches
                                     .AsNoTracking();
@@ -43,19 +43,14 @@ namespace caa_mis.Controllers
             }
             if (!String.IsNullOrEmpty(SearchDesc))
             {
-                branches = branches.Where(p => p.Address.ToUpper().Contains(SearchDesc.ToUpper()));
+                branches = branches.Where(p => p.Location.ToUpper().Contains(SearchDesc.ToUpper()));
+                ViewData["Filtering"] = "btn-danger";
+            }            
+            if (Status != null)
+            {
+                branches = branches.Where(p => p.Status == Status);
                 ViewData["Filtering"] = "btn-danger";
             }
-            //if (InOutStatus != null)
-            //{
-            //    branches = branches.Where(p => p.InOut == InOutStatus);
-            //    ViewData["Filtering"] = "btn-danger";
-            //}
-            //if (Status != null)
-            //{
-            //    branches = branches.Where(p => p.Status == Status);
-            //    ViewData["Filtering"] = "btn-danger";
-            //}
 
             //Before we sort, see if we have called for a change of filtering or sorting
             if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
@@ -91,58 +86,45 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.Name);
                 }
             }
-            else if (sortField == "Description")
+            else if (sortField == "Location")
             {
                 if (sortDirection == "asc")
                 {
                     branches = branches
-                        .OrderByDescending(p => p.Address);
+                        .OrderByDescending(p => p.Location);
                 }
                 else
                 {
                     branches = branches
-                        .OrderBy(p => p.Address);
+                        .OrderBy(p => p.Location);
+                }
+            }           
+            else if (sortField == "Status")
+            {
+                if (sortDirection == "asc")
+                {
+                    branches = branches
+                        .OrderBy(p => p.Status);
+                }
+                else
+                {
+                    branches = branches
+                        .OrderByDescending(p => p.Status);
                 }
             }
-            //else if (sortField == "In/Out")
-            //{
-            //    if (sortDirection == "asc")
-            //    {
-            //        branches = branches
-            //            .OrderBy(p => p.InOut);
-            //    }
-            //    else
-            //    {
-            //        branches = branches
-            //            .OrderByDescending(p => p.InOut);
-            //    }
-            //}
-            //else if (sortField == "Status")
-            //{
-            //    if (sortDirection == "asc")
-            //    {
-            //        branches = branches
-            //            .OrderBy(p => p.Status);
-            //    }
-            //    else
-            //    {
-            //        branches = branches
-            //            .OrderByDescending(p => p.Status);
-            //    }
-            //}
             else //Sorting by Name
             {
                 if (sortDirection == "asc")
                 {
                     branches = branches
                         .OrderBy(p => p.Name)
-                        .ThenBy(p => p.Address);
+                        .ThenBy(p => p.Location);
                 }
                 else
                 {
                     branches = branches
                         .OrderByDescending(p => p.Name)
-                        .ThenByDescending(p => p.Address);
+                        .ThenByDescending(p => p.Location);
                 }
             }
 
@@ -294,16 +276,6 @@ namespace caa_mis.Controllers
         {
             return _context.TransactionTypes.Any(e => e.ID == id);
         }
-
-        private SelectList InOutSelectList(InOut selectedId)
-        {
-            return new SelectList(_context.TransactionTypes
-                .OrderBy(d => d.InOut), "ID", "In/Out", selectedId);
-        }
-
-        private void PopulateDropDownLists(TransactionType transaction = null)
-        {
-            ViewData["InOutStatus"] = InOutSelectList((InOut)(transaction?.InOut));
-        }
+        
     }
 }
