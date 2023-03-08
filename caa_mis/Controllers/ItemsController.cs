@@ -44,15 +44,16 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost" }; 
+            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost" };
 
             //by default we want to show the active
-            
+
             var inventory = _context.Items
                                     .Include(i => i.Category)
                                     .Include(i => i.ItemStatus)
                                     .Include(i => i.ItemThumbnail)
                                     .Include(i => i.Manufacturer)
+                                    .Include(i => i.Stocks).ThenInclude(s => s.Branch)
                                     .AsNoTracking();
 
             //Add as many filters as needed
@@ -767,6 +768,13 @@ namespace caa_mis.Controllers
             }
             return NotFound("No data.");
         }
+        public async Task<IActionResult> GetBranchStock(int itemID)
+        {
+            var inventory = await _context.Stocks
+                .Include(s => s.Branch).ThenInclude(s => s.Stocks)
+                .ToListAsync();
 
+            return (IActionResult)inventory;
+        }
     }
 }

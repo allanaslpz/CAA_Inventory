@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Product Index";
+
 }
 
 <h1>Products</h1>
@@ -137,9 +138,9 @@
                         <th>
                             <input type="submit" name="actionButton" value="SKU Number" class="btn btn-link" />
                         </th>
-                        @*<th>
+                        <th>
                             Branch Available
-                        </th>*@
+                        </th>
                         <th>
                             <input type="submit" name="actionButton" value="Cost" class="btn btn-link" />
                         </th>
@@ -169,7 +170,8 @@
                             <td>
                                 @Html.DisplayFor(modelItem => item.SKUNumber)
                             </td>
-                            @*<td>
+                           
+                            <td>
                                 @{
                                     
                                     int condCount = item.Stocks.Count();
@@ -198,7 +200,7 @@
                                         }
                                     }
                                 }
-                            </td>*@
+                            </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Cost)
                             </td>
