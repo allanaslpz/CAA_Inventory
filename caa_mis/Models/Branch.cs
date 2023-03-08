@@ -24,6 +24,8 @@ namespace caa_mis.Models
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
 
+        public Archived Status { get; set; }
+
         public ICollection<Bulk> Bulks { get; set; } = new HashSet<Bulk>();
         public ICollection<Stock> Stocks { get; set; } = new HashSet<Stock>();
         public ICollection<Transaction> Origins { get; set; } = new HashSet<Transaction>();

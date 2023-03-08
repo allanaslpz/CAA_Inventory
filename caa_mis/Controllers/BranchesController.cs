@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using caa_mis.Data;
 using caa_mis.Models;
+using caa_mis.Utilities;
 
 namespace caa_mis.Controllers
 {
-    public class BranchesController : Controller
+    public class BranchesController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
 
@@ -19,76 +16,214 @@ namespace caa_mis.Controllers
             _context = context;
         }
 
-        // GET: Branches
-        public async Task<IActionResult> Index()
+        // GET: TransactionTypes
+        public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchName, string SearchDesc, InOut? InOutStatus, Archived? Status,
+            int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Name")
         {
-              return View(await _context.Branches.ToListAsync());
+            //Clear the sort/filter/paging URL Cookie for Controller
+            CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
+
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
+            //PopulateDropDownLists();
+
+            //List of sort options.
+            //NOTE: make sure this array has matching values to the column headings
+            string[] sortOptions = new[] { "Name", "Description", "In/Out", "Status" };
+
+            var branches = _context.Branches
+                                    .AsNoTracking();
+
+            //Add as many filters as needed
+            if (!String.IsNullOrEmpty(SearchName))
+            {
+                branches = branches.Where(p => p.Name.ToUpper().Contains(SearchName.ToUpper()));
+                ViewData["Filtering"] = "btn-danger";
+            }
+            if (!String.IsNullOrEmpty(SearchDesc))
+            {
+                branches = branches.Where(p => p.Address.ToUpper().Contains(SearchDesc.ToUpper()));
+                ViewData["Filtering"] = "btn-danger";
+            }
+            //if (InOutStatus != null)
+            //{
+            //    branches = branches.Where(p => p.InOut == InOutStatus);
+            //    ViewData["Filtering"] = "btn-danger";
+            //}
+            //if (Status != null)
+            //{
+            //    branches = branches.Where(p => p.Status == Status);
+            //    ViewData["Filtering"] = "btn-danger";
+            //}
+
+            //Before we sort, see if we have called for a change of filtering or sorting
+            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
+            {
+                page = 1;//Reset page to start
+
+                if (sortOptions.Contains(actionButton))//Change of sort is requested
+                {
+                    if (actionButton == sortField) //Reverse order on same field
+                    {
+                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
+                    }
+                    sortField = actionButton;//Sort by the button clicked
+                }
+                else //Sort by the controls in the filter area
+                {
+                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
+                    sortField = sortFieldID;
+                }
+            }
+
+            //Now we know which field and direction to sort by
+            if (sortField == "Name")
+            {
+                if (sortDirection == "asc")
+                {
+                    branches = branches
+                        .OrderBy(p => p.Name);
+                }
+                else
+                {
+                    branches = branches
+                        .OrderByDescending(p => p.Name);
+                }
+            }
+            else if (sortField == "Description")
+            {
+                if (sortDirection == "asc")
+                {
+                    branches = branches
+                        .OrderByDescending(p => p.Address);
+                }
+                else
+                {
+                    branches = branches
+                        .OrderBy(p => p.Address);
+                }
+            }
+            //else if (sortField == "In/Out")
+            //{
+            //    if (sortDirection == "asc")
+            //    {
+            //        branches = branches
+            //            .OrderBy(p => p.InOut);
+            //    }
+            //    else
+            //    {
+            //        branches = branches
+            //            .OrderByDescending(p => p.InOut);
+            //    }
+            //}
+            //else if (sortField == "Status")
+            //{
+            //    if (sortDirection == "asc")
+            //    {
+            //        branches = branches
+            //            .OrderBy(p => p.Status);
+            //    }
+            //    else
+            //    {
+            //        branches = branches
+            //            .OrderByDescending(p => p.Status);
+            //    }
+            //}
+            else //Sorting by Name
+            {
+                if (sortDirection == "asc")
+                {
+                    branches = branches
+                        .OrderBy(p => p.Name)
+                        .ThenBy(p => p.Address);
+                }
+                else
+                {
+                    branches = branches
+                        .OrderByDescending(p => p.Name)
+                        .ThenByDescending(p => p.Address);
+                }
+            }
+
+            //Set sort for next time
+            ViewData["sortField"] = sortField;
+            ViewData["sortDirection"] = sortDirection;
+            //SelectList for Sorting Options
+            ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
+
+            //Handle Paging
+            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "Items");
+            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
+            var pagedData = await PaginatedList<Branch>.CreateAsync(branches.AsNoTracking(), page ?? 1, pageSize);
+
+            return View(pagedData);
         }
 
-        // GET: Branches/Details/5
+        // GET: TransactionTypes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Branches == null)
+            if (id == null || _context.TransactionTypes == null)
             {
                 return NotFound();
             }
 
-            var branch = await _context.Branches
+            var transactionType = await _context.TransactionTypes
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (branch == null)
+            if (transactionType == null)
             {
                 return NotFound();
             }
 
-            return View(branch);
+            return View(transactionType);
         }
 
-        // GET: Branches/Create
+        // GET: TransactionTypes/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Branches/Create
+        // POST: TransactionTypes/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Address,Location,PhoneNumber")] Branch branch)
+        public async Task<IActionResult> Create([Bind("ID,Name,Description,InOut")] TransactionType transactionType)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(branch);
+                _context.Add(transactionType);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(branch);
+            return View(transactionType);
         }
 
-        // GET: Branches/Edit/5
+        // GET: TransactionTypes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Branches == null)
+            if (id == null || _context.TransactionTypes == null)
             {
                 return NotFound();
             }
 
-            var branch = await _context.Branches.FindAsync(id);
-            if (branch == null)
+            var transactionType = await _context.TransactionTypes.FindAsync(id);
+            if (transactionType == null)
             {
                 return NotFound();
             }
-            return View(branch);
+            return View(transactionType);
         }
 
-        // POST: Branches/Edit/5
+        // POST: TransactionTypes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Address,Location,PhoneNumber")] Branch branch)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description,InOut,Status")] TransactionType transactionType)
         {
-            if (id != branch.ID)
+            if (id != transactionType.ID)
             {
                 return NotFound();
             }
@@ -97,12 +232,12 @@ namespace caa_mis.Controllers
             {
                 try
                 {
-                    _context.Update(branch);
+                    _context.Update(transactionType);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BranchExists(branch.ID))
+                    if (!TransactionTypeExists(transactionType.ID))
                     {
                         return NotFound();
                     }
@@ -113,49 +248,62 @@ namespace caa_mis.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(branch);
+            return View(transactionType);
         }
 
-        // GET: Branches/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: TransactionTypes/Archive/5
+        public async Task<IActionResult> Archive(int? id)
         {
-            if (id == null || _context.Branches == null)
+            if (id == null || _context.TransactionTypes == null)
             {
                 return NotFound();
             }
 
-            var branch = await _context.Branches
+            var transactionType = await _context.TransactionTypes
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (branch == null)
+            if (transactionType == null)
             {
                 return NotFound();
             }
 
-            return View(branch);
+            return View(transactionType);
         }
 
-        // POST: Branches/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: TransactionTypes/Archive/5
+        [HttpPost, ActionName("Archive")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> ArchiveConfirmed(int id)
         {
-            if (_context.Branches == null)
+            if (_context.TransactionTypes == null)
             {
-                return Problem("Entity set 'InventoryContext.Branches'  is null.");
+                return Problem("Entity set 'InventoryContext.TransactionTypes'  is null.");
             }
-            var branch = await _context.Branches.FindAsync(id);
-            if (branch != null)
+
+            var transactionType = await _context.TransactionTypes.FindAsync(id);
+
+            if (transactionType != null)
             {
-                _context.Branches.Remove(branch);
+                transactionType.Status = Archived.Disabled;
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BranchExists(int id)
+        private bool TransactionTypeExists(int id)
         {
-          return _context.Branches.Any(e => e.ID == id);
+            return _context.TransactionTypes.Any(e => e.ID == id);
+        }
+
+        private SelectList InOutSelectList(InOut selectedId)
+        {
+            return new SelectList(_context.TransactionTypes
+                .OrderBy(d => d.InOut), "ID", "In/Out", selectedId);
+        }
+
+        private void PopulateDropDownLists(TransactionType transaction = null)
+        {
+            ViewData["InOutStatus"] = InOutSelectList((InOut)(transaction?.InOut));
         }
     }
 }
