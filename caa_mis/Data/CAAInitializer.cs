@@ -572,7 +572,7 @@ namespace caa_mis.Data
 
                 if (!context.Transactions.Any())
                 {
-                    for (int i = 1; i <= rowCount; i++)
+                    for (byte i = 1; i <= rowCount; i++)
                     {
                         Transaction t = new()
                         {
