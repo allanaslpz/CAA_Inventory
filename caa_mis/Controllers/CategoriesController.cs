@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using caa_mis.Data;
 using caa_mis.Models;
+using caa_mis.Utilities;
 
 namespace caa_mis.Controllers
 {
-    public class CategoriesController : Controller
+    public class CategoriesController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
 
@@ -19,76 +16,196 @@ namespace caa_mis.Controllers
             _context = context;
         }
 
-        // GET: Categories
-        public async Task<IActionResult> Index()
+        // GET: TransactionTypes
+        public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchName, string SearchDesc, InOut? InOutStatus, Archived? Status,
+            int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Name")
         {
-              return View(await _context.Categories.ToListAsync());
+            //Clear the sort/filter/paging URL Cookie for Controller
+            CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
+
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
+            //PopulateDropDownLists();
+
+            //List of sort options.
+            //NOTE: make sure this array has matching values to the column headings
+            string[] sortOptions = new[] { "Name", "Description", "In/Out", "Status" };
+
+            var category = _context.Categories
+                                    .AsNoTracking();
+
+            //Add as many filters as needed
+            if (!String.IsNullOrEmpty(SearchName))
+            {
+                category = category.Where(p => p.Name.ToUpper().Contains(SearchName.ToUpper()));
+                ViewData["Filtering"] = "btn-danger";
+            }
+            if (!String.IsNullOrEmpty(SearchDesc))
+            {
+                category = category.Where(p => p.Description.ToUpper().Contains(SearchDesc.ToUpper()));
+                ViewData["Filtering"] = "btn-danger";
+            }        
+            //if (Status != null)
+            //{
+            //    category = category.Where(p => p.Status == Status);
+            //    ViewData["Filtering"] = "btn-danger";
+            //}
+
+            //Before we sort, see if we have called for a change of filtering or sorting
+            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
+            {
+                page = 1;//Reset page to start
+
+                if (sortOptions.Contains(actionButton))//Change of sort is requested
+                {
+                    if (actionButton == sortField) //Reverse order on same field
+                    {
+                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
+                    }
+                    sortField = actionButton;//Sort by the button clicked
+                }
+                else //Sort by the controls in the filter area
+                {
+                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
+                    sortField = sortFieldID;
+                }
+            }
+
+            //Now we know which field and direction to sort by
+            if (sortField == "Name")
+            {
+                if (sortDirection == "asc")
+                {
+                    category = category
+                        .OrderBy(p => p.Name);
+                }
+                else
+                {
+                    category = category
+                        .OrderByDescending(p => p.Name);
+                }
+            }
+            else if (sortField == "Description")
+            {
+                if (sortDirection == "asc")
+                {
+                    category = category
+                        .OrderByDescending(p => p.Description);
+                }
+                else
+                {
+                    category = category
+                        .OrderBy(p => p.Description);
+                }
+            }           
+            //else if (sortField == "Status")
+            //{
+            //    if (sortDirection == "asc")
+            //    {
+            //        transactionTypes = transactionTypes
+            //            .OrderBy(p => p.Status);
+            //    }
+            //    else
+            //    {
+            //        transactionTypes = transactionTypes
+            //            .OrderByDescending(p => p.Status);
+            //    }
+            //}
+            else //Sorting by Name
+            {
+                if (sortDirection == "asc")
+                {
+                    category = category
+                        .OrderBy(p => p.Name)
+                        .ThenBy(p => p.Description);
+                }
+                else
+                {
+                    category = category
+                        .OrderByDescending(p => p.Name)
+                        .ThenByDescending(p => p.Description);
+                }
+            }
+
+            //Set sort for next time
+            ViewData["sortField"] = sortField;
+            ViewData["sortDirection"] = sortDirection;
+            //SelectList for Sorting Options
+            ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
+
+            //Handle Paging
+            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "Items");
+            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
+            var pagedData = await PaginatedList<Category>.CreateAsync(category.AsNoTracking(), page ?? 1, pageSize);
+
+            return View(pagedData);
         }
 
-        // GET: Categories/Details/5
+        // GET: TransactionTypes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Categories == null)
+            if (id == null || _context.TransactionTypes == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var transactionType = await _context.TransactionTypes
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (category == null)
+            if (transactionType == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(transactionType);
         }
 
-        // GET: Categories/Create
+        // GET: TransactionTypes/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Categories/Create
+        // POST: TransactionTypes/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Description")] Category category)
+        public async Task<IActionResult> Create([Bind("ID,Name,Description,InOut")] TransactionType transactionType)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                _context.Add(transactionType);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(transactionType);
         }
 
-        // GET: Categories/Edit/5
+        // GET: TransactionTypes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Categories == null)
+            if (id == null || _context.TransactionTypes == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var transactionType = await _context.TransactionTypes.FindAsync(id);
+            if (transactionType == null)
             {
                 return NotFound();
             }
-            return View(category);
+            return View(transactionType);
         }
 
-        // POST: Categories/Edit/5
+        // POST: TransactionTypes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description,InOut,Status")] TransactionType transactionType)
         {
-            if (id != category.ID)
+            if (id != transactionType.ID)
             {
                 return NotFound();
             }
@@ -97,12 +214,12 @@ namespace caa_mis.Controllers
             {
                 try
                 {
-                    _context.Update(category);
+                    _context.Update(transactionType);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.ID))
+                    if (!TransactionTypeExists(transactionType.ID))
                     {
                         return NotFound();
                     }
@@ -113,49 +230,62 @@ namespace caa_mis.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(transactionType);
         }
 
-        // GET: Categories/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: TransactionTypes/Archive/5
+        public async Task<IActionResult> Archive(int? id)
         {
-            if (id == null || _context.Categories == null)
+            if (id == null || _context.TransactionTypes == null)
             {
                 return NotFound();
             }
 
-            var category = await _context.Categories
+            var transactionType = await _context.TransactionTypes
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (category == null)
+            if (transactionType == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(transactionType);
         }
 
-        // POST: Categories/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: TransactionTypes/Archive/5
+        [HttpPost, ActionName("Archive")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> ArchiveConfirmed(int id)
         {
-            if (_context.Categories == null)
+            if (_context.TransactionTypes == null)
             {
-                return Problem("Entity set 'InventoryContext.Categories'  is null.");
+                return Problem("Entity set 'InventoryContext.TransactionTypes'  is null.");
             }
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+
+            var transactionType = await _context.TransactionTypes.FindAsync(id);
+
+            if (transactionType != null)
             {
-                _context.Categories.Remove(category);
+                transactionType.Status = Archived.Disabled;
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool TransactionTypeExists(int id)
         {
-          return _context.Categories.Any(e => e.ID == id);
+            return _context.TransactionTypes.Any(e => e.ID == id);
+        }
+
+        private SelectList InOutSelectList(InOut selectedId)
+        {
+            return new SelectList(_context.TransactionTypes
+                .OrderBy(d => d.InOut), "ID", "In/Out", selectedId);
+        }
+
+        private void PopulateDropDownLists(TransactionType transaction = null)
+        {
+            ViewData["InOutStatus"] = InOutSelectList((InOut)(transaction?.InOut));
         }
     }
 }
