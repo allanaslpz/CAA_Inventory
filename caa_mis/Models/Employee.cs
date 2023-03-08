@@ -11,7 +11,15 @@ namespace caa_mis.Models
         //[Required]
         //public int UserAccountID { get; set; }
         //public UserAccountID UserAccountID { get; set; }
-
+        public string FullName
+        {
+            get
+            {
+                return FirstName
+                    +  " "
+                    + LastName;
+            }
+        }
         [Required]
         [StringLength(50)]
         [Display(Name = "First Name")]

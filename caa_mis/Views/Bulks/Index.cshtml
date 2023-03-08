@@ -1,22 +1,23 @@
-﻿@model IEnumerable<caa_mis.Models.Transaction>
+﻿@model IEnumerable<caa_mis.Models.Bulk>
 
 @{
-    ViewData["Title"] = "Transactions Index";
+    ViewData["Title"] = "Initial Inventory";
 }
 
-<h1>Receiving/Transfer</h1>
+<h1>Initial Inventory</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary float-left">Create New Receiving/Transfer</a>
+    <a asp-action="Create" class="btn btn-primary float-left">Create Initial Inventory</a>
     <button class="btn @(ViewData["Filtering"]) btn-outline-primary float-end" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
         Filter/Search
     </button>
 </p>
+
 <form asp-action="Index" method="get">
     <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
     <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
     <div class="form-horizontal">
-       
+        
         <div class="collapse" id="collapseFilter">
             <div class="card card-body bg-light">
                 <div class="row">
@@ -36,8 +37,8 @@
                         </div>
                     </div>
                     <div class="form-group col-md-4">
-                        <label class="control-label">Select by Type:</label>
-                        @Html.DropDownList("TransactionTypeID", null, "All Transactions", htmlAttributes: new { @class = "form-control" })
+                        <label class="control-label">Select by Branch:</label>
+                        @Html.DropDownList("BranchID", null, "All Branches", htmlAttributes: new { @class = "form-control" })
                     </div>
                     <div class="form-group col-md-6">
                         <label class="control-label">Filter by Status:</label>
@@ -46,13 +47,10 @@
                 </div>
                 <div class="row">
                     <div class="form-group col-md-4">
-                        <label class="control-label">Filter by Destination:</label>
-                        @Html.DropDownList("DestinationID", null, "All Destination", htmlAttributes: new { @class = "form-control" })
+                        <label class="control-label">Filter by User Created:</label>
+                        @Html.DropDownList("EmployeeID", null, "All Users", htmlAttributes: new { @class = "form-control" })
                     </div>
-                    <div class="form-group col-md-4">
-                        <label class="control-label">Search Description:</label>
-                        @Html.TextBox("SearchString", null, htmlAttributes: new { @class = "form-control p-2" })
-                    </div>
+                    
                     <div class="form-group col-md-4 align-self-end">
                         <input type="submit" name="actionButton" value="Apply" class="btn btn-outline-primary" />
                         <a asp-action="Index" class="btn btn-outline-dark">Clear</a>
@@ -67,7 +65,7 @@
             @foreach (var item in Model)
             {
                 <div class="card mb-sm-3" style="min-width: 18rem;">
-                    <h5 class="card-header"><strong>@Html.DisplayFor(modelItem => item.TransactionType.Name)</strong></h5>
+                    <h5 class="card-header"><strong>@Html.DisplayFor(modelItem => item.Date) - @Html.DisplayFor(modelItem => item.Branch.Name)</strong></h5>
                     <div class="card-body">
                         <figure class="row">
                             <figcaption class="col">
@@ -75,20 +73,17 @@
                                     @*Card Text goes Here*@
                                     <dl class="row lh-1">
                                         <dt class="col-3 text-truncate">
-                                            @Html.DisplayNameFor(model => model.Description)
+                                            @Html.DisplayNameFor(model => model.Branch.Name)
                                         </dt>
                                         <dd class="col-9">
-                                            @Html.DisplayFor(modelItem => item.Origin.Name)
-                                        </dd>
-                                        <dt class="col-3 text-truncate">
-                                            @Html.DisplayNameFor(model => model.Destination.Name)
-                                        </dt>
-                                        <dd class="col-9">
-                                            @Html.DisplayFor(modelItem => item.TransactionDate)
+                                            @Html.DisplayFor(modelItem => item.Date)
                                         </dd>
                                         <dt class="col-3 text-truncate">
                                             @Html.DisplayNameFor(model => model.TransactionStatus.Name)
                                         </dt>
+                                        <dd class="col-9">
+                                            @Html.DisplayFor(modelItem => item.Employee.FullName)
+                                        </dd>
                                     </dl>
                                 </p>
                             </figcaption>
@@ -97,9 +92,9 @@
                             @if (item.TransactionStatus.Name == "Open")
                             {
                                 <a asp-action="Edit" asp-route-id="@item.ID">[ Edit ]</a>
-                                    
-                             }
-                            <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@item.ID">[ View/Add Details ]</a>
+
+                            }
+                            <a asp-action="Index" asp-controller="BulkItems" asp-route-BulkID="@item.ID">View/Add Details</a> |
                             @if (item.TransactionStatus.Name == "Open")
                             {
                                 <a asp-action="Delete" asp-route-id="@item.ID">[ Delete ]</a>
@@ -116,16 +111,7 @@
                 <thead>
                     <tr>
                         <th>
-                            <input type="submit" name="actionButton" value="Type" class="btn btn-link" />
-                        </th>
-                        <th>
-                            <input type="submit" name="actionButton" value="Description" class="btn btn-link" />
-                        </th>
-                        <th>
-                            <input type="submit" name="actionButton" value="Origin" class="btn btn-link" />
-                        </th>
-                        <th>
-                            <input type="submit" name="actionButton" value="Destination" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Branch" class="btn btn-link" />
                         </th>
                         <th>
                             <input type="submit" name="actionButton" value="Date" class="btn btn-link" />
@@ -141,23 +127,15 @@
                     {
                         <tr>
                             <td>
-                                @Html.DisplayFor(modelItem => item.TransactionType.Name)
+                                @Html.DisplayFor(modelItem => item.Branch.Name)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Description)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Origin.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Destination.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.TransactionDate)
+                                @Html.DisplayFor(modelItem => item.Date)
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.TransactionStatus.Name)
                             </td>
+                            
                             <td>
 
                                 @if (item.TransactionStatus.Name == "Open")
@@ -165,7 +143,7 @@
                                     <a asp-action="Edit" asp-route-id="@item.ID">[ Edit ]</a>
 
                                 }
-                                <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@item.ID">[ View/Add Details ]</a>
+                                <a asp-action="Index" asp-controller="BulkItems" asp-route-BulkID="@item.ID">[ View/Add Details ]</a>
                                 @if (item.TransactionStatus.Name == "Open")
                                 {
                                     <a asp-action="Delete" asp-route-id="@item.ID">[ Delete ]</a>
@@ -179,3 +157,4 @@
     </div>
     <partial name="_PagingNavBar" />
 </form>
+
