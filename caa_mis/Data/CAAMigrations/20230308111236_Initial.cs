@@ -33,7 +33,8 @@ namespace caa_mis.Data.CAAMigrations
                     ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    Description = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true)
+                    Description = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -61,6 +62,7 @@ namespace caa_mis.Data.CAAMigrations
                 {
                     ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true)
                 },
