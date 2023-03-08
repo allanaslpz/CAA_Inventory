@@ -555,110 +555,42 @@ namespace caa_mis.Data
                     context.SaveChanges();
                 }
 
-                // Transaction Seed Data //
+                //Transaction Seed Data
+                byte rowCount = 10;
+                int[] employeeIDs = context.Employees.Select(a => a.ID).ToArray();
+                int employeeIDCount = employeeIDs.Length;
+                int[] transactionStatusIDs = context.TransactionStatuses.Select(a => a.ID).ToArray();
+                int transactionStatusIDCount = transactionStatusIDs.Length;
+                int[] transactionTypeIDs = context.TransactionTypes.Select(a => a.ID).ToArray();
+                int transactionTypeIDCount = transactionTypeIDs.Length;
+                int[] branchIDs = context.Branches.Select(a => a.ID).ToArray();
+                int branchIDCount = branchIDs.Length;
+                string[] shipment = new string[] { "Bus", "Train", "Bicycle", "Taxi", "Own Ride" };
+                int shipCount = shipment.Length;
+                string[] description = new string[] { "Lead Guitar", "Base Guitar", "Drums", "Keyboards", "Lead Vocals", "Harmonica", "Didgeridoo" };
+                int descCount = description.Length;
+
                 if (!context.Transactions.Any())
                 {
-                    context.Transactions.AddRange(
-                    new Transaction
+                    for (int i = 1; i <= rowCount; i++)
                     {
-                        EmployeeID = context.Employees.FirstOrDefault(b => b.FirstName == "Allan Antonio").ID,
-                        TransactionStatusID = context.TransactionStatuses.FirstOrDefault(b => b.Name == "Open").ID,
-                        TransactionTypeID = context.TransactionTypes.FirstOrDefault(b => b.Name == "Thorold Spring Break").ID,
-                        OriginID = context.Branches.FirstOrDefault(b => b.Name == "CAA Welland").ID,
-                        DestinationID = context.Branches.FirstOrDefault(b => b.Name == "CAA Thorold").ID,
-                        TransactionDate = DateTime.Today.AddDays(-20),
-                        ReceivedDate = DateTime.Today.AddDays(-6),
-                        Description = "House keeping items thorold team",
-                        Shipment = "Thorold team will handle it"
-                    },
-                    new Transaction
-                    {
-                        EmployeeID = context.Employees.FirstOrDefault(b => b.FirstName == "Edmund Kevin").ID,
-                        TransactionStatusID = context.TransactionStatuses.FirstOrDefault(b => b.Name == "Open").ID,
-                        TransactionTypeID = context.TransactionTypes.FirstOrDefault(b => b.Name == "Thorold Spring Break").ID,
-                        OriginID = context.Branches.FirstOrDefault(b => b.Name == "CAA Thorold").ID,
-                        DestinationID = context.Branches.FirstOrDefault(b => b.Name == "CAA Welland").ID,
-                        TransactionDate = DateTime.Today.AddDays(-180),
-                        ReceivedDate = DateTime.Today.AddDays(-1),
-                        Description = "Some swagger items - 3 safety shoes, socks",
-                        Shipment = "Thorold team own truck"
-                    },
-                    new Transaction
-                    {
-                        EmployeeID = context.Employees.FirstOrDefault(b => b.FirstName == "Michael Laurence").ID,
-                        TransactionStatusID = context.TransactionStatuses.FirstOrDefault(b => b.Name == "Received").ID,
-                        TransactionTypeID = context.TransactionTypes.FirstOrDefault(b => b.Name == "St. Catharines Christmas Expo").ID,
-                        OriginID = context.Branches.FirstOrDefault(b => b.Name == "CAA St. Catharines").ID,
-                        DestinationID = context.Branches.FirstOrDefault(b => b.Name == "CAA Welland").ID,
-                        TransactionDate = DateTime.Today.AddDays(-220),
-                        ReceivedDate = DateTime.Today.AddDays(-6),
-                        Description = "Chrismas Events Items",
-                        Shipment = "No"
-                    },
-                    new Transaction
-                    {
-                        EmployeeID = context.Employees.FirstOrDefault(b => b.FirstName == "Edmund Kevin").ID,
-                        TransactionStatusID = context.TransactionStatuses.FirstOrDefault(b => b.Name == "Open").ID,
-                        TransactionTypeID = context.TransactionTypes.FirstOrDefault(b => b.Name == "Niagara Falls Summer Splash").ID,
-                        OriginID = context.Branches.FirstOrDefault(b => b.Name == "CAA Welland").ID,
-                        DestinationID = context.Branches.FirstOrDefault(b => b.Name == "CAA St. Catharines").ID,
-                        TransactionDate = DateTime.Today.AddDays(-10),
-                        ReceivedDate = DateTime.Today.AddDays(-2),
-                        Description = "4 desks for expo event",
-                        Shipment = "Test shipment"
-                    },
-                    new Transaction
-                    {
-                        EmployeeID = context.Employees.FirstOrDefault(b => b.FirstName == "Tsogt").ID,
-                        TransactionStatusID = context.TransactionStatuses.FirstOrDefault(b => b.Name == "Received").ID,
-                        TransactionTypeID = context.TransactionTypes.FirstOrDefault(b => b.Name == "Thorold Spring Break").ID,
-                        OriginID = context.Branches.FirstOrDefault(b => b.Name == "CAA St. Catharines").ID,
-                        DestinationID = context.Branches.FirstOrDefault(b => b.Name == "CAA Grimsby").ID,
-                        TransactionDate = DateTime.Today.AddDays(-20),
-                        ReceivedDate = DateTime.Today.AddDays(-6),
-                        Description = "House keeping items thorold team",
-                        Shipment = "Thorold team will handle it"
-
-
-                    },
-                    new Transaction
-                    {
-                        EmployeeID = context.Employees.FirstOrDefault(b => b.FirstName == "Allan Antonio").ID,
-                        TransactionStatusID = context.TransactionStatuses.FirstOrDefault(b => b.Name == "Open").ID,
-                        TransactionTypeID = context.TransactionTypes.FirstOrDefault(b => b.Name == "Niagara Falls Summer Splash").ID,
-                        OriginID = context.Branches.FirstOrDefault(b => b.Name == "CAA Thorold").ID,
-                        DestinationID = context.Branches.FirstOrDefault(b => b.Name == "CAA St. Catharines").ID,
-                        TransactionDate = DateTime.Today.AddDays(-20),
-                        ReceivedDate = DateTime.Today.AddDays(-6),
-                        Description = "stock recharge",
-                        Shipment = "Airport transportation"
-                    },
-                    new Transaction
-                    {
-                        EmployeeID = context.Employees.FirstOrDefault(b => b.FirstName == "Luisito Jr").ID,
-                        TransactionStatusID = context.TransactionStatuses.FirstOrDefault(b => b.Name == "Released").ID,
-                        TransactionTypeID = context.TransactionTypes.FirstOrDefault(b => b.Name == "St. Catharines Christmas Expo").ID,
-                        OriginID = context.Branches.FirstOrDefault(b => b.Name == "CAA Grimsby").ID,
-                        DestinationID = context.Branches.FirstOrDefault(b => b.Name == "CAA Thorold").ID,
-                        TransactionDate = DateTime.Today.AddDays(-20),
-                        ReceivedDate = DateTime.Today.AddDays(-6),
-                        Description = "House keeping items - 1 broom, 2 vacuum cleaner, 2 dawn cleaner, towels ",
-                        Shipment = "Bicycle"
-                    },
-                    new Transaction
-                    {
-                        EmployeeID = context.Employees.FirstOrDefault(b => b.FirstName == "Allan Antonio").ID,
-                        TransactionStatusID = context.TransactionStatuses.FirstOrDefault(b => b.Name == "Released").ID,
-                        TransactionTypeID = context.TransactionTypes.FirstOrDefault(b => b.Name == "St. Catharines Christmas Expo").ID,
-                        OriginID = context.Branches.FirstOrDefault(b => b.Name == "CAA Welland").ID,
-                        DestinationID = context.Branches.FirstOrDefault(b => b.Name == "CAA Grimsby").ID,
-                        TransactionDate = DateTime.Today.AddDays(-100),
-                        ReceivedDate = DateTime.Today.AddDays(-3),
-                        Description = "Disco items - 2 part balloons, 4 tapes, 6 candles",
-                        Shipment = "test"
-                    });
+                        Transaction t = new()
+                        {
+                            EmployeeID = employeeIDs[random.Next(employeeIDCount)],
+                            TransactionStatusID = transactionStatusIDs[random.Next(transactionStatusIDCount)],
+                            TransactionTypeID = transactionTypeIDs[random.Next(transactionTypeIDCount)],
+                            OriginID = branchIDs[random.Next(branchIDCount-1)],
+                            DestinationID = branchIDs[random.Next(branchIDCount - 1)],
+                            TransactionDate = DateTime.Today.AddDays(random.Next(-100, 6)),
+                            ReceivedDate = DateTime.Today.AddDays(random.Next(-100, 6)),
+                            Description = description[random.Next(descCount)] + " " + description[random.Next(descCount)],
+                            Shipment = shipment[random.Next(shipCount)]
+                        };
+                        context.Transactions.Add(t);
+                    }
                     context.SaveChanges();
                 }
+
                 //TransactionItem Seed Data
                 int[] itemIDs = context.Items.Select(a => a.ID).ToArray();
                 int itemIDCount = itemIDs.Length;
