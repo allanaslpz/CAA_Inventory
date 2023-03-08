@@ -6,6 +6,8 @@ namespace caa_mis.Models
     {
         public int ID { get; set; }
 
+        public Archived Status { get; set; }
+
         [Required]
         [StringLength(255)]
         public string Name { get; set; }

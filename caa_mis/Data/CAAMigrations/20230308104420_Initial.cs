@@ -18,7 +18,8 @@ namespace caa_mis.Data.CAAMigrations
                     Name = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     Address = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     Location = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    PhoneNumber = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false)
+                    PhoneNumber = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -523,7 +524,6 @@ namespace caa_mis.Data.CAAMigrations
                 name: "IX_Transactions_TransactionTypeID",
                 table: "Transactions",
                 column: "TransactionTypeID");
-
             ExtraMigration.Steps(migrationBuilder);
         }
 

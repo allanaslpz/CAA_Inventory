@@ -8,14 +8,14 @@
 
 <p>
     <a asp-action="Create" class="btn btn-primary float-left">Create New</a>
+    <button class="btn @(ViewData["Filtering"]) btn-outline-primary float-end" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+        Filter/Search
+    </button>
 </p>
 <form asp-action="Index" method="get">
     <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
     <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
-    <div class="form-horizontal">
-        <button class="btn @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
-            Filter/Search
-        </button>
+    <div class="form-horizontal">      
         <div class="collapse" id="collapseFilter">
             <div class="card card-body bg-light">
                 <div class="row">
@@ -35,16 +35,12 @@
                         </div>
                     </div>
                     <div class="form-group col-md-4">
-                        <label class="control-label">Search Name:</label>
-                        @Html.TextBox("SearchName", null, new { @class = "form-control p-2" })
+                        <label class="control-label">Search by First Name:</label>
+                        @Html.TextBox("SearchName", null, new { @class = "form-control" })
                     </div>
                     <div class="form-group col-md-4">
-                        <label class="control-label">Search Description:</label>
-                        @Html.TextBox("SearchDesc", null, new { @class = "form-control p-2" })
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label class="control-label">In/Out:</label>
-                        @Html.DropDownList("InOutStatus", new SelectList(Enum.GetValues(typeof(InOut))), "-- Select --", htmlAttributes: new { @class = "form-control" })
+                        <label class="control-label">Search by Last Name:</label>
+                        @Html.TextBox("SearchDesc", null, new { @class = "form-control" })
                     </div>
                     <div class="form-group col-md-4">
                         <label class="control-label">Filter by Status:</label>
@@ -63,35 +59,36 @@
         <div class="row">
             @foreach (var item in Model)
             {
-                    <div class="card mb-sm-3" style="min-width: 18rem;">
-                        <h5 class="card-header"><strong>@Html.DisplayFor(modelItem => item.LastName)</strong></h5>
-                        <div class="card-body">
-                            <dl class="row lh-1">
-                                <dt class="col-3 text-truncate">
-                                    @Html.DisplayNameFor(model => model.FirstName)
-                                </dt>
-                                <dd class="col-9">
+                <div class="card mb-sm-3" style="min-width: 18rem;">
+                    <h5 class="card-header"><strong>@Html.DisplayFor(modelItem => item.LastName)</strong></h5>
+                    <div class="card-body">
+                        <dl class="row lh-1">
+                            <dt class="col-3 text-truncate">
+                                @Html.DisplayNameFor(model => model.FirstName)
+                            </dt>
+                            <dd class="col-9">
                                 @Html.DisplayFor(modelItem => item.FirstName)
-                                </dd>
-                                <dt class="col-3 text-truncate">
-                                    @Html.DisplayNameFor(model => model.LastName)
-                                </dt>
-                                <dd class="col-9">
-                                    @Html.DisplayFor(modelItem => item.LastName)
-                                </dd>
-                                <dt class="col-3 text-truncate">
-                                    @Html.DisplayNameFor(model => model.Status)
-                                </dt>
-                                <dd class="col-9">
-                                    @Html.DisplayFor(modelItem => item.Status)
-                                </dd>
-                            </dl>
-                            <div class="card-footer">
-                                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
-                            </div>
+                            </dd>
+                            <dt class="col-3 text-truncate">
+                                @Html.DisplayNameFor(model => model.LastName)
+                            </dt>
+                            <dd class="col-9">
+                                @Html.DisplayFor(modelItem => item.LastName)
+                            </dd>
+
+                            <dt class="col-3 text-truncate">
+                                @Html.DisplayNameFor(model => model.Status)
+                            </dt>
+                            <dd class="col-9">
+                                @Html.DisplayFor(modelItem => item.Status)
+                            </dd>
+                        </dl>
+                        <div class="card-footer">
+                            <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.ID">Details</a>
                         </div>
                     </div>
+                </div>
             }
         </div>
     </div>
@@ -108,29 +105,32 @@
                         </th>
                         <th>
                             <input type="submit" name="actionButton" value="Status" class="btn btn-link" />
-                        </th>                      
+                        </th>
+                        <th>
                     </tr>
                 </thead>
                 <tbody>
-            @foreach (var item in Model) {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.FirstName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.LastName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Status)
-                        </td>
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                            <a asp-action="Details" asp-route-id="@item.ID">Details</a> |                
-                        </td>
-                    </tr>
-            }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FirstName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LastName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Status)
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
     </div>
+    <partial name="_PagingNavBar" />
 </form>

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using caa_mis.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace caa_mis.Utilities
 {
@@ -43,6 +44,11 @@ namespace caa_mis.Utilities
                 items = await source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
             }
             return new PaginatedList<T>(items, count, pageIndex, pageSize);
+        }
+
+        internal static Task CreateAsync(IQueryable<Employee> employees, int v, int pageSize)
+        {
+            throw new NotImplementedException();
         }
     }
 }
