@@ -13,6 +13,7 @@ using caa_mis.Utilities;
 
 namespace caa_mis.Controllers
 {
+    
     public class BulkItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;

@@ -4,9 +4,8 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>Edit Event Type</h1>
 
-<h4>Branch</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -19,23 +18,24 @@
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-<<<<<<< HEAD
                 <label asp-for="Address" class="control-label"></label>
                 <input asp-for="Address" class="form-control" />
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Location" class="control-label"></label>
-=======
-                <label asp-for="Location" class="control-label">Address<span style="color:red;">*</span></label>
->>>>>>> origin/DEV
-                <input asp-for="Location" class="form-control" />
+                <label asp-for="Location" class="control-label">Location<span style="color:red;">*</span></label>
+                <select asp-for="Location" class="form-control form-select" asp-items="Html.GetEnumSelectList<InOut>()"></select>
                 <span asp-validation-for="Location" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PhoneNumber" class="control-label"></label>
-                <input asp-for="PhoneNumber" class="form-control" />
+                <label asp-for="PhoneNumber" class="control-label">PhoneNumber<span style="color:red;">*</span></label>
+                <select asp-for="PhoneNumber" class="form-control form-select" asp-items="Html.GetEnumSelectList<InOut>()"></select>
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label">Status<span style="color:red;">*</span></label>
+                <select asp-for="Status" class="form-control form-select" asp-items="Html.GetEnumSelectList<Archived>()"></select>
+                <span asp-validation-for="Status" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -49,5 +49,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

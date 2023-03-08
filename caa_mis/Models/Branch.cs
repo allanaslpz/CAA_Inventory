@@ -25,6 +25,8 @@ namespace caa_mis.Models
         [Display(Name = "Phone Number")]
         public string PhoneNumber { get; set; }
 
+        public Archived Status { get; set; }
+
         public ICollection<Bulk> Bulks { get; set; } = new HashSet<Bulk>();
         [JsonIgnore]
         public ICollection<Stock> Stocks { get; set; } = new HashSet<Stock>();

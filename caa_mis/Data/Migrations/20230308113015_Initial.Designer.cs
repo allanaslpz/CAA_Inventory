@@ -11,13 +11,13 @@ using caa_mis.Data;
 namespace caa_mis.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230209175648_Initial")]
+    [Migration("20230308113015_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.13");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
