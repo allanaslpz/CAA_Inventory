@@ -137,6 +137,9 @@
                         <th>
                             <input type="submit" name="actionButton" value="SKU Number" class="btn btn-link" />
                         </th>
+                        @*<th>
+                            Branch Available
+                        </th>*@
                         <th>
                             <input type="submit" name="actionButton" value="Cost" class="btn btn-link" />
                         </th>
@@ -166,6 +169,36 @@
                             <td>
                                 @Html.DisplayFor(modelItem => item.SKUNumber)
                             </td>
+                            @*<td>
+                                @{
+                                    
+                                    int condCount = item.Stocks.Count();
+                                    if (condCount > 0)
+                                    {
+                                        string firstCond = item.Stocks.FirstOrDefault().Branch.Name;
+                                        if (condCount > 1)
+                                        {
+                                            string condList = "";
+                                            var c = item.Stocks.ToList();
+                                            for (int i = 1; i < condCount; i++)//Skip the first because we have it already
+                                            {
+                                                condList += c[i].Branch.Name + " <br />";
+                                            }
+                                            <a class="" role="button" data-bs-toggle="collapse" href="#collapseHistory@(item.ID)"
+                                   aria-expanded="false" aria-controls="collapseHistory@(item.ID)">
+                                                @firstCond <span class="badge bg-info">@condCount</span>
+                                            </a>
+                                            <div class="collapse" id="collapseHistory@(item.ID)">
+                                                @Html.Raw(condList)
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            @firstCond
+                                        }
+                                    }
+                                }
+                            </td>*@
                             <td>
                                 @Html.DisplayFor(modelItem => item.Cost)
                             </td>

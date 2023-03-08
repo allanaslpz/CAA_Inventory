@@ -25,6 +25,7 @@ namespace caa_mis.Models
         public string PhoneNumber { get; set; }
 
         public ICollection<Bulk> Bulks { get; set; } = new HashSet<Bulk>();
+
         public ICollection<Stock> Stocks { get; set; } = new HashSet<Stock>();
         public ICollection<Transaction> Origins { get; set; } = new HashSet<Transaction>();
         public ICollection<Transaction> Destinations { get; set; } = new HashSet<Transaction>();

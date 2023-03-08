@@ -8,6 +8,7 @@ namespace caa_mis.Models
 
         [Required]
         public int BranchID { get; set; }
+
         public Branch Branch { get; set; }
 
         [Required]
