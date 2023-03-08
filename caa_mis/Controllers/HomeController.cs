@@ -1,7 +1,6 @@
 ﻿using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
@@ -11,7 +10,6 @@ using System.Diagnostics;
 
 namespace caa_mis.Controllers
 {
-    
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

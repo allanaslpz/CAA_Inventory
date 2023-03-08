@@ -7,11 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using caa_mis.Data;
 using caa_mis.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace caa_mis.Controllers
 {
-    [Authorize(Roles = "Admin, Supervisor")]
     public class ItemStatusController : Controller
     {
         private readonly InventoryContext _context;

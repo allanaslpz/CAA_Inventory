@@ -13,11 +13,9 @@ using Newtonsoft.Json;
 using OfficeOpenXml.Style;
 using OfficeOpenXml;
 using System.Drawing;
-using Microsoft.AspNetCore.Authorization;
 
 namespace caa_mis.Controllers
 {
-    [Authorize(Roles = "Admin, Supervisor")]
     public class TransactionItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
