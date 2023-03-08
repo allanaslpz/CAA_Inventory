@@ -56,7 +56,7 @@ namespace caa_mis.Controllers
             }
             if (TransactionStatusID.HasValue)
             {
-                inventory = inventory.Where(p => p.TransactionTypeID == TransactionTypeID);
+                inventory = inventory.Where(p => p.TransactionStatusID == TransactionStatusID);
                 ViewData["Filtering"] = "btn-danger";
             }
             if (DestinationID.HasValue)
@@ -524,15 +524,100 @@ namespace caa_mis.Controllers
 
             var trans = new Transaction { ID = id, TransactionStatusID = status.ID };
 
-
+            ReleaseTransaction(id);
             if (ModelState.IsValid)
             {
                 _context.Transactions.Attach(trans).Property(x => x.TransactionStatusID).IsModified = true;
                 _context.SaveChanges();
+                
                 return Redirect(ViewData["returnURL"].ToString());
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        //adding item to the inventory
+        public void ReleaseTransaction(int id)
+        {
+            //get the transaction details
+            var transaction =  _context.Transactions
+                .AsNoTracking()
+               .FirstOrDefault(m => m.ID == id);
+            //get the transaction items
+            var transactionItems = _context.TransactionItems
+                .Where(m => m.TransactionID == id)
+                .AsNoTracking();
+
+            //determine if stock in or out
+            if(transaction.TransactionTypeID == 1)
+            {
+                //do stock in
+                foreach (var item in transactionItems)
+                {
+                    //check if stock record already have the item
+                    var stockItem = _context.Stocks
+                        .AsNoTracking()
+                        .FirstOrDefault(s => s.BranchID == transaction.DestinationID && s.ItemID == item.ItemID);
+                    
+                    if (stockItem == null)
+                    {
+                        //create a new record
+                        //create a new record.  This will create a negative item in the inventory
+                        Stock stock = new Stock
+                        {
+                            ID = 0,
+                            BranchID = (int)transaction.DestinationID,
+                            ItemID = item.ItemID,
+                            Quantity = item.Quantity
+                        };
+
+                        _context.Stocks.Add(stock);
+                        _context.SaveChanges();
+                    }
+                    else
+                    {
+                        //update the existing one. add the item quantity to the current quantity
+                        var updateStock = new Stock { ID = stockItem.ID, Quantity = stockItem.Quantity + item.Quantity };
+                        _context.Stocks.Attach(updateStock).Property(x => x.Quantity).IsModified = true;
+                        _context.SaveChanges();
+                    }
+
+                }
+            }
+            else
+            {
+                //do stock out
+                foreach (var item in transactionItems)
+                {
+                    //check if stock record already have the item
+                    var stockItem = _context.Stocks.AsNoTracking()
+                        .FirstOrDefault(s => s.BranchID == transaction.OriginID && s.ItemID == item.ItemID);
+
+                    if (stockItem == null)
+                    {
+                        //create a new record.  This will create a negative item in the inventory
+                        Stock stock = new Stock
+                        {
+                            ID = 0,
+                            BranchID = (int)transaction.OriginID,
+                            ItemID = item.ItemID,
+                            Quantity = -item.Quantity
+                        };
+
+                        _context.Stocks.Add(stock);
+                        _context.SaveChanges();
+                    }
+                    else
+                    {
+                        //update the existing one. Deduct the item quantity to the current quantity
+                        var updateStock = new Stock { ID = stockItem.ID, Quantity = stockItem.Quantity - item.Quantity };
+                        _context.Stocks.Attach(updateStock).Property(x => x.Quantity).IsModified = true;
+                        _context.SaveChanges();
+                    }
+
+                }
+            }
+ 
         }
         private bool TransactionExists(int id)
         {

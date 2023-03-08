@@ -11,13 +11,17 @@ using caa_mis.Data;
 namespace caa_mis.Data.CAAMigrations
 {
     [DbContext(typeof(InventoryContext))]
+<<<<<<<< HEAD:caa_mis/Data/CAAMigrations/20230308115655_Initial.Designer.cs
     [Migration("20230308115655_Initial")]
+========
+    [Migration("20230308165913_Initial")]
+>>>>>>>> origin/DEV:caa_mis/Data/CAAMigrations/20230308165913_Initial.Designer.cs
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.13");
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.14");
 
             modelBuilder.Entity("caa_mis.Models.Branch", b =>
                 {
