@@ -9,9 +9,11 @@ using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.Utilities;
 using caa_mis.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace caa_mis.Controllers
 {
+    [Authorize(Roles = "Admin, Supervisor")]
     public class BulksController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
