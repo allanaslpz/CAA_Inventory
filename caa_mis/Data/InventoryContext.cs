@@ -185,9 +185,13 @@ namespace caa_mis.Data
                 .WithOne(i => i.Manufacturer)
                 .HasForeignKey(i => i.ManufacturerID);
 
+            
+            modelBuilder.Entity<Event>()
+                .HasIndex(e => new { e.Name, e.Date })
+                .IsUnique();
+
+
         }
-
-
 
     }
 }
