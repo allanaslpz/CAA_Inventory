@@ -1,18 +1,18 @@
-﻿@model caa_mis.Models.Bulk
+﻿@model caa_mis.Models.Event
 
 @{
     ViewData["Title"] = "Release";
-    IEnumerable<caa_mis.Models.BulkItem> Items = (IEnumerable<caa_mis.Models.BulkItem>)ViewBag.Items;//(caa_mis.Models.TransactionItem)ViewBag.Items;
+    IEnumerable<caa_mis.Models.EventItem> Items = (IEnumerable<caa_mis.Models.EventItem>)ViewBag.Items;//(caa_mis.Models.TransactionItem)ViewBag.Items;
 }
 
 <h1>Release</h1>
 
-<h3>Are you sure you want to release this Initial Inventory for Branch @Model.Branch.Name?</h3>
-<p>Releasing this record will reset the branch's inventory.'</p>
+<h3>Are you sure you want to release this Event @Model.Branch.Name?</h3>
+<p>Releasing this will deduct inventory items to the selected branch.'</p>
 <form asp-action="Release">
     <input type="hidden" asp-for="@Model.ID" />
     <input type="submit" value="Release" class="btn btn-primary" />
-    <a asp-action="Index" asp-controller="BulkItems" asp-route-TransactionID="@Model.ID" class="btn btn-danger">Back to Details Page</a>
+    <a asp-action="Index" asp-controller="EventItems" asp-route-TransactionID="@Model.ID" class="btn btn-danger">Back to Details Page</a>
 </form>
 <hr />
 <div class="container-fluid">
@@ -20,7 +20,13 @@
         <div class="col-6">
             <dl class="row">
                 <dt class="col-md-4">
-                    Branch
+                    Name
+                </dt>
+                <dd class="col-md-8">
+                    @Html.DisplayFor(model => model.Name)
+                </dd>
+                <dt class="col-md-4">
+                    Origin Branch
                 </dt>
                 <dd class="col-md-8">
                     @Html.DisplayFor(model => model.Branch.Name)

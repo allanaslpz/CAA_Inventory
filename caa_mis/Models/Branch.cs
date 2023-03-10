@@ -28,6 +28,7 @@ namespace caa_mis.Models
         public Archived Status { get; set; }
 
         public ICollection<Bulk> Bulks { get; set; } = new HashSet<Bulk>();
+        public ICollection<Event> Events { get; set; } = new HashSet<Event>();
         [JsonIgnore]
         public ICollection<Stock> Stocks { get; set; } = new HashSet<Stock>();
         public ICollection<Transaction> Origins { get; set; } = new HashSet<Transaction>();
