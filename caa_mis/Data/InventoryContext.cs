@@ -33,7 +33,7 @@ namespace caa_mis.Data
         public DbSet<ItemThumbnail> ItemThumbnails { get; set; }        
         public DbSet<Employee> Employees { get; set; }
         public DbSet<StockSummaryByBranchVM> StockSummaryByBranch { get; set; }
-        public DbSet<TransactionSummaryVM> TransactionSummary { get; set; }
+        public DbSet<EventSummaryVM> EventSummary { get; set; }
         public DbSet<TransactionItemSummaryVM> TransactionItemSummary { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,8 +50,8 @@ namespace caa_mis.Data
                 .HasKey(a => a.ID);
 
             modelBuilder
-                .Entity<TransactionSummaryVM>()
-                .ToView(nameof(TransactionSummary))
+                .Entity<EventSummaryVM>()
+                .ToView(nameof(EventSummary))
                 .HasKey(a => a.ID);
 
             modelBuilder
