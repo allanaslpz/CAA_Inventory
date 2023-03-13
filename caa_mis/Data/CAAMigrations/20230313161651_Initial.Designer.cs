@@ -11,7 +11,7 @@ using caa_mis.Data;
 namespace caa_mis.Data.CAAMigrations
 {
     [DbContext(typeof(InventoryContext))]
-    [Migration("20230309195913_Initial")]
+    [Migration("20230313161651_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -183,6 +183,9 @@ namespace caa_mis.Data.CAAMigrations
                     b.HasIndex("EmployeeID");
 
                     b.HasIndex("TransactionStatusID");
+
+                    b.HasIndex("Name", "Date")
+                        .IsUnique();
 
                     b.ToTable("Events");
                 });
@@ -508,10 +511,16 @@ namespace caa_mis.Data.CAAMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool?>("IsEdited")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("ItemID")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ReceivedQuantity")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("StockID")

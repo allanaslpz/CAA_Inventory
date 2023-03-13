@@ -621,6 +621,162 @@ namespace caa_mis.Controllers
             }
  
         }
+
+        //incoming transactions
+        public async Task<IActionResult> Incoming(string sortDirectionCheck, string sortFieldID, string SearchString, int? TransactionTypeID, int? TransactionStatusID, int? DestinationID,
+           int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Type")
+        {
+            //Clear the sort/filter/paging URL Cookie for Controller
+            CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
+            //List of sort options.
+            //NOTE: make sure this array has matching values to the column headings
+            string[] sortOptions = new[] { "Type", "Description", "Origin", "Destination", "Transaction Date"};
+
+            PopulateDropDownLists();
+            ViewDataReturnURL();
+            
+            var inventory = _context.Transactions
+                .Include(t => t.Destination)
+                .Include(t => t.Employee)
+                .Include(t => t.Origin)
+                .Include(t => t.TransactionStatus)
+                .Include(t => t.TransactionType)
+                .Where(t => t.TransactionStatusID == 2 && t.TransactionTypeID == 2)
+                .AsNoTracking();
+
+            if (TransactionTypeID.HasValue)
+            {
+                inventory = inventory.Where(p => p.TransactionTypeID == TransactionTypeID);
+                ViewData["Filtering"] = "btn-danger";
+            }
+            if (DestinationID.HasValue)
+            {
+                inventory = inventory.Where(p => p.DestinationID == DestinationID);
+                ViewData["Filtering"] = "btn-danger";
+            }
+            if (!String.IsNullOrEmpty(SearchString))
+            {
+                inventory = inventory.Where(p => p.Description.ToUpper().Contains(SearchString.ToUpper()));
+                ViewData["Filtering"] = "btn-danger";
+            }
+
+            //Before we sort, see if we have called for a change of filtering or sorting
+            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
+            {
+                page = 1;//Reset page to start
+
+                if (sortOptions.Contains(actionButton))//Change of sort is requested
+                {
+                    if (actionButton == sortField) //Reverse order on same field
+                    {
+                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
+                    }
+                    sortField = actionButton;//Sort by the button clicked
+                }
+                else //Sort by the controls in the filter area
+                {
+                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
+                    sortField = sortFieldID;
+                }
+            }
+
+            //Now we know which field and direction to sort by
+            if (sortField == "Type")
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.TransactionType.Name);
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.TransactionType.Name);
+                }
+            }
+            else if (sortField == "Description")
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.Description);
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.Description);
+                }
+            }
+            else if (sortField == "Origin")
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.Origin.Name);
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.Origin.Name);
+                }
+            }
+            else if (sortField == "Destination")
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.Destination.Name);
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.Destination.Name);
+                }
+            }
+            else if (sortField == "Transaction Date")
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.TransactionDate);
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.TransactionDate);
+                }
+            }
+            else //Sorting by Name
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.TransactionStatus.Name);
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.TransactionStatus.Name);
+                }
+            }
+
+            //Set sort for next time
+            ViewData["sortField"] = sortField;
+            ViewData["sortDirection"] = sortDirection;
+            //SelectList for Sorting Options
+            ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
+
+            //Handle Paging
+            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "IncomingTransactions");
+            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
+            var pagedData = await PaginatedList<Transaction>.CreateAsync(inventory.AsNoTracking(), page ?? 1, pageSize);
+
+
+            return View(pagedData);
+        }
         private bool TransactionExists(int id)
         {
           return _context.Transactions.Any(e => e.ID == id);

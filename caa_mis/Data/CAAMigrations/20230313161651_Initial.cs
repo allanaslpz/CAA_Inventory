@@ -452,6 +452,8 @@ namespace caa_mis.Data.CAAMigrations
                     ItemID = table.Column<int>(type: "INTEGER", nullable: false),
                     TransactionID = table.Column<int>(type: "INTEGER", nullable: false),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    ReceivedQuantity = table.Column<int>(type: "INTEGER", nullable: true),
+                    IsEdited = table.Column<bool>(type: "INTEGER", nullable: true),
                     StockID = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
@@ -520,6 +522,12 @@ namespace caa_mis.Data.CAAMigrations
                 name: "IX_Events_EmployeeID",
                 table: "Events",
                 column: "EmployeeID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_Name_Date",
+                table: "Events",
+                columns: new[] { "Name", "Date" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_TransactionStatusID",
