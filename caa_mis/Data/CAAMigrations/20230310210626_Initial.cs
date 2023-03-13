@@ -522,6 +522,12 @@ namespace caa_mis.Data.CAAMigrations
                 column: "EmployeeID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Events_Name_Date",
+                table: "Events",
+                columns: new[] { "Name", "Date" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_TransactionStatusID",
                 table: "Events",
                 column: "TransactionStatusID");

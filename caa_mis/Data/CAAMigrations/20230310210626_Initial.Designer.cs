@@ -11,11 +11,7 @@ using caa_mis.Data;
 namespace caa_mis.Data.CAAMigrations
 {
     [DbContext(typeof(InventoryContext))]
-<<<<<<<< HEAD:caa_mis/Data/CAAMigrations/20230310004032_Initial.Designer.cs
-    [Migration("20230310004032_Initial")]
-========
-    [Migration("20230309195913_Initial")]
->>>>>>>> origin/DEV:caa_mis/Data/CAAMigrations/20230309195913_Initial.Designer.cs
+    [Migration("20230310210626_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -187,6 +183,9 @@ namespace caa_mis.Data.CAAMigrations
                     b.HasIndex("EmployeeID");
 
                     b.HasIndex("TransactionStatusID");
+
+                    b.HasIndex("Name", "Date")
+                        .IsUnique();
 
                     b.ToTable("Events");
                 });
