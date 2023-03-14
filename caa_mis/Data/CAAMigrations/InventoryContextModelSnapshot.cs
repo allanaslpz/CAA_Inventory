@@ -182,6 +182,9 @@ namespace caa_mis.Data.CAAMigrations
 
                     b.HasIndex("TransactionStatusID");
 
+                    b.HasIndex("Name", "Date")
+                        .IsUnique();
+
                     b.ToTable("Events");
                 });
 
