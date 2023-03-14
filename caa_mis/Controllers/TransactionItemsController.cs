@@ -206,7 +206,8 @@ namespace caa_mis.Controllers
                 ID = transactionItem.ID,
                 TransactionID = transactionItem.TransactionID,
                 ItemID = transactionItem.ProductID,
-                Quantity = transactionItem.Quantity
+                Quantity = transactionItem.Quantity,
+                ReceivedQuantity = transactionItem.Quantity
             };
             if (ModelState.IsValid)
             {
@@ -274,11 +275,20 @@ namespace caa_mis.Controllers
                 return NotFound();
             }
 
+            TransactionItem tI = new TransactionItem
+            {
+                ID = transactionItem.ID,
+                TransactionID = transactionItem.TransactionID,
+                ItemID = transactionItem.ItemID,
+                Quantity = transactionItem.Quantity,
+                ReceivedQuantity = transactionItem.Quantity
+            };
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(transactionItem);
+                    _context.Update(tI);
                     await _context.SaveChangesAsync();
                     return Redirect(ViewData["returnURL"].ToString());
                 }
@@ -297,7 +307,7 @@ namespace caa_mis.Controllers
 
             PopulateDropDownLists(transactionItem);
 
-            return View(transactionItem);
+            return View(tI);
         }
         // POST: TransactionItems/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.

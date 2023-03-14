@@ -39,7 +39,7 @@
 </div>
 
 <div>
-    <a href='@ViewData["returnURL"]'>Back to Transaction</a>
+    <a asp-action="Incoming" asp-controller="TransactionItems" asp-route-TransactionID="@Model.TransactionID" class="btn btn-secondary">Back to Incoming List</a>
 </div>
 
 @section Scripts {

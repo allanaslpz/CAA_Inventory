@@ -38,7 +38,7 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Type", "Description", "Origin", "Destination", "Transaction Date", "Transaction Status" };
+            string[] sortOptions = new[] { "Type", "Description", "Origin", "Destination", "Date", "Status" };
 
             PopulateDropDownLists();
             ViewDataReturnURL();
@@ -145,7 +145,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.Destination.Name);
                 }
             }
-            else if (sortField == "Transaction Date")
+            else if (sortField == "Date")
             {
                 if (sortDirection == "asc")
                 {
@@ -510,6 +510,40 @@ namespace caa_mis.Controllers
             return View(transaction);
         }
 
+
+        // GET: Transactions/Release/5
+        public async Task<IActionResult> Receive(int? id)
+        {
+            ViewDataReturnURL();
+            if (id == null || _context.Transactions == null)
+            {
+                return NotFound();
+            }
+
+            var transaction = await _context.Transactions
+                .Include(t => t.Destination)
+                .Include(t => t.Employee)
+                .Include(t => t.Origin)
+                .Include(t => t.TransactionStatus)
+                .Include(t => t.TransactionType)
+                .FirstOrDefaultAsync(m => m.ID == id);
+
+            var items = from a in _context.TransactionItems
+                .Include(t => t.Item)
+                .OrderBy(t => t.Item.Name)
+                        where a.TransactionID == id.GetValueOrDefault()
+                        select a;
+
+            ViewBag.Items = items.AsNoTracking();
+
+            if (transaction == null)
+            {
+                return NotFound();
+            }
+
+            return View(transaction);
+        }
+
         // POST: Transactions/Release/5
         [HttpPost, ActionName("Release")]
         [ValidateAntiForgeryToken]
@@ -538,6 +572,94 @@ namespace caa_mis.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // POST: Transactions/Receive/5
+        [HttpPost, ActionName("Receive")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReceiveConfirmed(int id)
+        {
+            ViewDataReturnURL();
+            if (_context.Transactions == null)
+            {
+                return Problem("Entity set 'InventoryContext.Transactions'  is null.");
+            }
+
+            var transToUpdate = await _context.Transactions.FindAsync(id);
+
+            var status = await _context.TransactionStatuses
+                .FirstOrDefaultAsync(m => m.Name == "Received");
+
+            // var trans = new Transaction { ID = id, TransactionStatusID = status.ID, ReceivedDate = DateTime.Today };
+            transToUpdate.ID = transToUpdate.ID;
+            transToUpdate.EmployeeID = transToUpdate.EmployeeID;
+            transToUpdate.TransactionStatusID = status.ID;
+            transToUpdate.TransactionDate = transToUpdate.TransactionDate;
+            transToUpdate.TransactionTypeID = transToUpdate.TransactionTypeID;
+            transToUpdate.OriginID = transToUpdate.OriginID;
+            transToUpdate.DestinationID = transToUpdate.DestinationID;
+            transToUpdate.ReceivedDate = DateTime.Today;
+            transToUpdate.Shipment = transToUpdate.Shipment;
+            transToUpdate.Description = transToUpdate.Description;
+            ReceiveTransaction(id);
+            if (ModelState.IsValid)
+            {
+                //_context.Transactions.Attach(trans).Property(x => x.TransactionStatusID).IsModified = true;
+                _context.Update(transToUpdate);
+                _context.SaveChanges();
+
+                return Redirect(ViewData["returnURL"].ToString());
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        //adding item to the inventory
+        public void ReceiveTransaction(int id)
+        {
+            //get the transaction details
+            var transaction = _context.Transactions
+                .AsNoTracking()
+               .FirstOrDefault(m => m.ID == id);
+            //get the transaction items
+            var transactionItems = _context.TransactionItems
+                .Where(m => m.TransactionID == id)
+                .AsNoTracking();
+
+            //do stock in
+            foreach (var item in transactionItems)
+            {
+                //check if stock record already have the item
+                var stockItem = _context.Stocks
+                    .AsNoTracking()
+                    .FirstOrDefault(s => s.BranchID == transaction.DestinationID && s.ItemID == item.ItemID);
+                
+               
+                int newQty = (item.ReceivedQuantity != null) ? (int)item.ReceivedQuantity: item.Quantity;
+
+                if (stockItem == null)
+                {
+                    //create a new record
+                    Stock stock = new Stock
+                    {
+                        ID = 0,
+                        BranchID = (int)transaction.DestinationID,
+                        ItemID = item.ItemID,
+                        Quantity = newQty
+                    };
+
+                    _context.Stocks.Add(stock);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    //update the existing one. add the item quantity to the current quantity
+                    var updateStock = new Stock { ID = stockItem.ID, Quantity = stockItem.Quantity + newQty };
+                    _context.Stocks.Attach(updateStock).Property(x => x.Quantity).IsModified = true;
+                    _context.SaveChanges();
+                }
+
+            }
+
+        }
         //adding item to the inventory
         public void ReleaseTransaction(int id)
         {
@@ -564,7 +686,6 @@ namespace caa_mis.Controllers
                     if (stockItem == null)
                     {
                         //create a new record
-                        //create a new record.  This will create a negative item in the inventory
                         Stock stock = new Stock
                         {
                             ID = 0,
