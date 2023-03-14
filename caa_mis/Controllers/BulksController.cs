@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace caa_mis.Controllers
 {
-    [Authorize(Roles = "Admin, Supervisor")]
+    [Authorize(Roles = "Admin")]
     public class BulksController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;

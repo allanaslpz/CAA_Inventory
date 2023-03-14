@@ -44,22 +44,22 @@
     <table class="table">
         <thead>
             <tr>
-                <th>
+                <th style="text-align: left;">
                     <input type="submit" name="actionButton" value="Employee" class="btn btn-link" />
                 </th>
-                <th>
+                <th style="text-align: center;">
                     <input type="submit" name="actionButton" value="Origin" class="btn btn-link" />
                 </th>
-                <th>
+                <th style="text-align: center;">
                     <input type="submit" name="actionButton" value="Destination" class="btn btn-link" />
                 </th>
-                <th>
+                <th style="text-align: center;">
                     <input type="submit" name="actionButton" value="Transfer Status" class="btn btn-link" />
                 </th>
-                <th>
-                    <input type="submit" name="actionButton" value="Item" class="btn btn-link" />
+                <th style="text-align: center;">
+                    <input type="submit" name="actionButton" value="Product" class="btn btn-link" />
                 </th>
-                <th>
+                <th style="text-align: center;">
                     <input type="submit" name="actionButton" value="Quantity" class="btn btn-link" />
                 </th>
             </tr>
@@ -68,22 +68,22 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>
+                    <td style="text-align: left;">
                         @Html.DisplayFor(modelItem => item.EmployeeName)
                     </td>
-                    <td>
+                    <td style="text-align: center;">
                         @Html.DisplayFor(modelItem => item.OriginName)
                     </td>
-                    <td>
+                    <td style="text-align: center;">
                         @Html.DisplayFor(modelItem => item.DestinationName)
                     </td>
-                    <td>
+                    <td style="text-align: center;">
                         @Html.DisplayFor(modelItem => item.TransactionStatusName)
                     </td>
-                    <td>
+                    <td style="text-align: center;">
                         @Html.DisplayFor(modelItem => item.ItemName)
                     </td>
-                    <td>
+                    <td style="text-align: center;">
                         @Html.DisplayFor(modelItem => item.Quantity)
                     </td>                    
                 </tr>

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/caa_mis.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/table-styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
@@ -25,8 +26,7 @@
                                 Inventory
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Items" asp-action="Index">Products</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Bulks" asp-action="Index">Initial Inventory</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Events" asp-action="Index">Events</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Index">Inventory In/Out</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Incoming">Incoming Stocks</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Events" asp-action="Index">Events</a></li>
@@ -65,6 +65,7 @@
                                 Setting
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Bulks" asp-action="Index">Initial Inventory</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="UserRoles" asp-action="">User Roles</a></li>
                             </ul>
                         </li>
