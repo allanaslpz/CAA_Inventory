@@ -1,0 +1,7 @@
+﻿table {
+    border-collapse: collapse;
+}
+
+table tr:hover {
+    background-color: #c7c7c7;
+}
