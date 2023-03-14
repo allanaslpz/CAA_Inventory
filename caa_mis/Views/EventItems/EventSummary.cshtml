@@ -36,28 +36,28 @@
             </div>
         </div>
     </div>
-    <table class="table">
+    <table class="table text-center">
         <thead>
             <tr>
-                <th style="text-align: left;">
+                <th class="text-start">
                     <input type="submit" name="actionButton" value="Branch" class="btn btn-link" />
                 </th>
-                <th style="text-align: center;">
+                <th>
                     <input type="submit" name="actionButton" value="Event" class="btn btn-link" />
                 </th>
-                <th style="text-align: center;">
+                <th>
                     <input type="submit" name="actionButton" value="Employee" class="btn btn-link" />
                 </th>
-                <th style="text-align: center;">
+                <th>
                     <input type="submit" name="actionButton" value="Transfer Status" class="btn btn-link" />
                 </th>
-                <th style="text-align: center;">
+                <th>
                     <input type="submit" name="actionButton" value="Event Date" class="btn btn-link" />
                 </th>
-                <th style="text-align: center;">
+                <th>
                     <input type="submit" name="actionButton" value="Product" class="btn btn-link" />
                 </th>
-                <th style="text-align: center;">
+                <th>
                     <input type="submit" name="actionButton" value="Quantity" class="btn btn-link" />
                 </th>
             </tr>
@@ -66,25 +66,25 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td style="text-align: left;">
+                    <td class="text-start">
                         @Html.DisplayFor(modelItem => item.BranchName)
                     </td>
-                    <td style="text-align: center;">
+                    <td>
                         @Html.DisplayFor(modelItem => item.EventName)
                     </td>
-                    <td style="text-align: center;">
+                    <td>
                         @Html.DisplayFor(modelItem => item.EmployeeName)
                     </td>
-                    <td style="text-align: center;">
+                    <td>
                         @Html.DisplayFor(modelItem => item.TransactionStatusName)
                     </td>
-                    <td style="text-align: center;">
+                    <td>
                         @Html.DisplayFor(modelItem => item.EventDate)
                     </td>
-                    <td style="text-align: center;">
+                    <td>
                         @Html.DisplayFor(modelItem => item.ItemName)
                     </td>
-                    <td style="text-align: center;">
+                    <td>
                         @Html.DisplayFor(modelItem => item.EventQuantity)
                     </td>
                 </tr>
