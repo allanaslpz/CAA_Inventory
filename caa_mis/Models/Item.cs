@@ -48,10 +48,12 @@ namespace caa_mis.Models
         public ItemStatus ItemStatus { get; set; }        
 
         public ICollection<BulkItem> BulkItems { get; set; } = new HashSet<BulkItem>();
+        public ICollection<EventItem> EventItems { get; set; } = new HashSet<EventItem>();
         public ICollection<Stock> Stocks { get; set; } = new HashSet<Stock>();
         public ICollection<ItemSupplier> ItemSuppliers { get; set; } = new HashSet<ItemSupplier>();
         public ICollection<TransactionItem> TransactionItems { get; set; } = new HashSet<TransactionItem>();
         public ItemPhoto ItemPhoto { get; set; }
+        [JsonIgnore]
         public ItemThumbnail ItemThumbnail { get; set; }
     }
 

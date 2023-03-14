@@ -74,41 +74,6 @@ namespace caa_mis.Data
                         Description = "Generic Stock Out",
                         InOut = InOut.Out,
                         Status = Archived.Enabled
-                    },
-                    new TransactionType
-                    {
-                        Name = "Winter Ice",
-                        Description = "CAA Winter 2023",
-                        InOut = InOut.In,
-                        Status = Archived.Enabled
-                    },
-                    new TransactionType
-                    {
-                        Name = "Spring Break",
-                        Description = "CAA Spring 2023",
-                        InOut = InOut.In,
-                        Status = Archived.Enabled
-                    },
-                    new TransactionType
-                    {
-                        Name = "Summer Splash",
-                        Description = "CAA Summer 2023",
-                        InOut = InOut.In,
-                        Status = Archived.Enabled
-                    },
-                    new TransactionType
-                    {
-                        Name = "Halloween Party",
-                        Description = "CAA Fall 2023",
-                        InOut = InOut.Out,
-                        Status = Archived.Enabled
-                    },
-                    new TransactionType
-                    {
-                        Name = "Testing Event",
-                        Description = "Pending Event Stock In ",
-                        InOut = InOut.In,
-                        Status = Archived.Disabled
                     });
                     context.SaveChanges();
                 }

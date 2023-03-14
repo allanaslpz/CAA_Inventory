@@ -4,9 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.Utilities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace caa_mis.Controllers
 {
+    [Authorize(Roles = "Admin, Supervisor")]
     public class TransactionTypesController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -191,12 +193,20 @@ namespace caa_mis.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,Name,Description,InOut")] TransactionType transactionType)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(transactionType);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(transactionType);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
+            catch
+            {
+                ModelState.AddModelError("", "Saving Failed. Please try again or contact your System Administrator.");
+            }
+
             return View(transactionType);
         }
 
@@ -223,31 +233,39 @@ namespace caa_mis.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description,InOut,Status")] TransactionType transactionType)
         {
-            if (id != transactionType.ID)
+            try
             {
-                return NotFound();
+                if (id != transactionType.ID)
+                {
+                    return NotFound();
+                }
+
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        _context.Update(transactionType);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!TransactionTypeExists(transactionType.ID))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch
+            {
+                ModelState.AddModelError("", "Saving Failed. Please try again or contact your System Administrator.");
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(transactionType);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TransactionTypeExists(transactionType.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
             return View(transactionType);
         }
 
@@ -274,19 +292,27 @@ namespace caa_mis.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ArchiveConfirmed(int id)
         {
-            if (_context.TransactionTypes == null)
+            try
             {
-                return Problem("Entity set 'InventoryContext.TransactionTypes'  is null.");
+                if (_context.TransactionTypes == null)
+                {
+                    return Problem("Entity set 'InventoryContext.TransactionTypes'  is null.");
+                }
+
+                var transactionType = await _context.TransactionTypes.FindAsync(id);
+
+                if (transactionType != null)
+                {
+                    transactionType.Status = Archived.Disabled;
+                }
+
+                await _context.SaveChangesAsync();
             }
-            
-            var transactionType = await _context.TransactionTypes.FindAsync(id);
-            
-            if (transactionType != null)
+            catch
             {
-                transactionType.Status = Archived.Disabled;
+                ModelState.AddModelError("", "Saving Failed. Please try again or contact your System Administrator.");
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

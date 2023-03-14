@@ -12,7 +12,7 @@
 <form asp-action="Release">
     <input type="hidden" asp-for="@Model.ID" />
     <input type="submit" value="Release" class="btn btn-primary" />
-    <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@Model.ID" class="btn btn-danger">Back to Details Page</a>
+    <a asp-action="Index" asp-controller="BulkItems" asp-route-TransactionID="@Model.ID" class="btn btn-danger">Back to Details Page</a>
 </form>
 <hr />
 <div class="container-fluid">

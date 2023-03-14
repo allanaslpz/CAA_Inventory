@@ -16,5 +16,10 @@ namespace caa_mis.Models
         [Required]
         [Range(0, int.MaxValue)]
         public int Quantity { get; set; }
+
+        [Range(0, int.MaxValue)]
+        public int? ReceivedQuantity { get; set; }
+
+        public bool? IsEdited { get; set; } = false;
     }
 }

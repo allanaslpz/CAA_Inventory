@@ -19,9 +19,11 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Utilities;
 using System.Collections;
+using Microsoft.AspNetCore.Authorization;
 
 namespace caa_mis.Controllers
 {
+    [Authorize(Roles = "Admin, Supervisor")]
     public class ItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;

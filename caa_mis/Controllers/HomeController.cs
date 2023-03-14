@@ -1,6 +1,7 @@
 ﻿using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using System.Diagnostics;
 
 namespace caa_mis.Controllers
 {
+    
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

@@ -41,10 +41,10 @@
             </div>
         </div>
     </div>
-    <table class="table">
+    <table class="table text-center">
         <thead>
             <tr>
-                <th>
+                <th class="text-start">
                     <input type="submit" name="actionButton" value="Employee" class="btn btn-link" />
                 </th>
                 <th>
@@ -57,7 +57,7 @@
                     <input type="submit" name="actionButton" value="Transfer Status" class="btn btn-link" />
                 </th>
                 <th>
-                    <input type="submit" name="actionButton" value="Item" class="btn btn-link" />
+                    <input type="submit" name="actionButton" value="Product" class="btn btn-link" />
                 </th>
                 <th>
                     <input type="submit" name="actionButton" value="Quantity" class="btn btn-link" />
@@ -68,7 +68,7 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>
+                    <td class="text-start">
                         @Html.DisplayFor(modelItem => item.EmployeeName)
                     </td>
                     <td>

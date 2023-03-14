@@ -11,7 +11,11 @@ using caa_mis.Data;
 namespace caa_mis.Data.CAAMigrations
 {
     [DbContext(typeof(InventoryContext))]
+<<<<<<<< HEAD:caa_mis/Data/CAAMigrations/20230309154657_Initial.Designer.cs
     [Migration("20230309154657_Initial")]
+========
+    [Migration("20230314162639_Initial")]
+>>>>>>>> origin/DEV:caa_mis/Data/CAAMigrations/20230314162639_Initial.Designer.cs
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +48,9 @@ namespace caa_mis.Data.CAAMigrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ID");
 
@@ -118,6 +125,9 @@ namespace caa_mis.Data.CAAMigrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("ID");
 
                     b.ToTable("Categories");
@@ -145,6 +155,67 @@ namespace caa_mis.Data.CAAMigrations
                     b.HasKey("ID");
 
                     b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("caa_mis.Models.Event", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BranchID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TransactionStatusID")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("BranchID");
+
+                    b.HasIndex("EmployeeID");
+
+                    b.HasIndex("TransactionStatusID");
+
+                    b.HasIndex("Name", "Date")
+                        .IsUnique();
+
+                    b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("caa_mis.Models.EventItem", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EventID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("EventID");
+
+                    b.HasIndex("ItemID");
+
+                    b.ToTable("EventItems");
                 });
 
             modelBuilder.Entity("caa_mis.Models.Item", b =>
@@ -239,6 +310,9 @@ namespace caa_mis.Data.CAAMigrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ID");
 
@@ -441,10 +515,16 @@ namespace caa_mis.Data.CAAMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool?>("IsEdited")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("ItemID")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ReceivedQuantity")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("StockID")
@@ -511,6 +591,53 @@ namespace caa_mis.Data.CAAMigrations
                     b.HasKey("ID");
 
                     b.ToTable("TransactionTypes");
+                });
+
+            modelBuilder.Entity("caa_mis.ViewModels.EventSummaryVM", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BranchID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("BranchName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("EmployeeName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("EventDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EventID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("EventName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EventQuantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ItemName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TransactionStatusID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TransactionStatusName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.ToView("EventSummary");
                 });
 
             modelBuilder.Entity("caa_mis.ViewModels.StockSummaryByBranchVM", b =>
@@ -583,59 +710,6 @@ namespace caa_mis.Data.CAAMigrations
                     b.ToView("TransactionItemSummary");
                 });
 
-            modelBuilder.Entity("caa_mis.ViewModels.TransactionSummaryVM", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("DestinationID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("DestinationName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("EmployeeID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("EmployeeName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("OriginID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("OriginName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ReceivedDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Shipment")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TransactionStatusID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("TransactionStatusName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TransactionTypeID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("TransactionTypeName")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ID");
-
-                    b.ToView("TransactionSummary");
-                });
-
             modelBuilder.Entity("caa_mis.Models.Bulk", b =>
                 {
                     b.HasOne("caa_mis.Models.Branch", "Branch")
@@ -678,6 +752,52 @@ namespace caa_mis.Data.CAAMigrations
                         .IsRequired();
 
                     b.Navigation("Bulk");
+
+                    b.Navigation("Item");
+                });
+
+            modelBuilder.Entity("caa_mis.Models.Event", b =>
+                {
+                    b.HasOne("caa_mis.Models.Branch", "Branch")
+                        .WithMany("Events")
+                        .HasForeignKey("BranchID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("caa_mis.Models.Employee", "Employee")
+                        .WithMany("Events")
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("caa_mis.Models.TransactionStatus", "TransactionStatus")
+                        .WithMany("Events")
+                        .HasForeignKey("TransactionStatusID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("TransactionStatus");
+                });
+
+            modelBuilder.Entity("caa_mis.Models.EventItem", b =>
+                {
+                    b.HasOne("caa_mis.Models.Event", "Event")
+                        .WithMany("EventItems")
+                        .HasForeignKey("EventID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("caa_mis.Models.Item", "Item")
+                        .WithMany("EventItems")
+                        .HasForeignKey("ItemID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
 
                     b.Navigation("Item");
                 });
@@ -839,6 +959,8 @@ namespace caa_mis.Data.CAAMigrations
 
                     b.Navigation("Destinations");
 
+                    b.Navigation("Events");
+
                     b.Navigation("Origins");
 
                     b.Navigation("Stocks");
@@ -858,12 +980,21 @@ namespace caa_mis.Data.CAAMigrations
                 {
                     b.Navigation("Bulks");
 
+                    b.Navigation("Events");
+
                     b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("caa_mis.Models.Event", b =>
+                {
+                    b.Navigation("EventItems");
                 });
 
             modelBuilder.Entity("caa_mis.Models.Item", b =>
                 {
                     b.Navigation("BulkItems");
+
+                    b.Navigation("EventItems");
 
                     b.Navigation("ItemPhoto");
 
@@ -904,6 +1035,8 @@ namespace caa_mis.Data.CAAMigrations
             modelBuilder.Entity("caa_mis.Models.TransactionStatus", b =>
                 {
                     b.Navigation("Bulks");
+
+                    b.Navigation("Events");
 
                     b.Navigation("Transactions");
                 });

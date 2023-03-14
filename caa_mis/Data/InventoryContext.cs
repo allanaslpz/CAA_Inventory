@@ -18,6 +18,9 @@ namespace caa_mis.Data
 
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<TransactionItem> TransactionItems { get; set; }
+
+        public DbSet<Event> Events { get; set; }
+        public DbSet<EventItem> EventItems { get; set; }
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Item> Items { get; set; }
@@ -30,7 +33,7 @@ namespace caa_mis.Data
         public DbSet<ItemThumbnail> ItemThumbnails { get; set; }        
         public DbSet<Employee> Employees { get; set; }
         public DbSet<StockSummaryByBranchVM> StockSummaryByBranch { get; set; }
-        public DbSet<TransactionSummaryVM> TransactionSummary { get; set; }
+        public DbSet<EventSummaryVM> EventSummary { get; set; }
         public DbSet<TransactionItemSummaryVM> TransactionItemSummary { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,8 +50,8 @@ namespace caa_mis.Data
                 .HasKey(a => a.ID);
 
             modelBuilder
-                .Entity<TransactionSummaryVM>()
-                .ToView(nameof(TransactionSummary))
+                .Entity<EventSummaryVM>()
+                .ToView(nameof(EventSummary))
                 .HasKey(a => a.ID);
 
             modelBuilder
@@ -60,6 +63,11 @@ namespace caa_mis.Data
                 .HasMany<Bulk>(t => t.Bulks)
                 .WithOne(b => b.TransactionStatus)
                 .HasForeignKey(b => b.TransactionStatusID);
+
+            modelBuilder.Entity<TransactionStatus>()
+               .HasMany<Event>(t => t.Events)
+               .WithOne(b => b.TransactionStatus)
+               .HasForeignKey(b => b.TransactionStatusID);
 
             modelBuilder.Entity<TransactionStatus>()
                 .HasMany<Transaction>(ts => ts.Transactions)
@@ -77,12 +85,22 @@ namespace caa_mis.Data
                 .HasForeignKey(b => b.EmployeeID);
 
             modelBuilder.Entity<Employee>()
+                .HasMany<Event>(e => e.Events)
+                .WithOne(b => b.Employee)
+                .HasForeignKey(b => b.EmployeeID);
+
+            modelBuilder.Entity<Employee>()
                 .HasMany<Transaction>(e => e.Transactions)
                 .WithOne(t => t.Employee)
                 .HasForeignKey(t => t.EmployeeID);
 
             modelBuilder.Entity<Branch>()
                 .HasMany<Bulk>(b => b.Bulks)
+                .WithOne(t => t.Branch)
+                .HasForeignKey(t => t.BranchID);
+
+            modelBuilder.Entity<Branch>()
+                .HasMany<Event>(b => b.Events)
                 .WithOne(t => t.Branch)
                 .HasForeignKey(t => t.BranchID);
 
@@ -106,6 +124,11 @@ namespace caa_mis.Data
                 .WithOne(bi => bi.Bulk)
                 .HasForeignKey(bi => bi.BulkID);
 
+            modelBuilder.Entity<Event>()
+               .HasMany<EventItem>(b => b.EventItems)
+               .WithOne(bi => bi.Event)
+               .HasForeignKey(bi => bi.EventID);
+
             modelBuilder.Entity<Transaction>()
                 .HasMany<TransactionItem>(t => t.TransactionItems)
                 .WithOne(ti => ti.Transaction)
@@ -119,9 +142,13 @@ namespace caa_mis.Data
             modelBuilder.Entity<Item>()
                 .HasMany<BulkItem>(i => i.BulkItems)
                 .WithOne(bi => bi.Item)
-                .HasForeignKey(bi => bi.ItemID);      
+                .HasForeignKey(bi => bi.ItemID);
 
-            
+            modelBuilder.Entity<Item>()
+               .HasMany<EventItem>(i => i.EventItems)
+               .WithOne(bi => bi.Item)
+               .HasForeignKey(bi => bi.ItemID);
+
             modelBuilder.Entity<Item>()
                 .HasMany<Stock>(i => i.Stocks)
                 .WithOne(s => s.Item)
@@ -158,9 +185,13 @@ namespace caa_mis.Data
                 .WithOne(i => i.Manufacturer)
                 .HasForeignKey(i => i.ManufacturerID);
 
+            
+            modelBuilder.Entity<Event>()
+                .HasIndex(e => new { e.Name, e.Date })
+                .IsUnique();
+
+
         }
-
-
 
     }
 }

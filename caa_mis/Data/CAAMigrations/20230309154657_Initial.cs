@@ -18,7 +18,8 @@ namespace caa_mis.Data.CAAMigrations
                     Name = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     Address = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     Location = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    PhoneNumber = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false)
+                    PhoneNumber = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -32,7 +33,8 @@ namespace caa_mis.Data.CAAMigrations
                     ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    Description = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true)
+                    Description = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -61,6 +63,7 @@ namespace caa_mis.Data.CAAMigrations
                     ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true)
                 },
                 constraints: table =>
@@ -200,6 +203,41 @@ namespace caa_mis.Data.CAAMigrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Bulks_TransactionStatuses_TransactionStatusID",
+                        column: x => x.TransactionStatusID,
+                        principalTable: "TransactionStatuses",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Events",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    EmployeeID = table.Column<int>(type: "INTEGER", nullable: false),
+                    TransactionStatusID = table.Column<int>(type: "INTEGER", nullable: false),
+                    BranchID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Events", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Events_Branches_BranchID",
+                        column: x => x.BranchID,
+                        principalTable: "Branches",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Events_Employees_EmployeeID",
+                        column: x => x.EmployeeID,
+                        principalTable: "Employees",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Events_TransactionStatuses_TransactionStatusID",
                         column: x => x.TransactionStatusID,
                         principalTable: "TransactionStatuses",
                         principalColumn: "ID",
@@ -379,6 +417,33 @@ namespace caa_mis.Data.CAAMigrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EventItems",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ItemID = table.Column<int>(type: "INTEGER", nullable: false),
+                    EventID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventItems", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_EventItems_Events_EventID",
+                        column: x => x.EventID,
+                        principalTable: "Events",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EventItems_Items_ItemID",
+                        column: x => x.ItemID,
+                        principalTable: "Items",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TransactionItems",
                 columns: table => new
                 {
@@ -387,6 +452,8 @@ namespace caa_mis.Data.CAAMigrations
                     ItemID = table.Column<int>(type: "INTEGER", nullable: false),
                     TransactionID = table.Column<int>(type: "INTEGER", nullable: false),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    ReceivedQuantity = table.Column<int>(type: "INTEGER", nullable: true),
+                    IsEdited = table.Column<bool>(type: "INTEGER", nullable: true),
                     StockID = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
@@ -434,6 +501,37 @@ namespace caa_mis.Data.CAAMigrations
             migrationBuilder.CreateIndex(
                 name: "IX_Bulks_TransactionStatusID",
                 table: "Bulks",
+                column: "TransactionStatusID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventItems_EventID",
+                table: "EventItems",
+                column: "EventID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventItems_ItemID",
+                table: "EventItems",
+                column: "ItemID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_BranchID",
+                table: "Events",
+                column: "BranchID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_EmployeeID",
+                table: "Events",
+                column: "EmployeeID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_Name_Date",
+                table: "Events",
+                columns: new[] { "Name", "Date" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_TransactionStatusID",
+                table: "Events",
                 column: "TransactionStatusID");
 
             migrationBuilder.CreateIndex(
@@ -533,6 +631,9 @@ namespace caa_mis.Data.CAAMigrations
                 name: "BulkItems");
 
             migrationBuilder.DropTable(
+                name: "EventItems");
+
+            migrationBuilder.DropTable(
                 name: "ItemPhotos");
 
             migrationBuilder.DropTable(
@@ -546,6 +647,9 @@ namespace caa_mis.Data.CAAMigrations
 
             migrationBuilder.DropTable(
                 name: "Bulks");
+
+            migrationBuilder.DropTable(
+                name: "Events");
 
             migrationBuilder.DropTable(
                 name: "Suppliers");

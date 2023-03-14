@@ -1,0 +1,95 @@
+﻿@model IEnumerable<caa_mis.ViewModels.EventSummaryVM>
+
+@{
+    ViewData["Title"] = "Event Summary";
+}
+
+<h2>Event Summary</h2>
+<p>
+    <a asp-action="DownloadEventItems" class="btn btn-info float-end">Download Event Products</a>
+</p>
+<form asp-controller="EventItems" asp-action="EventSummary" method="get">
+    <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
+    <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
+    <div class="form-horizontal">
+        <button class="btn  @(ViewData["Filtering"]) btn-outline-primary" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+            Filter/Search
+        </button>
+        <div class="collapse" id="collapseFilter">
+            <div class="card card-body bg-light">
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <label class="control-label">Filter by Branches: (Ctrl + click to multiselect)</label>
+                        @Html.ListBox("BranchID", null, htmlAttributes: new { @class = "form-select p-0", size = "5"})  @*<=Branch Listbox Item Size *@
+
+                    </div>                    
+
+                    <div class="form-group col-md-4">
+                        <label class="control-label">Search Product:</label>
+                        @Html.TextBox("SearchString", null, new { @class = "form-control p-2" })
+                    </div>
+                    <div class="form-group col-md-4 align-self-end">
+                        <input type="submit" name="actionButton" value="Filter" class="btn btn-outline-primary" />
+                        <a asp-action="EventSummary" class="btn btn-outline-dark">Clear</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <table class="table text-center">
+        <thead>
+            <tr>
+                <th class="text-start">
+                    <input type="submit" name="actionButton" value="Branch" class="btn btn-link" />
+                </th>
+                <th>
+                    <input type="submit" name="actionButton" value="Event" class="btn btn-link" />
+                </th>
+                <th>
+                    <input type="submit" name="actionButton" value="Employee" class="btn btn-link" />
+                </th>
+                <th>
+                    <input type="submit" name="actionButton" value="Transfer Status" class="btn btn-link" />
+                </th>
+                <th>
+                    <input type="submit" name="actionButton" value="Event Date" class="btn btn-link" />
+                </th>
+                <th>
+                    <input type="submit" name="actionButton" value="Product" class="btn btn-link" />
+                </th>
+                <th>
+                    <input type="submit" name="actionButton" value="Quantity" class="btn btn-link" />
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="text-start">
+                        @Html.DisplayFor(modelItem => item.BranchName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EventName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EmployeeName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TransactionStatusName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EventDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EventQuantity)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <partial name="_PagingNavBar" />
+</form>
