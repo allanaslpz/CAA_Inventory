@@ -77,7 +77,7 @@ namespace caa_mis.Data
 
                     if (result.Succeeded)
                     {
-                        userManager.AddToRoleAsync(user, "Supervisor").Wait();
+                        userManager.AddToRoleAsync(user, "Admin").Wait();
                     }
                 }
                 if (userManager.FindByEmailAsync("AA.lopez03@gmail.com").Result == null)
