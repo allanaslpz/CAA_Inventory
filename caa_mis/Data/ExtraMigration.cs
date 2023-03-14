@@ -18,20 +18,19 @@ namespace caa_mis.Data
 
             migrationBuilder.Sql(
              @"
-                    CREATE VIEW TransactionSummary AS
-                    SELECT t.ID, t.EmployeeID, e.FirstName AS EmployeeName,
-                           t.OriginID, b1.Name AS OriginName,
-                           t.DestinationID, b2.Name AS DestinationName,
-                           t.TransactionStatusID, ts.Name AS TransactionStatusName,
-                           t.TransactionTypeID, tt.Name AS TransactionTypeName,
-                           t.TransactionDate, t.ReceivedDate,
-                           t.Description, t.Shipment
-                    FROM Transactions t
-                    INNER JOIN Employees e ON t.EmployeeID = e.ID
-                    INNER JOIN Branches b1 ON t.OriginID = b1.ID
-                    INNER JOIN Branches b2 ON t.DestinationID = b2.ID
-                    INNER JOIN TransactionStatuses ts ON t.TransactionStatusID = ts.ID
-                    INNER JOIN TransactionTypes tt ON t.TransactionTypeID = tt.ID
+                    CREATE VIEW EventSummary AS
+                    SELECT ei.ID, ei.EventID, e.Name AS EventName,
+                           e.EmployeeID, emp.FirstName AS EmployeeName,
+                           e.BranchID, b.Name AS BranchName,
+                           e.TransactionStatusID, ts.Name AS TransactionStatusName,
+                           e.Date AS EventDate, ei.ItemID, i.Name AS ItemName,
+                           ei.Quantity AS EventQuantity
+                    FROM EventItems ei
+                    INNER JOIN Events e ON ei.EventID = e.ID
+                    INNER JOIN Employees emp ON e.EmployeeID = emp.ID
+                    INNER JOIN Branches b ON e.BranchID = b.ID
+                    INNER JOIN TransactionStatuses ts ON e.TransactionStatusID = ts.ID
+                    INNER JOIN Items i ON ei.ItemID = i.ID
                 ");
             migrationBuilder.Sql(
             @"

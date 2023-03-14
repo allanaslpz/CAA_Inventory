@@ -252,12 +252,20 @@ namespace caa_mis.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,SupplierName,Address1,Address2,City,Province,PostalCode,Phone,Email")] Supplier supplier)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(supplier);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(supplier);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
+            catch
+            {
+                ModelState.AddModelError("", "Saving Failed. Please try again or contact your System Administrator.");
+            }
+
             return View(supplier);
         }
 
@@ -284,31 +292,39 @@ namespace caa_mis.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ID,SupplierName,Address1,Address2,City,Province,PostalCode,Phone,Email,Status")] Supplier supplier)
         {
-            if (id != supplier.ID)
+            try
             {
-                return NotFound();
+                if (id != supplier.ID)
+                {
+                    return NotFound();
+                }
+
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        _context.Update(supplier);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!SupplierExists(supplier.ID))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch
+            {
+                ModelState.AddModelError("", "Saving Failed. Please try again or contact your System Administrator.");
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(supplier);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SupplierExists(supplier.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
             return View(supplier);
         }
 
@@ -335,18 +351,26 @@ namespace caa_mis.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ArchiveConfirmed(int id)
         {
-            if (_context.Suppliers == null)
+            try
             {
-                return Problem("Entity set 'InventoryContext.Suppliers'  is null.");
-            }
-            var supplier = await _context.Suppliers.FindAsync(id);
+                if (_context.Suppliers == null)
+                {
+                    return Problem("Entity set 'InventoryContext.Suppliers'  is null.");
+                }
+                var supplier = await _context.Suppliers.FindAsync(id);
 
-            if (supplier != null)
+                if (supplier != null)
+                {
+                    supplier.Status = Archived.Disabled;
+                }
+
+                await _context.SaveChangesAsync();
+            }
+            catch
             {
-                supplier.Status = Archived.Disabled;
+                ModelState.AddModelError("", "Saving Failed. Please try again or contact your System Administrator.");
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

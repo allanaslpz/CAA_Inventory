@@ -47,7 +47,7 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Product Name", "Quantity" };
+            string[] sortOptions = new[] { "Product Name", "Quantity", "Quantity Received" };
 
             PopulateDropDownLists();
 
@@ -106,6 +106,19 @@ namespace caa_mis.Controllers
                 {
                     item = item
                         .OrderByDescending(p => p.Quantity);
+                }
+            }
+            if(sortField == "Quantity Received")
+            {
+                if (sortDirection == "asc")
+                {
+                    item = item
+                        .OrderBy(p => p.ReceivedQuantity);
+                }
+                else
+                {
+                    item = item
+                        .OrderByDescending(p => p.ReceivedQuantity);
                 }
             }
             else //Sorting by Name
@@ -193,7 +206,8 @@ namespace caa_mis.Controllers
                 ID = transactionItem.ID,
                 TransactionID = transactionItem.TransactionID,
                 ItemID = transactionItem.ProductID,
-                Quantity = transactionItem.Quantity
+                Quantity = transactionItem.Quantity,
+                ReceivedQuantity = transactionItem.Quantity
             };
             if (ModelState.IsValid)
             {
@@ -207,6 +221,27 @@ namespace caa_mis.Controllers
 
         // GET: TransactionItems/Edit/5
         public async Task<IActionResult> Edit(int? id)
+        {
+            ViewDataReturnURL();
+
+            if (id == null || _context.TransactionItems == null)
+            {
+                return NotFound();
+            }
+
+            var transactionItem = await _context.TransactionItems.FindAsync(id);
+            if (transactionItem == null)
+            {
+                return NotFound();
+            }
+
+            PopulateDropDownLists(transactionItem);
+
+            return View(transactionItem);
+        }
+
+        // GET: TransactionItems/Edit/5
+        public async Task<IActionResult> EditIncoming(int? id)
         {
             ViewDataReturnURL();
 
@@ -240,11 +275,20 @@ namespace caa_mis.Controllers
                 return NotFound();
             }
 
+            TransactionItem tI = new TransactionItem
+            {
+                ID = transactionItem.ID,
+                TransactionID = transactionItem.TransactionID,
+                ItemID = transactionItem.ItemID,
+                Quantity = transactionItem.Quantity,
+                ReceivedQuantity = transactionItem.Quantity
+            };
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(transactionItem);
+                    _context.Update(tI);
                     await _context.SaveChangesAsync();
                     return Redirect(ViewData["returnURL"].ToString());
                 }
@@ -263,9 +307,51 @@ namespace caa_mis.Controllers
 
             PopulateDropDownLists(transactionItem);
 
+            return View(tI);
+        }
+        // POST: TransactionItems/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditIncoming(int id, [Bind("ID,ItemID,TransactionID,Quantity,ReceivedQuantity")] TransactionItem transactionItem)
+        {
+            ViewDataReturnURL();
+
+            if (id != transactionItem.ID)
+            {
+                return NotFound();
+            }
+            
+            transactionItem.IsEdited = true;
+            
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(transactionItem);
+                    await _context.SaveChangesAsync();
+                    
+                    return RedirectToAction("Incoming", new { TransactionID = transactionItem.TransactionID });
+                    //return Redirect(ViewData["returnURL"].ToString());
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!TransactionItemExists(transactionItem.ID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            PopulateDropDownLists(transactionItem);
+
             return View(transactionItem);
         }
-
         // GET: TransactionItems/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -488,6 +574,116 @@ namespace caa_mis.Controllers
             return View(pagedData);
         }
 
+
+        //Incoming stock items
+        public async Task<IActionResult> Incoming(int? TransactionID, string sortDirectionCheck, string sortFieldID, int? ItemID,
+            int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Product Name")
+        {
+            //Clear the sort/filter/paging URL Cookie for Controller
+            CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
+
+            ViewDataReturnURL();
+
+            if (!TransactionID.HasValue)
+            {
+                //Go back to the proper return URL for the Transactions controller
+                return Redirect(ViewData["returnURL"].ToString());
+            }
+
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
+            //List of sort options.
+            //NOTE: make sure this array has matching values to the column headings
+            string[] sortOptions = new[] { "Product Name", "Quantity" };
+
+            PopulateDropDownLists();
+
+            var item = from a in _context.TransactionItems
+                .Include(t => t.Item)
+                where a.TransactionID == TransactionID.GetValueOrDefault()
+                select a;
+
+
+            var transactions = _context.Transactions
+                .Include(t => t.Destination)
+                .Include(t => t.Employee)
+                .Include(t => t.Origin)
+                .Include(t => t.TransactionStatus)
+                .Include(t => t.TransactionType)
+                .Where(p => p.ID == TransactionID.GetValueOrDefault())
+                .AsNoTracking()
+                .FirstOrDefault();
+
+            ViewBag.Transactions = transactions;
+
+            if (ItemID.HasValue)
+            {
+                item = item.Where(p => p.ItemID == ItemID);
+                ViewData["Filtering"] = "btn-danger";
+            }
+
+            //Before we sort, see if we have called for a change of filtering or sorting
+            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
+            {
+                page = 1;//Reset page to start
+
+                if (sortOptions.Contains(actionButton))//Change of sort is requested
+                {
+                    if (actionButton == sortField) //Reverse order on same field
+                    {
+                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
+                    }
+                    sortField = actionButton;//Sort by the button clicked
+                }
+                else //Sort by the controls in the filter area
+                {
+                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
+                    sortField = sortFieldID;
+                }
+            }
+            //Now we know which field and direction to sort by
+            if (sortField == "Quantity")
+            {
+                if (sortDirection == "asc")
+                {
+                    item = item
+                        .OrderBy(p => p.Quantity);
+                }
+                else
+                {
+                    item = item
+                        .OrderByDescending(p => p.Quantity);
+                }
+            }
+            else //Sorting by Name
+            {
+                if (sortDirection == "asc")
+                {
+                    item = item
+                        .OrderBy(p => p.Item.Name);
+                }
+                else
+                {
+                    item = item
+                        .OrderByDescending(p => p.Item.Name);
+                }
+            }
+            //Set sort for next time
+            ViewData["sortField"] = sortField;
+            ViewData["sortDirection"] = sortDirection;
+            //SelectList for Sorting Options
+            ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
+
+            //Handle Paging
+            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "IncomingItems");
+            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
+            var pagedData = await PaginatedList<TransactionItem>.CreateAsync(item.AsNoTracking(), page ?? 1, pageSize);
+
+
+
+            return View(pagedData);
+        }
         private bool TransactionItemExists(int id)
         {
           return _context.TransactionItems.Any(e => e.ID == id);

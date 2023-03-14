@@ -38,7 +38,7 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Type", "Description", "Origin", "Destination", "Transaction Date", "Transaction Status" };
+            string[] sortOptions = new[] { "Type", "Description", "Origin", "Destination", "Date", "Status" };
 
             PopulateDropDownLists();
             ViewDataReturnURL();
@@ -145,7 +145,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.Destination.Name);
                 }
             }
-            else if (sortField == "Transaction Date")
+            else if (sortField == "Date")
             {
                 if (sortDirection == "asc")
                 {
@@ -335,150 +335,43 @@ namespace caa_mis.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        public async Task<IActionResult> TransactionSummary(int? page, int? pageSizeID, int[] OriginID, int[] DestinationID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "OriginName")
-        {
-            //List of sort options.
-            //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "EmployeeName", "OriginName", "DestinationName", "TransactionStatusName", "TransactionTypeName",
-                                            "TransactionDate", "ReceivedDate", "Description", "Shipment"};
-
-            IQueryable<TransactionSummaryVM> sumQ = _context.TransactionSummary;
-
-            if (OriginID != null && OriginID.Length > 0)
-            {
-                sumQ = sumQ.Where(s => OriginID.Contains(s.OriginID));
-                ViewData["Filtering"] = "btn-danger";
-            }
-            if (DestinationID != null && DestinationID.Length > 0)
-            {
-                sumQ = sumQ.Where(s => DestinationID.Contains(s.OriginID));
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-            if (!String.IsNullOrEmpty(SearchString))
-            {
-                sumQ = sumQ.Where(i => i.EmployeeName.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-            ViewData["OriginID"] = BranchList(OriginID);
-            ViewData["DestinationID"] = BranchList(DestinationID);
-            // Save filtered data to cookie
-            CachingFilteredData(sumQ);
-
-            //Before we sort, see if we have called for a change of filtering or sorting
-            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
-            {
-                page = 1;//Reset page to start
-
-                if (sortOptions.Contains(actionButton))//Change of sort is requested
-                {
-                    if (actionButton == sortField) //Reverse order on same field
-                    {
-                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
-                    }
-                    sortField = actionButton;//Sort by the button clicked
-                }
-                else //Sort by the controls in the filter area
-                {
-                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
-                    sortField = sortFieldID;
-                }
-            }
-
-            //Now we know which field and direction to sort by
-            if (sortField == "EmployeeName")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.EmployeeName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.EmployeeName);
-                }
-            }
-            else if (sortField == "OriginName")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.OriginName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.OriginName);
-                }
-            }
-            else if (sortField == "DestinationName")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.DestinationName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.DestinationName);
-                }
-            }
-            else if (sortField == "TransactionStatusName")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.TransactionStatusName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.TransactionStatusName);
-                }
-            }
-            else if (sortField == "TransactionTypeName")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.TransactionTypeName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.TransactionTypeName);
-                }
-            }
-            else //Sorting by Name
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.OriginName)
-                        .ThenBy(p => p.DestinationName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.OriginName)
-                        .ThenByDescending(p => p.DestinationName);
-                }
-            }
-            //Set sort for next time
-            ViewData["sortField"] = sortField;
-            ViewData["sortDirection"] = sortDirection;
-
-            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "TransactionSummary");
-            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
-            var pagedData = await PaginatedList<TransactionSummaryVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
-            return View(pagedData);
-        }
+        
         // GET: Transactions/Release/5
         public async Task<IActionResult> Release(int? id)
+        {
+            ViewDataReturnURL();
+            if (id == null || _context.Transactions == null)
+            {
+                return NotFound();
+            }
+
+            var transaction = await _context.Transactions
+                .Include(t => t.Destination)
+                .Include(t => t.Employee)
+                .Include(t => t.Origin)
+                .Include(t => t.TransactionStatus)
+                .Include(t => t.TransactionType)
+                .FirstOrDefaultAsync(m => m.ID == id);
+
+            var items = from a in _context.TransactionItems
+                .Include(t => t.Item)
+                .OrderBy(t => t.Item.Name)
+                        where a.TransactionID == id.GetValueOrDefault()
+                        select a;
+
+            ViewBag.Items = items.AsNoTracking();
+
+            if (transaction == null)
+            {
+                return NotFound();
+            }
+
+            return View(transaction);
+        }
+
+
+        // GET: Transactions/Release/5
+        public async Task<IActionResult> Receive(int? id)
         {
             ViewDataReturnURL();
             if (id == null || _context.Transactions == null)
@@ -538,6 +431,94 @@ namespace caa_mis.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // POST: Transactions/Receive/5
+        [HttpPost, ActionName("Receive")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReceiveConfirmed(int id)
+        {
+            ViewDataReturnURL();
+            if (_context.Transactions == null)
+            {
+                return Problem("Entity set 'InventoryContext.Transactions'  is null.");
+            }
+
+            var transToUpdate = await _context.Transactions.FindAsync(id);
+
+            var status = await _context.TransactionStatuses
+                .FirstOrDefaultAsync(m => m.Name == "Received");
+
+            // var trans = new Transaction { ID = id, TransactionStatusID = status.ID, ReceivedDate = DateTime.Today };
+            transToUpdate.ID = transToUpdate.ID;
+            transToUpdate.EmployeeID = transToUpdate.EmployeeID;
+            transToUpdate.TransactionStatusID = status.ID;
+            transToUpdate.TransactionDate = transToUpdate.TransactionDate;
+            transToUpdate.TransactionTypeID = transToUpdate.TransactionTypeID;
+            transToUpdate.OriginID = transToUpdate.OriginID;
+            transToUpdate.DestinationID = transToUpdate.DestinationID;
+            transToUpdate.ReceivedDate = DateTime.Today;
+            transToUpdate.Shipment = transToUpdate.Shipment;
+            transToUpdate.Description = transToUpdate.Description;
+            ReceiveTransaction(id);
+            if (ModelState.IsValid)
+            {
+                //_context.Transactions.Attach(trans).Property(x => x.TransactionStatusID).IsModified = true;
+                _context.Update(transToUpdate);
+                _context.SaveChanges();
+
+                return Redirect(ViewData["returnURL"].ToString());
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        //adding item to the inventory
+        public void ReceiveTransaction(int id)
+        {
+            //get the transaction details
+            var transaction = _context.Transactions
+                .AsNoTracking()
+               .FirstOrDefault(m => m.ID == id);
+            //get the transaction items
+            var transactionItems = _context.TransactionItems
+                .Where(m => m.TransactionID == id)
+                .AsNoTracking();
+
+            //do stock in
+            foreach (var item in transactionItems)
+            {
+                //check if stock record already have the item
+                var stockItem = _context.Stocks
+                    .AsNoTracking()
+                    .FirstOrDefault(s => s.BranchID == transaction.DestinationID && s.ItemID == item.ItemID);
+                
+               
+                int newQty = (item.ReceivedQuantity != null) ? (int)item.ReceivedQuantity: item.Quantity;
+
+                if (stockItem == null)
+                {
+                    //create a new record
+                    Stock stock = new Stock
+                    {
+                        ID = 0,
+                        BranchID = (int)transaction.DestinationID,
+                        ItemID = item.ItemID,
+                        Quantity = newQty
+                    };
+
+                    _context.Stocks.Add(stock);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    //update the existing one. add the item quantity to the current quantity
+                    var updateStock = new Stock { ID = stockItem.ID, Quantity = stockItem.Quantity + newQty };
+                    _context.Stocks.Attach(updateStock).Property(x => x.Quantity).IsModified = true;
+                    _context.SaveChanges();
+                }
+
+            }
+
+        }
         //adding item to the inventory
         public void ReleaseTransaction(int id)
         {
@@ -564,7 +545,6 @@ namespace caa_mis.Controllers
                     if (stockItem == null)
                     {
                         //create a new record
-                        //create a new record.  This will create a negative item in the inventory
                         Stock stock = new Stock
                         {
                             ID = 0,
@@ -621,6 +601,162 @@ namespace caa_mis.Controllers
             }
  
         }
+
+        //incoming transactions
+        public async Task<IActionResult> Incoming(string sortDirectionCheck, string sortFieldID, string SearchString, int? TransactionTypeID, int? TransactionStatusID, int? DestinationID,
+           int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Type")
+        {
+            //Clear the sort/filter/paging URL Cookie for Controller
+            CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
+            //List of sort options.
+            //NOTE: make sure this array has matching values to the column headings
+            string[] sortOptions = new[] { "Type", "Description", "Origin", "Destination", "Transaction Date"};
+
+            PopulateDropDownLists();
+            ViewDataReturnURL();
+            
+            var inventory = _context.Transactions
+                .Include(t => t.Destination)
+                .Include(t => t.Employee)
+                .Include(t => t.Origin)
+                .Include(t => t.TransactionStatus)
+                .Include(t => t.TransactionType)
+                .Where(t => t.TransactionStatusID == 2 && t.TransactionTypeID == 2)
+                .AsNoTracking();
+
+            if (TransactionTypeID.HasValue)
+            {
+                inventory = inventory.Where(p => p.TransactionTypeID == TransactionTypeID);
+                ViewData["Filtering"] = "btn-danger";
+            }
+            if (DestinationID.HasValue)
+            {
+                inventory = inventory.Where(p => p.DestinationID == DestinationID);
+                ViewData["Filtering"] = "btn-danger";
+            }
+            if (!String.IsNullOrEmpty(SearchString))
+            {
+                inventory = inventory.Where(p => p.Description.ToUpper().Contains(SearchString.ToUpper()));
+                ViewData["Filtering"] = "btn-danger";
+            }
+
+            //Before we sort, see if we have called for a change of filtering or sorting
+            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
+            {
+                page = 1;//Reset page to start
+
+                if (sortOptions.Contains(actionButton))//Change of sort is requested
+                {
+                    if (actionButton == sortField) //Reverse order on same field
+                    {
+                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
+                    }
+                    sortField = actionButton;//Sort by the button clicked
+                }
+                else //Sort by the controls in the filter area
+                {
+                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
+                    sortField = sortFieldID;
+                }
+            }
+
+            //Now we know which field and direction to sort by
+            if (sortField == "Type")
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.TransactionType.Name);
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.TransactionType.Name);
+                }
+            }
+            else if (sortField == "Description")
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.Description);
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.Description);
+                }
+            }
+            else if (sortField == "Origin")
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.Origin.Name);
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.Origin.Name);
+                }
+            }
+            else if (sortField == "Destination")
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.Destination.Name);
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.Destination.Name);
+                }
+            }
+            else if (sortField == "Transaction Date")
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.TransactionDate);
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.TransactionDate);
+                }
+            }
+            else //Sorting by Name
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.TransactionStatus.Name);
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.TransactionStatus.Name);
+                }
+            }
+
+            //Set sort for next time
+            ViewData["sortField"] = sortField;
+            ViewData["sortDirection"] = sortDirection;
+            //SelectList for Sorting Options
+            ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
+
+            //Handle Paging
+            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "IncomingTransactions");
+            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
+            var pagedData = await PaginatedList<Transaction>.CreateAsync(inventory.AsNoTracking(), page ?? 1, pageSize);
+
+
+            return View(pagedData);
+        }
         private bool TransactionExists(int id)
         {
           return _context.Transactions.Any(e => e.ID == id);
@@ -670,12 +806,7 @@ namespace caa_mis.Controllers
                 .TransactionTypes
                 .OrderBy(m => m.Name), "ID", "Name", selectedId);*/
         }
-        private SelectList BranchList(int[] selectedId)
-        {
-            return new SelectList(_context.Branches
-                .OrderBy(d => d.Name), "ID", "Name", selectedId);
-        }
-
+        
         private void PopulateDropDownLists(Transaction transaction = null)
         {
             ViewData["DestinationID"] = DestinationSelectList(transaction?.DestinationID);
@@ -684,74 +815,6 @@ namespace caa_mis.Controllers
             ViewData["TransactionStatusID"] = TransactionStatusList(transaction?.TransactionStatusID);
             ViewData["TransactionTypeID"] = TransactionTypeList(transaction?.TransactionTypeID);
         }
-        private void CachingFilteredData<T>(IQueryable<T> sumQ)
-        {
-            FilteredDataCaching.SaveFilteredData(HttpContext, "filteredData", sumQ, 120);
-        }
-        public IActionResult DownloadTransactions()
-        {
-            //retrieving filtered data from cookie
-            var items = JsonConvert.DeserializeObject<IEnumerable<TransactionSummaryVM>>(
-            Request.Cookies["filteredData"]);
-
-            int numRows = items.Count();
-
-            if (numRows > 0)
-            {
-                using ExcelPackage excel = new();
-                var workSheet = excel.Workbook.Worksheets.Add("ProductsTransaction");
-
-                workSheet.Cells[3, 1].LoadFromCollection(items, true);
-
-                //Set Style and backgound colour of headings
-                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 15])
-                {
-                    headings.Style.Font.Bold = true;
-                    var fill = headings.Style.Fill;
-                    fill.PatternType = ExcelFillStyle.Solid;
-                    fill.BackgroundColor.SetColor(Color.LightCyan);
-                }
-
-                //Autofit columns
-                workSheet.Cells.AutoFitColumns();
-
-                //Add a title and timestamp at the top of the report
-                workSheet.Cells[1, 1].Value = "Product Transaction Report";
-                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 15])
-                {
-                    Rng.Merge = true; //Merge columns start and end range
-                    Rng.Style.Font.Bold = true; //Font should be bold
-                    Rng.Style.Font.Size = 18;
-                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                }
-                //Since the time zone where the server is running can be different, adjust to 
-                //Local for us.
-                DateTime utcDate = DateTime.UtcNow;
-                TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-                DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
-                using (ExcelRange Rng = workSheet.Cells[2, 15])
-                {
-                    Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
-                        localDate.ToShortDateString();
-
-                    Rng.Style.Font.Size = 12;
-                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                }
-
-                try
-                {
-                    Byte[] theData = excel.GetAsByteArray();
-                    string filename = "ProductsTransaction.xlsx";
-                    string mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    return File(theData, mimeType, filename);
-                }
-                catch (Exception)
-                {
-                    return BadRequest("Could not build and download the file.");
-                }
-            }
-            return NotFound("No data.");
-        }
-
+        
     }
 }
