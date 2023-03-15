@@ -581,6 +581,53 @@ namespace caa_mis.Data.CAAMigrations
                     b.ToTable("TransactionTypes");
                 });
 
+            modelBuilder.Entity("caa_mis.ViewModels.EventSummaryVM", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BranchID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("BranchName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("EmployeeName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("EventDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EventID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("EventName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EventQuantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ItemName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TransactionStatusID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TransactionStatusName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.ToView("EventSummary");
+                });
+
             modelBuilder.Entity("caa_mis.ViewModels.StockSummaryByBranchVM", b =>
                 {
                     b.Property<int>("ID")
@@ -649,59 +696,6 @@ namespace caa_mis.Data.CAAMigrations
                     b.HasKey("ID");
 
                     b.ToView("TransactionItemSummary");
-                });
-
-            modelBuilder.Entity("caa_mis.ViewModels.TransactionSummaryVM", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("DestinationID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("DestinationName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("EmployeeID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("EmployeeName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("OriginID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("OriginName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ReceivedDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Shipment")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TransactionStatusID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("TransactionStatusName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TransactionTypeID")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("TransactionTypeName")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ID");
-
-                    b.ToView("TransactionSummary");
                 });
 
             modelBuilder.Entity("caa_mis.Models.Bulk", b =>
