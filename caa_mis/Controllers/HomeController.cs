@@ -3,6 +3,7 @@ using caa_mis.Models;
 using caa_mis.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using SQLitePCL;
@@ -31,23 +32,39 @@ namespace caa_mis.Controllers
             var Stocklist = _inventoryContext.Stocks.Where(s => s.Quantity > 0).ToList();
             var Branch = _inventoryContext.Branches.ToList();
 
+            ViewBag.Branches = Branch.Select(b => new SelectListItem
+            {
+                Value = b.ID.ToString(),
+                Text = b.Location
+            }).ToList();
+            ViewBag.Branches.Insert(0, new SelectListItem { Value = "0", Text = "All" });
+
+            int branchID;
+            bool result = int.TryParse(Request.Query["branch"], out branchID);
+            if (!result)
+            {
+                branchID = 0;
+            }
+
             var tableItems = from item in Item
                              join stock in Stocklist on item.ID equals stock.ItemID
+                             where (branchID == 0 || stock.BranchID == branchID)
                              group stock by item.Name into t
                              select new
                              {
                                  ItemName = t.Key,
                                  MinLevel = t.Min(s => s.MinLevel),
                                  TotalStock = t.Sum(s => s.Quantity),
-                                 Percentage = 1 - ((double)t.Min(s => s.MinLevel)/ (double)t.Sum(s => s.Quantity))
+                                 Percentage = 1 - ((double)t.Min(s => s.MinLevel) / (double)t.Sum(s => s.Quantity))
                              };
-
+            ViewBag.CurrentBranchID = branchID;
             ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage).Take(5);
 
             //PieChart information
 
             var pieData = from item in Item join category in Category on item.CategoryID equals category.ID
                           join stock in Stocklist on item.ID equals stock.ItemID
+                          where (branchID == 0 || stock.BranchID == branchID)
                           group new {stock, item} by category into g
                           select new
                           {

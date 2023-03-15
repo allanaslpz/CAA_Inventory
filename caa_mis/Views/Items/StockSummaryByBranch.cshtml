@@ -36,22 +36,22 @@
             </div>
         </div>
     </div>
-    <table class="table">
+    <table class="table text-center">
         <thead>
             <tr>
-                <th style="text-align: left;">
+                <th class="text-start">
                     <input type="submit" name="actionButton" value="Branch" class="btn btn-link" />
                 </th>
-                <th style="text-align: center;">
+                <th>
                     <input type="submit" name="actionButton" value="Product" class="btn btn-link" />
                 </th>
-                <th style="text-align: center;">
+                <th>
                     <input type="submit" name="actionButton" value="Cost" class="btn btn-link" />
                 </th>
-                <th style="text-align: center;">
+                <th>
                     <input type="submit" name="actionButton" value="Quantity" class="btn btn-link" />
                 </th>
-                <th style="text-align: center;">
+                <th>
                     <input type="submit" name="actionButton" value="Min Level" class="btn btn-link" />
                 </th>
             </tr>
@@ -60,19 +60,19 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td style="text-align: left;">
+                    <td class="text-start">
                         @Html.DisplayFor(modelItem => item.BranchName)
                     </td>
-                    <td style="text-align: center;">
+                    <td>
                         @Html.DisplayFor(modelItem => item.ItemName)
                     </td>
-                    <td style="text-align: center;">
+                    <td>
                         @Html.DisplayFor(modelItem => item.ItemCost)
                     </td>
-                    <td style="text-align: center;">
+                    <td>
                         @Html.DisplayFor(modelItem => item.Quantity)
                     </td>
-                    <td style="text-align: center;">
+                    <td >
                         @Html.DisplayFor(modelItem => item.MinLevel)
                     </td>
                 </tr>

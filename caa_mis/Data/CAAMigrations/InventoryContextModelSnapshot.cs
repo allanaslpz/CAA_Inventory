@@ -509,10 +509,16 @@ namespace caa_mis.Data.CAAMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool?>("IsEdited")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("ItemID")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ReceivedQuantity")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("StockID")

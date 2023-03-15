@@ -16,7 +16,7 @@
                 <a href="@Url.Action("Index","Transactions")" class="btn btn-primary stretched-link">
                     <div class="card-body">
                         <i class="fas fa-file-signature fa-4x"></i>
-                        <p class="card-text"><h5>Transactions</h5></p>
+                        <p class="card-text"><h5>Inventory</h5></p>
                     </div>
                 </a>
             </div>
@@ -48,6 +48,12 @@
     <div class="col">
         <div class="card h-100">
             <div class="card-body">
+                        <select class="form-select" id="branchFilter">
+            @foreach (var item in ViewBag.Branches)
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        </select>
                 <h5 class="card-title" style="text-align:center"><b>Top 5 Low in Stock</b></h5>
                 <table class="table">
                     <thead style="text-align:center">
@@ -104,13 +110,6 @@
                                     'orange',]
                             }]
                         },
-                        //options: {
-                        //    scales: {
-                        //        y: {
-                        //            beginAtZero: true
-                        //        }
-                        //    }
-                        //}
                     });
                 </script>
             </div>
@@ -142,18 +141,20 @@
                               'yellow',
                               'orange',]
                         }]
-                    },
-                    //options: {
-                    //    scales: {
-                    //        y: {
-                    //            beginAtZero: true
-                    //        }
-                    //    }
-                    //}
-                    
+                    },                 
                 });
             </script>            
         </div>
     </div>
 </div>
 
+<script>
+    $(document).ready(function () {
+        var currentBranchID = '@ViewBag.CurrentBranchID';
+        $('#branchFilter').val(currentBranchID);
+        $('#branchFilter').change(function () {
+            var selectedBranchID = $('#branchFilter').val();
+            window.location.href = '/Home/Index?branch=' + selectedBranchID;
+        });
+    });
+</script>
