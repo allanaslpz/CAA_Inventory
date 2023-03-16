@@ -26,11 +26,13 @@
                                 Inventory
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Events" asp-action="Index">Events</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Incoming">Incoming Stocks</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Items" asp-action="Index">Products</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Index">Stock In/Out</a></li>
                             </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Events" asp-action="Index">Events</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
