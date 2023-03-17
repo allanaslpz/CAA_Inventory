@@ -4,7 +4,7 @@
     ViewData["Title"] = "Stock In/Out Items";
     caa_mis.Models.Transaction transaction = (caa_mis.Models.Transaction)ViewBag.Transactions;
 }
-<h1>Receive / Transfer Details</h1>
+<h4>Transfer Details</h4>
 <hr />
 <div class="row">
     <div class="col-6">
@@ -124,8 +124,10 @@
                     <div class="col-sm">
                         <div class="form-group col-sm col-lg">
                             <label for="ProductName" clas="bold">Product</label>
-                            <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Start typing a product..." required>
+                            <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Start typing a product or sku..." required>
                             <input type="hidden" name="ProductID" id="ProductID" />
+                       @* @Html.DropDownList("ProductID",null,null, htmlAttributes: new { @class = "form-control" })*@
+
                         <input type="hidden" name="TransactionID" id="TransactionID" value="@transaction.ID" />
                         </div>
                     </div>
@@ -255,11 +257,12 @@
                 $.ajax({
                     url: '/TransactionItems/SearchProduct/',
                     dataType: 'json',
-                    data: { term: $('#ProductName').val() },
+                    data: { BranchID: @transaction.OriginID, term: $('#ProductName').val() },
                     success: function (data) {
                         var result = $.map(data, function (item) {
+                            console.log(item);
                             return {
-                                label: item.name,
+                                label: item.productName,
                                 value: item.id
                             };
                         });
@@ -271,7 +274,12 @@
                 event.preventDefault();
                 $('#ProductName').val(ui.item.label);
                 $('#ProductID').val(ui.item.value);
-            }
+            },
+            minLength: 0,
+        }).focus(function () {
+            // trigger the search when the input field receives focus
+            $(this).autocomplete("search", "");
         });
+
     </script>
 }

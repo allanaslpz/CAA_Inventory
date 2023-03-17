@@ -11,7 +11,7 @@ using caa_mis.Data;
 namespace caa_mis.Data.CAAMigrations
 {
     [DbContext(typeof(InventoryContext))]
-    [Migration("20230314221447_Initial")]
+    [Migration("20230317005847_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -634,6 +634,29 @@ namespace caa_mis.Data.CAAMigrations
                     b.HasKey("ID");
 
                     b.ToView("EventSummary");
+                });
+
+            modelBuilder.Entity("caa_mis.ViewModels.ProductListVM", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BranchID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SKUNumber")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.ToView("ProductList");
                 });
 
             modelBuilder.Entity("caa_mis.ViewModels.StockSummaryByBranchVM", b =>

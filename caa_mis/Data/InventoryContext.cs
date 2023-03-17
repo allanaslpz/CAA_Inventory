@@ -35,6 +35,8 @@ namespace caa_mis.Data
         public DbSet<StockSummaryByBranchVM> StockSummaryByBranch { get; set; }
         public DbSet<EventSummaryVM> EventSummary { get; set; }
         public DbSet<TransactionItemSummaryVM> TransactionItemSummary { get; set; }
+
+        public DbSet<ProductListVM> ProductList { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Item>()
@@ -52,6 +54,11 @@ namespace caa_mis.Data
             modelBuilder
                 .Entity<EventSummaryVM>()
                 .ToView(nameof(EventSummary))
+                .HasKey(a => a.ID);
+
+            modelBuilder
+                .Entity<ProductListVM>()
+                .ToView(nameof(ProductList))
                 .HasKey(a => a.ID);
 
             modelBuilder

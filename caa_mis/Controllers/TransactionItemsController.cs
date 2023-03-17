@@ -14,6 +14,7 @@ using OfficeOpenXml.Style;
 using OfficeOpenXml;
 using System.Drawing;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace caa_mis.Controllers
 {
@@ -50,6 +51,7 @@ namespace caa_mis.Controllers
             string[] sortOptions = new[] { "Product Name", "Quantity", "Quantity Received" };
 
             PopulateDropDownLists();
+            
 
             var item = from a in _context.TransactionItems
                 .Include(t => t.Item)
@@ -68,6 +70,8 @@ namespace caa_mis.Controllers
                 .FirstOrDefault();
 
             ViewBag.Transactions = transactions;
+
+            ViewData["ProductID"] = ItemListPerBranch(transactions.OriginID);
 
             if (ItemID.HasValue)
             {
@@ -405,13 +409,19 @@ namespace caa_mis.Controllers
         }
         
         [Produces("application/json")]
-        public IActionResult SearchProduct(string term = null)
+        public IActionResult SearchProduct(int branchID, string term = null)
         {
 
-            var result = _context.Items
+            IQueryable<ProductListVM> sumQ = _context.ProductList;
+
+            var result = sumQ
                 .AsNoTracking()
-                .Where(p => p.Name.ToUpper().Contains(term.ToUpper()) || p.SKUNumber.Contains(term) );
-                
+                .Where(p => p.BranchID == branchID);
+               
+            if(term != null)
+            {
+                result.Where(p => p.Name.ToUpper().Contains(term.ToUpper()) || p.SKUNumber.Contains(term));
+            }
             return Json(result);
         }
 
@@ -701,6 +711,15 @@ namespace caa_mis.Controllers
                 .OrderBy(m => m.Name), "ID", "Name", selectedId);
         }
 
+        private SelectList ItemListPerBranch(int? branchID)
+        {
+            IQueryable<ProductListVM> sumQ = _context.ProductList;
+
+            return new SelectList(
+                sumQ
+                .Where(p => p.BranchID == branchID)
+                .OrderBy(m => m.Name), "ID", "ProductName");
+        }
         private SelectList TransactionList(int? selectedId)
         {
             return new SelectList(_context

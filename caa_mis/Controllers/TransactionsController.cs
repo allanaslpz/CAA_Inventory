@@ -14,6 +14,8 @@ using OfficeOpenXml.Style;
 using OfficeOpenXml;
 using System.Drawing;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
 
 namespace caa_mis.Controllers
 {
@@ -21,10 +23,12 @@ namespace caa_mis.Controllers
     public class TransactionsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public TransactionsController(InventoryContext context)
+        public TransactionsController(InventoryContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Transactions
@@ -768,13 +772,17 @@ namespace caa_mis.Controllers
         }
 
         private SelectList DestinationSelectList(int? selectedId)
-        {
+        { 
             return new SelectList(_context
                 .Branches
                 .OrderBy(m => m.Name), "ID", "Name", selectedId);
         }
         private SelectList EmployeeList(int? selectedId)
         {
+           // var userId = _userManager.GetUserAsync(User);
+
+            //selectedId = selectedId != null ? userId: selectedId;
+            
             return new SelectList(_context
                 .Employees
                 .OrderBy(m => m.FirstName), "ID", "FirstName", selectedId);

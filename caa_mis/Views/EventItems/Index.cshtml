@@ -228,11 +228,12 @@
                 $.ajax({
                     url: '/TransactionItems/SearchProduct/',
                     dataType: 'json',
-                    data: { term: $('#ProductName').val() },
+                    data: { BranchID: @transaction.BranchID, term: $('#ProductName').val() },
                     success: function (data) {
                         var result = $.map(data, function (item) {
+                            console.log(item);
                             return {
-                                label: item.name,
+                                label: item.productName,
                                 value: item.id
                             };
                         });
@@ -244,7 +245,12 @@
                 event.preventDefault();
                 $('#ProductName').val(ui.item.label);
                 $('#ProductID').val(ui.item.value);
-            }
+            },
+            minLength: 0,
+        }).focus(function () {
+            // trigger the search when the input field receives focus
+            $(this).autocomplete("search", "");
         });
+
     </script>
 }
