@@ -46,7 +46,7 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost" };
+            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost", "Total"};
 
             //by default we want to show the active
 
@@ -86,7 +86,7 @@ namespace caa_mis.Controllers
             }
             if (!String.IsNullOrEmpty(SearchSKU))
             {
-                inventory = inventory.Where(p => p.SKUNumber.ToUpper().Contains(SearchString.ToUpper()));
+                inventory = inventory.Where(p => p.SKUNumber.ToUpper().Contains(SearchSKU.ToUpper()));
                 ViewData["Filtering"] = "btn-danger";
             }
 
@@ -129,12 +129,12 @@ namespace caa_mis.Controllers
                 if (sortDirection == "asc")
                 {
                     inventory = inventory
-                        .OrderByDescending(p => p.Cost);
+                        .OrderBy(p => p.Cost);
                 }
                 else
                 {
                     inventory = inventory
-                        .OrderBy(p => p.Cost);
+                        .OrderByDescending(p => p.Cost);
                 }
             }
             else if (sortField == "Category")
@@ -148,6 +148,19 @@ namespace caa_mis.Controllers
                 {
                     inventory = inventory
                         .OrderByDescending(p => p.Category.Name);
+                }
+            }
+            else if (sortField == "Total")
+            {
+                if (sortDirection == "asc")
+                {
+                    inventory = inventory
+                        .OrderBy(p => p.Stocks.Sum(s => s.Quantity));
+                }
+                else
+                {
+                    inventory = inventory
+                        .OrderByDescending(p => p.Stocks.Sum(s => s.Quantity));
                 }
             }
             else //Sorting by Name
