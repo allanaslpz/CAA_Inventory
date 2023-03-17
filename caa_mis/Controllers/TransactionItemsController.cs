@@ -167,7 +167,7 @@ namespace caa_mis.Controllers
             var transactionItem = await _context.TransactionItems
                 .Include(t => t.Item)
                 .Include(t => t.Transaction)
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(t => t.ID == id);
             if (transactionItem == null)
             {
                 return NotFound();
@@ -204,6 +204,7 @@ namespace caa_mis.Controllers
         public async Task<IActionResult> Create([Bind("ID,ProductID,TransactionID,Quantity")] TransactionItemVM transactionItem)
         {
             ViewDataReturnURL();
+            
 
             TransactionItem tI = new TransactionItem
             {
@@ -213,14 +214,34 @@ namespace caa_mis.Controllers
                 Quantity = transactionItem.Quantity,
                 ReceivedQuantity = transactionItem.Quantity
             };
-            if (ModelState.IsValid)
+
+            var itemExists = _context.TransactionItems
+                .Where(p => p.TransactionID == transactionItem.TransactionID && p.ItemID == transactionItem.ProductID)
+                .FirstOrDefault();
+
+            if (itemExists == null)
             {
-                _context.Add(tI);
-                await _context.SaveChangesAsync();
-                return Redirect(ViewData["returnURL"].ToString());
+                if (validateOnHand(transactionItem.TransactionID, transactionItem.ProductID, transactionItem.Quantity))
+                {
+                    if (ModelState.IsValid)
+                    {
+                        _context.Add(tI);
+                        await _context.SaveChangesAsync();
+                        return Redirect(ViewData["returnURL"].ToString());
+                    }
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "The changes cannot be saved because the quantity entered is higher than the available stock in the branch.";
+                }
             }
+            else
+            {
+                TempData["ErrorMessage"] = "The changes cannot be saved. There is already an existing product in your list.";
+            }
+
             PopulateDropDownLists(tI);
-            return View(transactionItem);
+            return Redirect(ViewData["returnURL"].ToString());
         }
 
         // GET: TransactionItems/Edit/5
@@ -233,7 +254,7 @@ namespace caa_mis.Controllers
                 return NotFound();
             }
 
-            var transactionItem = await _context.TransactionItems.FindAsync(id);
+            var transactionItem = await _context.TransactionItems.Include(p=>p.Item).FirstOrDefaultAsync(p => p.ID == id);
             if (transactionItem == null)
             {
                 return NotFound();
@@ -287,31 +308,37 @@ namespace caa_mis.Controllers
                 Quantity = transactionItem.Quantity,
                 ReceivedQuantity = transactionItem.Quantity
             };
-
-            if (ModelState.IsValid)
+            if (validateOnHand(transactionItem.TransactionID, transactionItem.ItemID, transactionItem.Quantity))
             {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(tI);
-                    await _context.SaveChangesAsync();
-                    return Redirect(ViewData["returnURL"].ToString());
+                    try
+                    {
+                        _context.Update(tI);
+                        await _context.SaveChangesAsync();
+                        return Redirect(ViewData["returnURL"].ToString());
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!TransactionItemExists(transactionItem.ID))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TransactionItemExists(transactionItem.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }                
+            }
+            else
+            {
+                ModelState.AddModelError("", "The changes cannot be saved because the quantity entered is higher than the available stock in the branch.");
             }
 
             PopulateDropDownLists(transactionItem);
 
-            return View(tI);
+            return View(transactionItem);
         }
         // POST: TransactionItems/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -408,24 +435,64 @@ namespace caa_mis.Controllers
             return View(transactionItem);
         }
         
+        public bool validateOnHand(int TransactionID, int ProductID, int Quantity)
+        {
+            //validate quantity vs the item
+            var trans = _context.Transactions
+                .FirstOrDefault(p => p.ID == TransactionID);
+
+            var currentOnHand = _context.Stocks
+                .Where(p => p.ItemID == ProductID && p.BranchID == trans.OriginID)
+                .FirstOrDefault();
+
+            return currentOnHand.Quantity >= Quantity;
+        }
         [Produces("application/json")]
         public IActionResult SearchProduct(int branchID, string term = null)
         {
 
-            IQueryable<ProductListVM> sumQ = _context.ProductList;
+            IQueryable<ProductListVM> sumQ = _context.ProductList.OrderBy(p=>p.Name);
+            IQueryable<ProductListVM> result;
 
-            var result = sumQ
-                .AsNoTracking()
-                .Where(p => p.BranchID == branchID);
-               
-            if(term != null)
+            if (term != null)
             {
-                result.Where(p => p.Name.ToUpper().Contains(term.ToUpper()) || p.SKUNumber.Contains(term));
+                result = sumQ
+                 .AsNoTracking()
+                 .Where(p => p.BranchID == branchID && p.Name.ToUpper().Contains(term.ToUpper()) || p.SKUNumber.Contains(term));
             }
+            else
+            {
+                result = sumQ
+               .AsNoTracking()
+               .Where(p => p.BranchID == branchID);
+                
+            }
+               
             return Json(result);
         }
 
-        public async Task<IActionResult> TransactionItemSummary(int? page, int? pageSizeID, int[] OriginID, int[] DestinationID, string sortDirectionCheck,
+        [Produces("application/json")]
+        public IActionResult SearchAllProduct(string term = null)
+        {
+            IQueryable<Item> result;
+            if (term != null)
+            {
+                result = _context.Items
+                .OrderBy(p => p.Name)
+                .AsNoTracking()
+                .Where(p => p.Name.ToUpper().Contains(term.ToUpper()) || p.SKUNumber.Contains(term));
+            }
+            else
+            {
+                result = _context.Items
+                .OrderBy(p => p.Name)
+               .AsNoTracking();
+            }
+
+            return Json(result);
+        }
+
+            public async Task<IActionResult> TransactionItemSummary(int? page, int? pageSizeID, int[] OriginID, int[] DestinationID, string sortDirectionCheck,
                                             string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "OriginName")
         {
             //List of sort options.

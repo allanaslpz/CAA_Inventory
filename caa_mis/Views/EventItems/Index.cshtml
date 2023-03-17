@@ -5,7 +5,7 @@
     caa_mis.Models.Event transaction = (caa_mis.Models.Event)ViewBag.Transactions;
 }
 
-<h1>Event Items</h1>
+<h4>Event Items</h4>
 <hr />
 <div class="row">
     <div class="col-6">
@@ -93,11 +93,15 @@
         <div id="productDetails">
             <h5>Add Product</h5>
             <form asp-action="Create">
+                @if (TempData.ContainsKey("ErrorMessage"))
+                {
+                    <span class="text-danger">@TempData["ErrorMessage"]</span>
+                }
                 <div class="row alert alert-light">
                     <div class="col-sm">
                         <div class="form-group col-sm col-lg">
                             <label for="ProductName" clas="bold">Product</label>
-                            <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Start typing a product..." required>
+                        <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Start typing a product or sku..." required>
                             <input type="hidden" name="ProductID" id="ProductID" />
                         <input type="hidden" name="TransactionID" id="TransactionID" value="@transaction.ID" />
                         </div>
