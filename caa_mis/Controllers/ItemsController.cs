@@ -257,9 +257,9 @@ namespace caa_mis.Controllers
             }
             catch (DbUpdateException dex)
             {
-                if (dex.GetBaseException().Message.Contains("UNIQUE constraint failed: SKUNumber"))
+                if (dex.GetBaseException().Message.Contains("UNIQUE constraint failed: Items.SKUNumber"))
                 {
-                    ModelState.AddModelError("SKUNumber", "Unable to save changes. Remember, you cannot have duplicate SKU numbers.");
+                    ModelState.AddModelError("SKUNumber", "Please generate a new SKU for this item.");
                 }
                 else
                 {
@@ -345,6 +345,17 @@ namespace caa_mis.Controllers
                     else
                     {
                         throw;
+                    }
+                }
+                catch (DbUpdateException dex)
+                {
+                    if (dex.GetBaseException().Message.Contains("UNIQUE constraint failed: Items.SKUNumber"))
+                    {
+                        ModelState.AddModelError("SKUNumber", "Please generate a new SKU for this item.");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
                     }
                 }
                 //return RedirectToAction(nameof(Index));
