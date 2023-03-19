@@ -1,11 +1,11 @@
 ﻿@model IEnumerable<caa_mis.Models.Item>
 
 @{
-    ViewData["Title"] = "Product Index";
+    ViewData["Title"] = "Products";
 
 }
 
-<h1>Products</h1>
+<h1>@ViewData["Title"]</h1>
 
 <p>
     <a asp-action="Create" class="btn btn-primary float-left">Create New Product</a>
