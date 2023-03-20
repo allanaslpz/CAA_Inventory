@@ -23,13 +23,13 @@
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Location" class="control-label">Location<span style="color:red;">*</span></label>
-                <select asp-for="Location" class="form-control form-select" asp-items="Html.GetEnumSelectList<InOut>()"></select>
+                <label asp-for="Location" class="control-label"></label>
+                <input asp-for="Location" class="form-control" />
                 <span asp-validation-for="Location" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PhoneNumber" class="control-label">PhoneNumber<span style="color:red;">*</span></label>
-                <select asp-for="PhoneNumber" class="form-control form-select" asp-items="Html.GetEnumSelectList<InOut>()"></select>
+                <label asp-for="PhoneNumber" class="control-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
