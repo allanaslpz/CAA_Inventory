@@ -136,13 +136,19 @@
                             <input type="submit" name="actionButton" value="Category" class="btn btn-link" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="SKU Number" class="btn btn-link" />
+                            <input type="submit" disabled="disabled" value="SKU" class="btn btn-link" style="color: blue;" />
                         </th>
                         <th>
-                            Branch Available
+                            <input type="submit" disabled="disabled" value="Cost" class="btn btn-link" style="color: blue;" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Cost" class="btn btn-link" />
+                            <input type="submit" disabled="disabled" value="Branch" class="btn btn-link" style="color: blue;" />
+                        </th>
+                        <th>
+                            <input type="submit" disabled="disabled" value="Quantity" class="btn btn-link" style="color: blue;" />
+                        </th>
+                        <th>
+                            <input type="submit" name="actionButton" value="Total" class="btn btn-link" />
                         </th>
                         <th></th>
                     </tr>
@@ -170,7 +176,9 @@
                             <td>
                                 @Html.DisplayFor(modelItem => item.SKUNumber)
                             </td>
-                           
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Cost)
+                            </td>
                             <td>
                                 @{
                                     
@@ -202,7 +210,38 @@
                                 }
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Cost)
+								@{  // Codes to Retrieve Quantity of Items //
+									int qCount = item.Stocks.Count();
+                                    if (qCount > 0)
+									{
+										int firstCond = item.Stocks.FirstOrDefault().Quantity;
+                                        if (qCount > 1)
+										{
+											string qList = "";
+											var c = item.Stocks.ToList();
+                                            for (int i = 1; i < qCount; i++)
+											{
+                                                qList += c[i].Quantity + " <br />";
+											}
+											<a class="" role="button" data-bs-toggle="collapse" href="#collapseHistory@(item.ID)"
+								                aria-expanded="false" aria-controls="collapseHistory@(item.ID)">
+                                                @firstCond <span class="badge bg-info">@qCount</span>
+											</a>
+											<div class="collapse" id="collapseHistory@(item.ID)">
+                                                @Html.Raw(qList)
+											</div>
+										}
+										else
+										{
+											@firstCond
+										}
+									}
+								}
+                            </td>
+                            <td>
+                                @{  // Code to Retrieve Total Quantities of Items //
+                                    @item.Stocks.Sum(s => s.Quantity)
+                                }
                             </td>
                             <td>
                                 
