@@ -237,7 +237,7 @@
                         var result = $.map(data, function (item) {
                             console.log(item);
                             return {
-                                label: item.productName,
+                                label: item.productName ? item.productName : item.name,
                                 value: item.id
                             };
                         });

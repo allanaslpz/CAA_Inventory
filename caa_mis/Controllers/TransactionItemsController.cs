@@ -452,23 +452,42 @@ namespace caa_mis.Controllers
         {
 
             IQueryable<ProductListVM> sumQ = _context.ProductList.OrderBy(p=>p.Name);
-            IQueryable<ProductListVM> result;
+            IQueryable<Item> items = _context.Items.OrderBy(p => p.Name);
 
+            IQueryable<Item> result;
+            IQueryable<ProductListVM> result2;
+            //head office or others
+            if (branchID == 1 && term != null)
+            {
+                result = items
+                .AsNoTracking()
+                .Where(p => p.Name.ToUpper().Contains(term.ToUpper()) || p.SKUNumber.Contains(term));
+
+                return Json(result);
+            }
+            else if (branchID == 1 && term == null)
+            {
+                result = items
+                .AsNoTracking();
+                
+                return Json(result);
+            }
+            
             if (term != null)
             {
-                result = sumQ
+                result2 = sumQ
                  .AsNoTracking()
                  .Where(p => p.BranchID == branchID && p.Name.ToUpper().Contains(term.ToUpper()) || p.SKUNumber.Contains(term));
             }
             else
             {
-                result = sumQ
+                result2 = sumQ
                .AsNoTracking()
                .Where(p => p.BranchID == branchID);
                 
             }
                
-            return Json(result);
+            return Json(result2);
         }
 
         [Produces("application/json")]
