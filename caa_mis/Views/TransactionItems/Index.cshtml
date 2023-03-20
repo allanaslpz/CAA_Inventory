@@ -3,8 +3,9 @@
 @{
     ViewData["Title"] = "Stock In/Out Items";
     caa_mis.Models.Transaction transaction = (caa_mis.Models.Transaction)ViewBag.Transactions;
+
 }
-<h1>Receive / Transfer Details</h1>
+<h4>Transfer Details</h4>
 <hr />
 <div class="row">
     <div class="col-6">
@@ -117,15 +118,22 @@
     <hr />
     @if (transaction.TransactionStatus.Name == "Open")
     {
+   
         <div id="productDetails">
             <h5>Add Product</h5>
             <form asp-action="Create">
+                @if (TempData.ContainsKey("ErrorMessage"))
+                {
+                    <span class="text-danger">@TempData["ErrorMessage"]</span>
+                }
                 <div class="row alert alert-light">
                     <div class="col-sm">
                         <div class="form-group col-sm col-lg">
                             <label for="ProductName" clas="bold">Product</label>
-                            <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Start typing a product..." required>
+                            <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Start typing a product or sku..." required>
                             <input type="hidden" name="ProductID" id="ProductID" />
+                       @* @Html.DropDownList("ProductID",null,null, htmlAttributes: new { @class = "form-control" })*@
+
                         <input type="hidden" name="TransactionID" id="TransactionID" value="@transaction.ID" />
                         </div>
                     </div>
@@ -134,6 +142,7 @@
                             <label for="Quantity">Quantity</label>
                        
                             <input type="number" class="form-control" id="Quantity" name="Quantity" placeholder="1" value="1" required>
+                            
                         </div>
                     </div>
                     <div class="col-sm">
@@ -142,6 +151,7 @@
                             <input type="submit" value="Add Product" class="btn btn-primary" />
                         </div>
                     </div>
+                
                 </div>
             </form>
         </div>
@@ -255,11 +265,12 @@
                 $.ajax({
                     url: '/TransactionItems/SearchProduct/',
                     dataType: 'json',
-                    data: { term: $('#ProductName').val() },
+                    data: { BranchID: @transaction.OriginID, term: $('#ProductName').val() },
                     success: function (data) {
                         var result = $.map(data, function (item) {
+                            console.log(item);
                             return {
-                                label: item.name,
+                                label: item.productName ? item.productName : item.name,
                                 value: item.id
                             };
                         });
@@ -271,7 +282,12 @@
                 event.preventDefault();
                 $('#ProductName').val(ui.item.label);
                 $('#ProductID').val(ui.item.value);
-            }
+            },
+            minLength: 0,
+        }).focus(function () {
+            // trigger the search when the input field receives focus
+            $(this).autocomplete("search", "");
         });
+
     </script>
 }

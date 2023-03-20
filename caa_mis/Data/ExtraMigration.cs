@@ -49,7 +49,13 @@ namespace caa_mis.Data
                     INNER JOIN Branches b2 ON t.DestinationID = b2.ID
                     INNER JOIN TransactionStatuses ts ON t.TransactionStatusID = ts.ID
                 ");
-
+            migrationBuilder.Sql(
+            @"
+                    CREATE VIEW ProductList AS
+                    SELECT s.ItemID as ID, s.BranchID, s.Quantity, i.Name, i.SKUNumber
+                    FROM STOCKS s
+                    INNER JOIN ITEMS i ON (s.ItemID = i.ID)
+                ");
         }
     }
 }

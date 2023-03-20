@@ -5,7 +5,7 @@
     caa_mis.Models.Bulk transaction = (caa_mis.Models.Bulk)ViewBag.Transactions;
 }
 
-<h1>@ViewData["Title"]</h1>
+<h4>Inventory Items</h4>
 <hr />
 <div class="row">
     <div class="col-6">
@@ -220,11 +220,12 @@
         $('#ProductName').autocomplete({
             source: function (request, response) {
                 $.ajax({
-                    url: '/TransactionItems/SearchProduct/',
+                    url: '/TransactionItems/SearchAllProduct/',
                     dataType: 'json',
-                    data: { term: $('#ProductName').val() },
+                    data: {  term: $('#ProductName').val() },
                     success: function (data) {
                         var result = $.map(data, function (item) {
+                            console.log(item);
                             return {
                                 label: item.name,
                                 value: item.id
@@ -238,7 +239,12 @@
                 event.preventDefault();
                 $('#ProductName').val(ui.item.label);
                 $('#ProductID').val(ui.item.value);
-            }
+            },
+            minLength: 0,
+        }).focus(function () {
+            // trigger the search when the input field receives focus
+            $(this).autocomplete("search", "");
         });
+
     </script>
 }

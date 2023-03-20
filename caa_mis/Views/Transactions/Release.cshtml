@@ -7,7 +7,7 @@
 
 <h1>Release</h1>
 
-<h3>Are you sure you want to release this receiving/transfer?</h3>
+<h3>Are you sure you want to release this transfer?</h3>
 <p>Releasing this record will deduct or add items to you inventory</p>
 <form asp-action="Release">
     <input type="hidden" asp-for="@Model.ID" />
@@ -15,6 +15,10 @@
     <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@Model.ID" class="btn btn-danger">Back to Details Page</a>
 </form>
 <hr />
+@if (TempData.ContainsKey("ErrorMessage"))
+{
+    <span class="text-danger">@TempData["ErrorMessage"]</span>
+}
 <div class="container-fluid">
     <div class="row">
     <div class="col-6">

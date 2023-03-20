@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<caa_mis.Models.Transaction>
 
 @{
-    ViewData["Title"] = "Stock In/Out";
+    ViewData["Title"] = "Transfers";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h4>Transfers</h4>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary float-left">Create New Stock In/Out</a>
+    <a asp-action="Create" class="btn btn-primary float-left">Create New Transfer</a>
     <button class="btn @(ViewData["Filtering"]) btn-outline-primary float-end" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
         Filter/Search
     </button>
@@ -99,7 +99,7 @@
                                 <a asp-action="Edit" asp-route-id="@item.ID">[ Edit ]</a>
                                     
                              }
-                            <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@item.ID">[ View/Add Details ]</a>
+                            <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@item.ID">[ Details ]</a>
                             @if (item.TransactionStatus.Name == "Open")
                             {
                                 <a asp-action="Delete" asp-route-id="@item.ID">[ Delete ]</a>
@@ -165,7 +165,7 @@
                                     <a asp-action="Edit" asp-route-id="@item.ID">[ Edit ]</a>
 
                                 }
-                                <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@item.ID">[ View/Add Details ]</a>
+                                <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@item.ID">[ Details ]</a>
                                 @if (item.TransactionStatus.Name == "Open")
                                 {
                                     <a asp-action="Delete" asp-route-id="@item.ID">[ Delete ]</a>
