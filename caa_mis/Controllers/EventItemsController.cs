@@ -551,11 +551,21 @@ namespace caa_mis.Controllers
             //validate quantity vs the item
             var trans = _context.Events
                 .FirstOrDefault(p => p.ID == TransactionID);
-
+            
+            if(trans.BranchID == 1)
+            {
+                return true;
+            }
+            
             var currentOnHand = _context.Stocks
                 .Where(p => p.ItemID == ProductID && p.BranchID == trans.BranchID)
                 .FirstOrDefault();
 
+            if (currentOnHand == null)
+            {
+                return false;
+            }
+            
             return currentOnHand.Quantity >= Quantity;
         }
 

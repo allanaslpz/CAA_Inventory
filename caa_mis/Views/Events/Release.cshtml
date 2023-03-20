@@ -15,6 +15,10 @@
     <a asp-action="Index" asp-controller="EventItems" asp-route-TransactionID="@Model.ID" class="btn btn-danger">Back to Details Page</a>
 </form>
 <hr />
+@if (TempData.ContainsKey("ErrorMessage"))
+{
+    <span class="text-danger">@TempData["ErrorMessage"]</span>
+}
 <div class="container-fluid">
     <div class="row">
         <div class="col-6">

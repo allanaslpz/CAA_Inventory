@@ -441,10 +441,19 @@ namespace caa_mis.Controllers
             var trans = _context.Transactions
                 .FirstOrDefault(p => p.ID == TransactionID);
 
+            if(trans.OriginID == 1)
+            {
+                return true;
+            }
             var currentOnHand = _context.Stocks
                 .Where(p => p.ItemID == ProductID && p.BranchID == trans.OriginID)
                 .FirstOrDefault();
 
+            if(currentOnHand == null)
+            {
+                return false;
+            }
+            
             return currentOnHand.Quantity >= Quantity;
         }
         [Produces("application/json")]
