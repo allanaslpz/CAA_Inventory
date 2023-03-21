@@ -50,15 +50,18 @@ namespace caa_mis.Controllers
                              join stock in Stocklist on item.ID equals stock.ItemID
                              where (branchID == 0 || stock.BranchID == branchID)
                              group stock by item.Name into t
+                             let minLevel = t.Min(s => s.MinLevel)
+                             let totalStock = t.Sum(s => s.Quantity)
+                             where totalStock < minLevel // Filter out items not low in stock
                              select new
                              {
                                  ItemName = t.Key,
-                                 MinLevel = t.Min(s => s.MinLevel),
-                                 TotalStock = t.Sum(s => s.Quantity),
-                                 Percentage = 1 - ((double)t.Min(s => s.MinLevel) / (double)t.Sum(s => s.Quantity))
+                                 MinLevel = minLevel,
+                                 TotalStock = totalStock,
+                                 Percentage = 1 - ((double)minLevel / (double)totalStock)
                              };
             ViewBag.CurrentBranchID = branchID;
-            ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage).Take(5);
+            ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage);
 
             //PieChart information
 
