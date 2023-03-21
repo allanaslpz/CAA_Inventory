@@ -36,7 +36,7 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "FirstName", "LastName" };
+            string[] sortOptions = new[] { "FirstName", "LastName", "Status" };
 
             var Employee = _context.Employees
                                     .AsNoTracking();
@@ -210,7 +210,7 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,FirstName,LastName")] Employee employee)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,FirstName,LastName,Status")] Employee employee)
         {
             if (id != employee.ID)
             {
