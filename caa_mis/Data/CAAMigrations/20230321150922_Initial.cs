@@ -621,6 +621,7 @@ namespace caa_mis.Data.CAAMigrations
                 name: "IX_Transactions_TransactionTypeID",
                 table: "Transactions",
                 column: "TransactionTypeID");
+            ExtraMigration.Steps(migrationBuilder);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
