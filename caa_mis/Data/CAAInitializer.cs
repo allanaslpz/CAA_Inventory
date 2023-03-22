@@ -605,16 +605,23 @@ namespace caa_mis.Data
                 {
                     for (byte i = 0; i < eventNameCount; i++)
                     {
-                        foreach (int f in itemIDs)
+                        EventItem ei = new()
                         {
-                            EventItem ei = new()
-                            {
-                                ItemID = itemIDs[random.Next(itemIDCount)],
-                                EventID = eventIDs[i],
-                                Quantity = random.Next(1, 34)
-                            };
-                            context.EventItems.Add(ei);
-                        }
+                            ItemID = itemIDs[random.Next(itemIDCount)],
+                            EventID = eventIDs[i],
+                            Quantity = random.Next(1, 34)
+                        };
+                        context.EventItems.Add(ei);
+
+                        EventItem ei2 = new()
+                        {
+                            ItemID = itemIDs[random.Next(itemIDCount+1)],
+                            EventID = eventIDs[i],
+                            Quantity = random.Next(1, 34)
+                        };
+                        context.EventItems.Add(ei2);
+
+
                     }                        
                     context.SaveChanges();
                 }
