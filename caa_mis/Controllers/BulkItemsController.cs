@@ -199,7 +199,7 @@ namespace caa_mis.Controllers
             }
 
             PopulateDropDownLists(bI);
-            return View(bI);
+            return Redirect(ViewData["returnURL"].ToString());
         }
 
         // GET: BulkItems/Edit/5

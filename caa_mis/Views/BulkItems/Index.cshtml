@@ -87,6 +87,10 @@
         <div id="productDetails">
             <h5>Add Product</h5>
             <form asp-action="Create">
+            @if (TempData.ContainsKey("ErrorMessage"))
+            {
+                <span class="text-danger">@TempData["ErrorMessage"]</span>
+            }
                 <div class="row alert alert-light">
                     <div class="col-sm">
                         <div class="form-group col-sm col-lg">
