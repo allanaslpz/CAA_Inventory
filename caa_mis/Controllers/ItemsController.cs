@@ -248,7 +248,8 @@ namespace caa_mis.Controllers
                     await AddPicture(item, thePicture);
                     _context.Add(item);
                     await _context.SaveChangesAsync();
-                    return Redirect(ViewData["returnURL"].ToString());
+                    return RedirectToAction("Details", "Items", new { id = item.ID });
+                    //return Redirect(ViewData["returnURL"].ToString());
                 }
             }
             catch (RetryLimitExceededException)
@@ -580,7 +581,7 @@ namespace caa_mis.Controllers
         {
             ViewData["CategoryID"] = CategorySelectList(item?.CategoryID);
             ViewData["ItemStatusID"] = ItemStatusList(item?.ItemStatusID);
-            ViewData["ManufacturerID"] = ItemStatusList(item?.ManufacturerID);
+            ViewData["ManufacturerID"] = ManufacturerList(item?.ManufacturerID);
         }
 
         private bool ItemExists(int id)
