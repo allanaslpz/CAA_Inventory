@@ -575,6 +575,57 @@ namespace caa_mis.Data
                     }
                     context.SaveChanges();
                 }
+
+                //Event Seed Data
+                string[] eventName = new string[] { "Natioanal Indigenous Day", "Canada Day", "Funding",
+                                                    "Saint-Patricks Day", "Niagara College Graduation", "Canada 150",
+                "Games of La Francophonie", "Canadian Multiculturalism Day", "National Acadian Day"};
+                int eventNameCount = eventName.Length;
+                if (!context.Events.Any())
+                {
+                    for (byte i = 0; i < eventNameCount; i++)
+                    {
+                        Event e = new()
+                        {
+                            Name = eventName[i],
+                            EmployeeID = employeeIDs[random.Next(employeeIDCount)],
+                            TransactionStatusID = transactionStatusIDs[random.Next(transactionStatusIDCount)],
+                            BranchID = branchIDs[random.Next(branchIDCount - 1)],
+                            Date = DateTime.Today.AddDays(random.Next(-100, 6))
+                        };
+                        context.Events.Add(e);
+                    }
+                    context.SaveChanges();
+                }
+
+                //EventItem Seed Data
+                int[] eventIDs = context.Events.Select(a => a.ID).ToArray();
+                int eventIDCount = eventIDs.Length;
+                if (!context.EventItems.Any())
+                {
+                    for (byte i = 0; i < eventNameCount; i++)
+                    {
+                        EventItem ei = new()
+                        {
+                            ItemID = itemIDs[random.Next(itemIDCount)],
+                            EventID = eventIDs[i],
+                            Quantity = random.Next(1, 34)
+                        };
+                        context.EventItems.Add(ei);
+
+                        EventItem ei2 = new()
+                        {
+                            ItemID = itemIDs[random.Next(itemIDCount+1)],
+                            EventID = eventIDs[i],
+                            Quantity = random.Next(1, 34)
+                        };
+                        context.EventItems.Add(ei2);
+
+
+                    }                        
+                    context.SaveChanges();
+                }
+
             }
             catch (Exception ex)
             {

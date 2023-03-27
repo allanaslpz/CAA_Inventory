@@ -54,9 +54,10 @@
                 <option value="@item.Value">@item.Text</option>
             }
         </select>
-                <h5 class="card-title" style="text-align:center"><b>Top 5 Low in Stock</b></h5>
+                <h5 class="card-title" style="text-align:center"><b>Low in Stock</b></h5>
+                <div style="max-height: 250px; overflow-y: auto;">
                 <table class="table">
-                    <thead style="text-align:center">
+                        <thead style="text-align:center; position: sticky; top: 0; background-color: #fff;">
                         <tr>
                             <th scope="col">Product</th>
                             <th scope="col">Minimum</th>
@@ -64,7 +65,7 @@
                             @*<th scope="col">%</th>*@
                         </tr>
                     </thead>
-                    <tbody style="text-align:center">
+                    <tbody style="text-align:center;">
                         
                          @foreach(var item in ViewBag.TableItem)
                         {
@@ -78,9 +79,11 @@
                         }
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     </div>
+
     <div class="col">
         <div class="card h-100">
             <div class="card-body">

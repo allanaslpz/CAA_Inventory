@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<caa_mis.Models.ItemStatus>
 
 @{
-    ViewData["Title"] = "Product Status";
+    ViewData["Title"] = "Product Statuses";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -122,7 +122,7 @@
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
                     @*<a asp-action="Delete" asp-route-id="@item.ID">Delete</a>*@
             </td>
         </tr>
