@@ -1,0 +1,41 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewBag.Title = "LowInStock";
+}
+
+<h4>Low In Stock Items</h4>
+<br />
+<p>
+    @Html.ActionLink("Download Report", "DownloadLowInStock", new { branch = ViewBag.CurrentBranchID }, new { @class = "btn btn-info float-end" })
+</p>
+
+@using (Html.BeginForm())
+{
+    <p>
+        @Html.DropDownList("branch", ViewBag.Branches as List<SelectListItem>, new { onchange = "this.form.submit();", style = "width: 300px;" })
+    </p>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Item Name</th>
+            <th>Minimum Level</th>
+            <th>Total Stock</th>
+            @*<th>Percentage</th>*@
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ItemName</td>
+                <td>@item.MinLevel</td>
+                <td>@item.TotalStock</td>
+                @*<td>@string.Format("{0:P2}", item.Percentage)</td>*@
+            </tr>
+        }
+    </tbody>
+</table>
+
