@@ -11,12 +11,6 @@
     <div class="col-6">
         <dl class="row">
             <dt class="col-md-4">
-                Transaction Type
-            </dt>
-            <dd class="col-md-8">
-                @Html.DisplayFor(model => transaction.TransactionType.Name)
-            </dd>
-            <dt class="col-md-4">
                 @Html.DisplayNameFor(model => transaction.Employee)
             </dt>
             <dd class="col-md-8">
@@ -29,11 +23,17 @@
                 @Html.DisplayFor(model => transaction.Origin.Name)
             </dd>
             
-            <dt class="col-md-4">
+            @*<dt class="col-md-4">
                 @Html.DisplayNameFor(model => transaction.ReceivedDate)
             </dt>
             <dd class="col-md-8">
                 @Html.DisplayFor(model => transaction.ReceivedDate)
+            </dd>*@
+            <dt class="col-md-4">
+                @Html.DisplayNameFor(model => transaction.Shipment)
+            </dt>
+            <dd class="col-md-8">
+                @Html.DisplayFor(model => transaction.Shipment)
             </dd>
             <dt class="col-md-4">
                 @Html.DisplayNameFor(model => transaction.Description)
@@ -52,26 +52,21 @@
             <dd class="col-md-8">
                 @Html.DisplayFor(model => transaction.TransactionDate)
             </dd>
-            
-            <dt class="col-md-4">
-                Status
-            </dt>
-            <dd class="col-md-8">
-                @Html.DisplayFor(model => transaction.TransactionStatus.Name)
-            </dd>
             <dt class="col-md-4">
                 @Html.DisplayNameFor(model => transaction.Destination)
             </dt>
             <dd class="col-md-8">
                 @Html.DisplayFor(model => transaction.Destination.Name)
             </dd>
-            
             <dt class="col-md-4">
-                @Html.DisplayNameFor(model => transaction.Shipment)
+                Status
             </dt>
             <dd class="col-md-8">
-                @Html.DisplayFor(model => transaction.Shipment)
+                @Html.DisplayFor(model => transaction.TransactionStatus.Name)
             </dd>
+            
+            
+            
             
         </dl>
     </div>

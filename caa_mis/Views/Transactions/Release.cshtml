@@ -42,18 +42,19 @@
                 @Html.DisplayFor(model => model.Origin.Name)
             </dd>
 
-            <dt class="col-md-4">
+            @*<dt class="col-md-4">
                 @Html.DisplayNameFor(model => model.ReceivedDate)
             </dt>
             <dd class="col-md-8">
                 @Html.DisplayFor(model => model.ReceivedDate)
-            </dd>
-            <dt class="col-md-4">
-                @Html.DisplayNameFor(model => model.Description)
-            </dt>
-            <dd class="col-md-8">
-                @Html.DisplayFor(model => model.Description)
-            </dd>
+            </dd>*@
+                <dt class="col-md-4">
+                    @Html.DisplayNameFor(model => model.Shipment)
+                </dt>
+                <dd class="col-md-8">
+                    @Html.DisplayFor(model => model.Shipment)
+                </dd>
+            
 
         </dl>
     </div>
@@ -78,13 +79,13 @@
             <dd class="col-md-8">
                 @Html.DisplayFor(model => model.Destination.Name)
             </dd>
-
             <dt class="col-md-4">
-                @Html.DisplayNameFor(model => model.Shipment)
+                @Html.DisplayNameFor(model => model.Description)
             </dt>
             <dd class="col-md-8">
-                @Html.DisplayFor(model => model.Shipment)
+                @Html.DisplayFor(model => model.Description)
             </dd>
+            
 
         </dl>
     </div>
