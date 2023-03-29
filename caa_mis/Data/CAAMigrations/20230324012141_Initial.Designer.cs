@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using caa_mis.Data;
 
@@ -10,9 +11,10 @@ using caa_mis.Data;
 namespace caa_mis.Data.CAAMigrations
 {
     [DbContext(typeof(InventoryContext))]
-    partial class InventoryContextModelSnapshot : ModelSnapshot
+    [Migration("20230324012141_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.14");
@@ -634,8 +636,6 @@ namespace caa_mis.Data.CAAMigrations
                     b.ToView("EventSummary");
                 });
 
-<<<<<<< HEAD
-=======
             modelBuilder.Entity("caa_mis.ViewModels.ProductListVM", b =>
                 {
                     b.Property<int>("ID")
@@ -659,7 +659,6 @@ namespace caa_mis.Data.CAAMigrations
                     b.ToView("ProductList");
                 });
 
->>>>>>> origin/DEV
             modelBuilder.Entity("caa_mis.ViewModels.StockSummaryByBranchVM", b =>
                 {
                     b.Property<int>("ID")

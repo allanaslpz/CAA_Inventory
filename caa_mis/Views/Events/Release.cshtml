@@ -5,7 +5,7 @@
     IEnumerable<caa_mis.Models.EventItem> Items = (IEnumerable<caa_mis.Models.EventItem>)ViewBag.Items;//(caa_mis.Models.TransactionItem)ViewBag.Items;
 }
 
-<h1>Release</h1>
+<h4>Release</h4>
 
 <h3>Are you sure you want to release this Event @Model.Branch.Name?</h3>
 <p>Releasing this will deduct inventory items to the selected branch.'</p>
@@ -15,6 +15,10 @@
     <a asp-action="Index" asp-controller="EventItems" asp-route-TransactionID="@Model.ID" class="btn btn-danger">Back to Details Page</a>
 </form>
 <hr />
+@if (TempData.ContainsKey("ErrorMessage"))
+{
+    <span class="text-danger">@TempData["ErrorMessage"]</span>
+}
 <div class="container-fluid">
     <div class="row">
         <div class="col-6">

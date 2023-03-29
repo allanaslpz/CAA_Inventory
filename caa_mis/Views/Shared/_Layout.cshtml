@@ -14,7 +14,7 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><img src="/images/logo.svg"  alt="Home" width="150"/></a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><img src="/images/logo.svg" alt="Home" width="150" /></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -26,10 +26,13 @@
                                 Inventory
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Events" asp-action="Index">Events</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Index">Stock In/Out</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Incoming">Incoming Stocks</a></li>
+                                @*<li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Incoming">Receive Transfers</a></li>*@
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Items" asp-action="Index">Products</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Index">Transfers</a></li>
                             </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Events" asp-action="Index">Events</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -40,21 +43,21 @@
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Employees" asp-action="Index">Employees</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="TransactionTypes" asp-action="Index">Event Types</a></li>
                                 <li><hr /></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="TransactionStatus" asp-action="Index">Inventory Statuses</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="TransactionStatus" asp-action="Index">Inventory Status</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Categories" asp-action="Index">Product Categories</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="ItemStatus" asp-action="Index">Product Statuses</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="ItemStatus" asp-action="Index">Product Status</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Suppliers" asp-action="Index">Vendors</a></li>
                             </ul>
                         </li>
                         @*<li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Report
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Items" asp-action="StockSummaryByBranch">Stock Summary By Branch</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="TransactionSummary">Transfer Summary</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="TransactionItems" asp-action="TransactionItemSummary">Transferred Product Summary</a></li>
-                            </ul>
+                        <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Report
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" asp-area="" asp-controller="Items" asp-action="StockSummaryByBranch">Stock Summary By Branch</a></li>
+                        <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="TransactionSummary">Transfer Summary</a></li>
+                        <li><a class="dropdown-item" asp-area="" asp-controller="TransactionItems" asp-action="TransactionItemSummary">Transferred Product Summary</a></li>
+                        </ul>
                         </li>*@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="">Reports</a>
@@ -64,14 +67,14 @@
                                 Setting
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Bulks" asp-action="Index">Initial Inventory</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Bulks" asp-action="Index">Inventory Reset</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="UserRoles" asp-action="">User Roles</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" onclick="toggleSidebar()" href="#">Help</a>
                         </li>
-                        
+
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -85,11 +88,8 @@
 
         @*sidebar Content*@
         <div class="sidebar" id="sidebar">
-            <div class="container-liner">
-                <br/>
-                <a class="btn btn-primary" onclick="toggleSidebar()" href="#">Close</a>
-                <h4>HOME Page</h4>
-                <div>This is the <b>HOME Dashboard</b> where you can navigate by pointing and clicking your mouse or tabbing using your keyboard and enter key. <br/><br/> <b>INVENTORY</b> for creating new Products, Transfers, and Receiving of items. <br/><br/> <b>ADMINISTRATION</b> for creating Branches, Employees, Event Types, Inventory Statuses, Vendors, Product Categories, and Statuses. <br/><br/> <b>REPORT</b> for viewing and generating of Products Transaction, Transferred Products, and Stock Summary reports. <br/><br/> <b>SETTING</b> for editing User Roles information and archiving of existing employees. <br/><br/> <b>REGISTER</b> for creating new application logins of new employees. <br/><br/> <b>LOGIN</b> for signing in of registered users, resetting of passwords, and resending of email confirmations.</div>
+            <div class="container-liner">                
+                <a class="btn btn-secondary" onclick="toggleSidebar()" href="#">Close</a>
             </div>
         </div>
     </div>
@@ -102,43 +102,94 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
 
 
-
 <script>
+    // Define a lookup object for the help text
+    var helpTextLookup = {
+        "/items": "This is the page where you can manage product information. <br> *SKU - It is our stock keeping unit barcode <br> *Cost - It shows current stock product cost <br> *Branch, Quantity - It shows each product count by each branch",
+        "/transactions/incoming": "This is the page where you can transfer items between locations.",
+        "/transactions": "This is the page where you can receive items from suppliers. <br> *Origin - It is original branch that product belongs<br> *Destination - It is a branch that product belongs after transfer<br> *Date - It is a transaction start date<br> *Status - RELEASED is product transaction is ongoing but released from origin branch, OPEN is ongoing but not released yet. RECEIVED is transfer process it finished.",
+        "/events": "This is the page where you can create new events and see all events.<br> *Date - It is a event start date<br> *Status - RELEASED is product transaction is ongoing but released from origin branch, OPEN is ongoing but not released yet. RECEIVED is transfer process it finished.",
+        "/branches": "This is the page where you can create new branch and see all branches.",
+        "/employees": "This is the page where you can create new employee and see all employees and archive existing employees.",
+        "/transactiontypes": "This is the page where you can create new event types and see all event types.",
+        "/transactionstatus": "This is the page where you can create new inventory status and see all inventory statuses.",
+        "/categories": "This is the page where you can create new product category and see categories.",
+        "/itemstatus": "This is the page where you can create new product status and see all product statuses.",
+        "/suppliers": "This is the page where you can create new vendor and see all vendors.",
+        "/reports": "This is the page where you can reports for inventory items, event items, and all transfered items.",
+        "/bulks": "This is the page where you can bulk change on item list using import excel file.",
+        "/userroles": "This is the page where you can manage user roles information.",
+        "/register": "This is the page where you can create new application logins for new employees.",
+        "/eventitems/eventsummary": "This is the page where you can see all event products list.<br> *Branch - It is a event that happened branch",
+        "/transactionitems/transactionitemsummary": "This is the page where you can see all transferred products list.<br> *Quantity - It shows many products transfering or transferred to that branch",
+        "/items/stocksummarybybranch": "This is the page where you can see all products in each branch stock.<br> *Quantity - It is a current quantity in stock also including transfering products with OPEN status. Once product status changed to released. It will be decreased current branch will added destination branch"
+    };
 
-     // sidebar Help
-$(function(){
-  $("#sidebar-tab-text").width($("#sidebar").height());
-});
-$( window ).resize(function() {
-  $("#sidebar-tab-text").width($("#sidebar").height());
-});
-/* End of unsure centering */
+    // Listen for the Help button click event
+    $(".nav-link.text-dark[href='#']").on("click", function (event) {
+        event.preventDefault();
 
-//The only necessary piece of code
-function toggleSidebar(){
-  $("#sidebar").toggleClass("move-to-left");
-  $("#sidebar-tab").toggleClass("move-to-left");
-  $("main").toggleClass("move-to-left-partly");
-  $(".arrow").toggleClass("active");
-}
+        // Get the URL of the current page
+        var url = window.location.pathname.toLowerCase();
 
-//helpcenter
-$(document).ready(function() {
-  $('.help-popover').popover({
-    placement: 'bottom',
-    title: "THE HOME PAGE",
-    html: true,
-    content: ""
+        // Get the help text based on the URL
+        var helpText = helpTextLookup[url] || `
+          <p>This is the <b>HOME Dashboard</b> where you can navigate by pointing and
+                clicking your mouse or tabbing using your keyboard and enter key.</p>
+          <ul>
+            <li><b>INVENTORY</b> for creating new Products, Transfers, and Receiving of items.</li>
+            <li><b>EVENT</b> for creating Events, EventItems and Assign to Other Branches.</li>
+            <li><b>ADMINISTRATION</b> for creating Branches, Employees, Event Types, Inventory Statuses, Vendors, Product Categories, and Statuses.</li>
+            <li><b>REPORT</b> for viewing and generating of Products Transaction, Transferred Products, and Stock Summary reports.</li>
+            <li><b>SETTING</b> for editing User Roles information and archiving of existing employees.</li>
+            <li><b>REGISTER</b> for creating new application logins of new employees.</li>
+            <li><b>LOGIN</b> for signing in of registered users, resetting of passwords, and resending of email confirmations.</li>
+          </ul>
+        `;
+
+        // Get the title page name
+        var titlePageName = $("title").text().replace(/-.*/, "Page");
+
+        // Set the help text
+        $("#sidebar .container-liner").html("<br/><a class='btn btn-primary' onclick='toggleSidebar()' href='#'>Close</a><h4>" + titlePageName + "</h4><div>" + helpText + "</div>");
     });
-   //$(document).on("click", ".popover .close" , function(){
-   //      $(this).parents(".popover").popover('hide');
-   //  });
-});
+
+    // sidebar Help
+    $(function () {
+        $("#sidebar-tab-text").width($("#sidebar").height());
+    });
+    $(window).resize(function () {
+        $("#sidebar-tab-text").width($("#sidebar").height());
+    });
+    /* End of unsure centering */
+
+    //The only necessary piece of code
+    function toggleSidebar() {
+        $("#sidebar").toggleClass("move-to-left");
+        $("#sidebar-tab").toggleClass("move-to-left");
+        $("main").toggleClass("move-to-left-partly");
+        $(".arrow").toggleClass("active");
+    }
+
+    //helpcenter
+    $(document).ready(function () {
+        $('.help-popover').popover({
+            placement: 'bottom',
+            title: "THE HOME PAGE",
+            html: true,
+            content: ""
+        });
+        //$(document).on("click", ".popover .close" , function(){
+        //      $(this).parents(".popover").popover('hide');
+        //  });
+    });
 
 </script>

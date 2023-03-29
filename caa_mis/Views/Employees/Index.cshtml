@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<caa_mis.Models.Employee>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Employees";
 }
 
-<h1>Employees</h1>
+<h1>@ViewData["Title"]</h1>
 
 <p>
     <a asp-action="Create" class="btn btn-primary float-left">Create New</a>
@@ -119,7 +119,7 @@
                         </td>
                         <td>
                             <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                            <a asp-action="Details" asp-route-id="@item.ID">Details</a> |                
+                            <a asp-action="Details" asp-route-id="@item.ID">Details</a>
                         </td>
                     </tr>
             }
