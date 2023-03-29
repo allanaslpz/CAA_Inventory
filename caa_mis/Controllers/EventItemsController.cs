@@ -183,15 +183,34 @@ namespace caa_mis.Controllers
                 ItemID = transactionItem.ProductID,
                 Quantity = transactionItem.Quantity
             };
-            
-            if (ModelState.IsValid)
+
+            var itemExists = _context.EventItems
+                .Where(p => p.EventID == transactionItem.TransactionID && p.ItemID == transactionItem.ProductID)
+                .FirstOrDefault();
+
+            if (itemExists == null)
             {
-                _context.Add(bI);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (validateOnHand(transactionItem.TransactionID, transactionItem.ProductID, transactionItem.Quantity))
+                {
+                    if (ModelState.IsValid)
+                    {
+                        _context.Add(bI);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "The changes cannot be saved because the quantity entered is higher than the available stock in the branch.";
+                }
             }
+            else
+            {
+                TempData["ErrorMessage"] = "The changes cannot be saved. There is already an existing product in your list.";
+            }
+            
             PopulateDropDownLists(bI);
-            return View(bI);
+            return Redirect(ViewData["returnURL"].ToString());
         }
 
         // GET: EventItems/Edit/5
@@ -226,27 +245,33 @@ namespace caa_mis.Controllers
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
+            if (validateOnHand(EventItem.EventID, EventItem.ItemID, EventItem.Quantity))
             {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(EventItem);
-                    await _context.SaveChangesAsync();
-                    return Redirect(ViewData["returnURL"].ToString());
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EventItemExists(EventItem.ID))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(EventItem);
+                        await _context.SaveChangesAsync();
+                        return Redirect(ViewData["returnURL"].ToString());
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!EventItemExists(EventItem.ID))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
-                }
                 
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "The changes cannot be saved because the quantity entered is higher than the available stock in the branch.");
             }
             PopulateDropDownLists(EventItem);
             return View(EventItem);
@@ -519,6 +544,29 @@ namespace caa_mis.Controllers
                 }
             }
             return NotFound("No data.");
+        }
+
+        public bool validateOnHand(int TransactionID, int ProductID, int Quantity)
+        {
+            //validate quantity vs the item
+            var trans = _context.Events
+                .FirstOrDefault(p => p.ID == TransactionID);
+            
+            if(trans.BranchID == 1)
+            {
+                return true;
+            }
+            
+            var currentOnHand = _context.Stocks
+                .Where(p => p.ItemID == ProductID && p.BranchID == trans.BranchID)
+                .FirstOrDefault();
+
+            if (currentOnHand == null)
+            {
+                return false;
+            }
+            
+            return currentOnHand.Quantity >= Quantity;
         }
 
         private bool EventItemExists(int id)

@@ -28,7 +28,7 @@ namespace caa_mis.Controllers
         // GET: Events
         public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, 
             int? TransactionStatusID, int? BranchID,int? EmployeeID,
-            int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "BranchID")
+            int? page, int? pageSizeID, string actionButton, string sortDirection = "desc", string sortField = "Date")
         {
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
@@ -353,18 +353,24 @@ namespace caa_mis.Controllers
                 .FirstOrDefaultAsync(m => m.Name == "Released");
 
             var trans = new Event { ID = id, TransactionStatusID = status.ID };
-            ReleaseTransaction(id);
-            if (ModelState.IsValid)
+            if (ReleaseTransaction(id))
             {
-                _context.Events.Attach(trans).Property(x => x.TransactionStatusID).IsModified = true;
-                _context.SaveChanges();
+                if (ModelState.IsValid)
+                {
+                    _context.Events.Attach(trans).Property(x => x.TransactionStatusID).IsModified = true;
+                    _context.SaveChanges();
 
-                return Redirect(ViewData["returnURL"].ToString());
+                    return Redirect(ViewData["returnURL"].ToString());
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Cannot Release this event, there are Items that are currently out of stock.";
             }
 
             return RedirectToAction(nameof(Index));
         }
-        public void ReleaseTransaction(int id)
+        public bool ReleaseTransaction(int id)
         {
             //get the transaction details
             var Event = _context.Events
@@ -375,35 +381,32 @@ namespace caa_mis.Controllers
                 .Where(m => m.EventID == id)
                 .AsNoTracking();
 
-            //delete all in stocks in branch
-            var stocks = _context.Stocks
-                .Where(m => m.BranchID == Event.BranchID)
-                .AsNoTracking();
-            _context.Stocks.RemoveRange(stocks);
 
+            // check item if have stocks in the branch
+            if (Event.BranchID != 1)
+            {
+                foreach (var item in EventItems)
+                {
+                    var stockItem = _context.Stocks.AsNoTracking()
+                            .FirstOrDefault(s => s.BranchID == Event.BranchID && s.ItemID == item.ItemID && s.Quantity >= item.Quantity);
+
+                    //if we dont have enough stock return false;
+                    if (stockItem == null)
+                    {
+                        return false;
+                    }
+                }
+            }
             //do stock out
             foreach (var item in EventItems)
             {
-                //check if stock record already have the item
-                var stockItem = _context.Stocks.AsNoTracking()
+                //no need to deduct item if it is from head office or supplier
+                if (Event.BranchID != 1)
+                {
+                    //check if stock record already have the item
+                    var stockItem = _context.Stocks.AsNoTracking()
                     .FirstOrDefault(s => s.BranchID == Event.BranchID && s.ItemID == item.ItemID);
 
-                if (stockItem == null)
-                {
-                    //create a new record.  This will create a negative item in the inventory
-                    Stock stock = new Stock
-                    {
-                        ID = 0,
-                        BranchID = (int)Event.BranchID,
-                        ItemID = item.ItemID,
-                        Quantity = -item.Quantity
-                    };
-
-                    _context.Stocks.Add(stock);
-                    _context.SaveChanges();
-                }
-                else
-                {
                     //update the existing one. Deduct the item quantity to the current quantity
                     var updateStock = new Stock { ID = stockItem.ID, Quantity = stockItem.Quantity - item.Quantity };
                     _context.Stocks.Attach(updateStock).Property(x => x.Quantity).IsModified = true;
@@ -411,7 +414,7 @@ namespace caa_mis.Controllers
                 }
 
             }
-            _context.SaveChanges(); 
+            return true;
         }
 
         private bool EventExists(int id)

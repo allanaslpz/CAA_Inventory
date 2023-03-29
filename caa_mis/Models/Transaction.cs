@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 namespace caa_mis.Models
 {
-    public class Transaction
+    public class Transaction : IValidatableObject
     {
         public int ID { get; set; }
 
@@ -50,5 +50,13 @@ namespace caa_mis.Models
 
         public ICollection<TransactionItem> TransactionItems { get; set; } = new HashSet<TransactionItem>();
 
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (OriginID == DestinationID)
+            {
+                yield return new ValidationResult("Origin Branch should not be the same with Destination Branch", new[] { "DestinationID" });
+            }
+           
+        }
     }
 }

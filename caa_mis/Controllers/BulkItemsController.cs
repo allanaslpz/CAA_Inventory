@@ -180,15 +180,26 @@ namespace caa_mis.Controllers
                 ItemID = transactionItem.ProductID,
                 Quantity = transactionItem.Quantity
             };
-            
-            if (ModelState.IsValid)
+            var itemExists = _context.BulkItems
+                .Where(p => p.BulkID == transactionItem.TransactionID && p.ItemID == transactionItem.ProductID)
+                .FirstOrDefault();
+
+            if (itemExists == null)
             {
-                _context.Add(bI);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(bI);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
+            else
+            {
+                TempData["ErrorMessage"] = "The changes cannot be saved. There is already an existing product in your list.";
+            }
+
             PopulateDropDownLists(bI);
-            return View(bI);
+            return Redirect(ViewData["returnURL"].ToString());
         }
 
         // GET: BulkItems/Edit/5

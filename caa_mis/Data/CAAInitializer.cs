@@ -288,7 +288,7 @@ namespace caa_mis.Data
                     new Item
                     {
                         Name = "Sunglasses",
-                        SKUNumber = "00001",
+                        SKUNumber = "CAA685349",
                         Cost = 20,
                         Description = "Cool and trending sunglasses",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
@@ -297,7 +297,7 @@ namespace caa_mis.Data
                     new Item
                     {
                         Name = "Pen",
-                        SKUNumber = "00002",
+                        SKUNumber = "CAA780017",
                         Cost = 5,
                         Description = "Clickable pen",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
@@ -306,7 +306,7 @@ namespace caa_mis.Data
                     new Item
                     {
                         Name = "Towel",
-                        SKUNumber = "00003",
+                        SKUNumber = "CAA814972",
                         Cost = 15,
                         Description = "100% Cotton Towels",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
@@ -315,7 +315,7 @@ namespace caa_mis.Data
                     new Item
                     {
                         Name = "T-Shirt",
-                        SKUNumber = "00004",
+                        SKUNumber = "CAA929919",
                         Cost = 20,
                         Description = "White T-Shirt with CAA Logo",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
@@ -324,7 +324,7 @@ namespace caa_mis.Data
                     new Item
                     {
                         Name = "Tent",
-                        SKUNumber = "00010",
+                        SKUNumber = "CAA183952",
                         Cost = 200,
                         Description = "Large red tent",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
@@ -333,7 +333,7 @@ namespace caa_mis.Data
                     new Item
                     {
                         Name = "Table",
-                        SKUNumber = "00020",
+                        SKUNumber = "CAA399773",
                         Cost = 120,
                         Description = "White long foldable table",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
@@ -342,7 +342,7 @@ namespace caa_mis.Data
                     new Item
                     {
                         Name = "Table Cloth",
-                        SKUNumber = "00030",
+                        SKUNumber = "CAA30812",
                         Cost = 20,
                         Description = "Blue table cloth ",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
@@ -351,7 +351,7 @@ namespace caa_mis.Data
                     new Item
                     {
                         Name = "Roll-up Poster",
-                        SKUNumber = "00040",
+                        SKUNumber = "CAA610986",
                         Cost = 40,
                         Description = "Large Poster of CAA",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
@@ -360,7 +360,7 @@ namespace caa_mis.Data
                     new Item
                     {
                         Name = "Sticker",
-                        SKUNumber = "00005",
+                        SKUNumber = "CAA216285",
                         Cost = 5,
                         Description = "Giveaway Stickers with CAA brand",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
@@ -369,7 +369,7 @@ namespace caa_mis.Data
                     new Item
                     {
                         Name = "Chair",
-                        SKUNumber = "00050",
+                        SKUNumber = "CAA975524",
                         Cost = 40,
                         Description = "Foldable Chair",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
@@ -575,6 +575,57 @@ namespace caa_mis.Data
                     }
                     context.SaveChanges();
                 }
+
+                //Event Seed Data
+                string[] eventName = new string[] { "Natioanal Indigenous Day", "Canada Day", "Funding",
+                                                    "Saint-Patricks Day", "Niagara College Graduation", "Canada 150",
+                "Games of La Francophonie", "Canadian Multiculturalism Day", "National Acadian Day"};
+                int eventNameCount = eventName.Length;
+                if (!context.Events.Any())
+                {
+                    for (byte i = 0; i < eventNameCount; i++)
+                    {
+                        Event e = new()
+                        {
+                            Name = eventName[i],
+                            EmployeeID = employeeIDs[random.Next(employeeIDCount)],
+                            TransactionStatusID = transactionStatusIDs[random.Next(transactionStatusIDCount)],
+                            BranchID = branchIDs[random.Next(branchIDCount - 1)],
+                            Date = DateTime.Today.AddDays(random.Next(-100, 6))
+                        };
+                        context.Events.Add(e);
+                    }
+                    context.SaveChanges();
+                }
+
+                //EventItem Seed Data
+                int[] eventIDs = context.Events.Select(a => a.ID).ToArray();
+                int eventIDCount = eventIDs.Length;
+                if (!context.EventItems.Any())
+                {
+                    for (byte i = 0; i < eventNameCount; i++)
+                    {
+                        EventItem ei = new()
+                        {
+                            ItemID = itemIDs[random.Next(itemIDCount)],
+                            EventID = eventIDs[i],
+                            Quantity = random.Next(1, 34)
+                        };
+                        context.EventItems.Add(ei);
+
+                        EventItem ei2 = new()
+                        {
+                            ItemID = itemIDs[random.Next(itemIDCount+1)],
+                            EventID = eventIDs[i],
+                            Quantity = random.Next(1, 34)
+                        };
+                        context.EventItems.Add(ei2);
+
+
+                    }                        
+                    context.SaveChanges();
+                }
+
             }
             catch (Exception ex)
             {

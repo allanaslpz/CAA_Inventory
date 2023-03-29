@@ -5,3 +5,14 @@
 table tr:hover {
     background-color: #c7c7c7;
 }
+
+.left-aligned th
+{
+    text-align: left;
+    <!-- background-color: blue; -->
+}
+.left-aligned td 
+{
+    text-align: left; 
+    <!-- background-color: red; -->
+}
