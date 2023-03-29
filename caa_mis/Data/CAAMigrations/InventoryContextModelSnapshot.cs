@@ -634,8 +634,6 @@ namespace caa_mis.Data.CAAMigrations
                     b.ToView("EventSummary");
                 });
 
-<<<<<<< HEAD
-=======
             modelBuilder.Entity("caa_mis.ViewModels.ProductListVM", b =>
                 {
                     b.Property<int>("ID")
@@ -659,7 +657,6 @@ namespace caa_mis.Data.CAAMigrations
                     b.ToView("ProductList");
                 });
 
->>>>>>> origin/DEV
             modelBuilder.Entity("caa_mis.ViewModels.StockSummaryByBranchVM", b =>
                 {
                     b.Property<int>("ID")
