@@ -52,7 +52,7 @@ namespace caa_mis.Controllers
                 Employee = Employee.Where(p => p.LastName.ToUpper().Contains(SearchDesc.ToUpper()));
                 ViewData["Filtering"] = "btn-danger";
             }
-            if (InOutStatus != null)
+            if (Status != null)
             {
                 Employee = Employee.Where(p => p.Status == Status);
                 ViewData["Filtering"] = "btn-danger";
