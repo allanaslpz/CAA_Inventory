@@ -33,7 +33,7 @@ namespace caa_mis.Controllers
 
         // GET: Transactions
         public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchString, int? TransactionTypeID, int? TransactionStatusID, int? DestinationID,
-            int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Type")
+            int? page, int? pageSizeID, string actionButton, string sortDirection = "desc", string sortField = "Date")
         {
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);

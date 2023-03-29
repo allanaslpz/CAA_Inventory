@@ -113,10 +113,10 @@
 <script>
     // Define a lookup object for the help text
     var helpTextLookup = {
-        "/items": "This is the page where you can manage product information.",
+        "/items": "This is the page where you can manage product information. <br> *SKU - It is our stock keeping unit barcode <br> *Cost - It shows current stock product cost <br> *Branch, Quantity - It shows each product count by each branch",
         "/transactions/incoming": "This is the page where you can transfer items between locations.",
-        "/transactions": "This is the page where you can receive items from suppliers.",
-        "/events": "This is the page where you can create new events and see all events.",
+        "/transactions": "This is the page where you can receive items from suppliers. <br> *Origin - It is original branch that product belongs<br> *Destination - It is a branch that product belongs after transfer<br> *Date - It is a transaction start date<br> *Status - RELEASED is product transaction is ongoing but released from origin branch, OPEN is ongoing but not released yet. RECEIVED is transfer process it finished.",
+        "/events": "This is the page where you can create new events and see all events.<br> *Date - It is a event start date<br> *Status - RELEASED is product transaction is ongoing but released from origin branch, OPEN is ongoing but not released yet. RECEIVED is transfer process it finished.",
         "/branches": "This is the page where you can create new branch and see all branches.",
         "/employees": "This is the page where you can create new employee and see all employees and archive existing employees.",
         "/transactiontypes": "This is the page where you can create new event types and see all event types.",
@@ -127,7 +127,10 @@
         "/reports": "This is the page where you can reports for inventory items, event items, and all transfered items.",
         "/bulks": "This is the page where you can bulk change on item list using import excel file.",
         "/userroles": "This is the page where you can manage user roles information.",
-        "/register": "This is the page where you can create new application logins for new employees."
+        "/register": "This is the page where you can create new application logins for new employees.",
+        "/eventitems/eventsummary": "This is the page where you can see all event products list.<br> *Branch - It is a event that happened branch",
+        "/transactionitems/transactionitemsummary": "This is the page where you can see all transferred products list.<br> *Quantity - It shows many products transfering or transferred to that branch",
+        "/items/stocksummarybybranch": "This is the page where you can see all products in each branch stock.<br> *Quantity - It is a current quantity in stock also including transfering products with OPEN status. Once product status changed to released. It will be decreased current branch will added destination branch"
     };
 
     // Listen for the Help button click event
