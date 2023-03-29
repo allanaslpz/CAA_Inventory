@@ -20,6 +20,7 @@
 <table class="table">
     <thead>
         <tr>
+            <th>Location</th>
             <th>Item Name</th>
             <th>Minimum Level</th>
             <th>Total Stock</th>
@@ -27,9 +28,10 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in ViewBag.TableItem)
         {
             <tr>
+                <td>@item.BranchName</td>
                 <td>@item.ItemName</td>
                 <td>@item.MinLevel</td>
                 <td>@item.TotalStock</td>

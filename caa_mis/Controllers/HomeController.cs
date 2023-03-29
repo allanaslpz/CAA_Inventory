@@ -4,6 +4,7 @@ using caa_mis.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.Operations;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
@@ -49,22 +50,44 @@ namespace caa_mis.Controllers
                 branchID = 0;
             }
 
-            var tableItems = from item in Item
-                             join stock in Stocklist on item.ID equals stock.ItemID
-                             where (branchID == 0 || stock.BranchID == branchID)
-                             group stock by item.Name into t
-                             let minLevel = t.Min(s => s.MinLevel)
-                             let totalStock = t.Sum(s => s.Quantity)
-                             where totalStock < minLevel // Filter out items not low in stock
-                             select new
-                             {
-                                 ItemName = t.Key,
-                                 MinLevel = minLevel,
-                                 TotalStock = totalStock,
-                                 Percentage = 1 - ((double)minLevel / (double)totalStock)
-                             };
+            if (branchID == 0)
+            {
+                var tableItems = from item in Item
+                                 join stock in Stocklist on item.ID equals stock.ItemID
+                                 group stock by new { item.Name, stock.BranchID } into t
+                                 let minLevel = t.Min(s => s.MinLevel)
+                                 let totalStock = t.Sum(s => s.Quantity)
+                                 where totalStock < minLevel // Filter out items not low in stock
+                                 select new
+                                 {
+                                     ItemName = t.Key.Name,
+                                     BranchID = t.Key.BranchID,
+                                     MinLevel = minLevel,
+                                     TotalStock = totalStock,
+                                     Percentage = 1 - ((double)minLevel / (double)totalStock)
+                                 };
+                ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage);
+            }
+            else
+            {
+                var tableItems = from item in Item
+                                 join stock in Stocklist on item.ID equals stock.ItemID
+                                 where stock.BranchID == branchID
+                                 group stock by item.Name into t
+                                 let minLevel = t.Min(s => s.MinLevel)
+                                 let totalStock = t.Sum(s => s.Quantity)
+                                 where totalStock < minLevel // Filter out items not low in stock
+                                 select new
+                                 {
+                                     ItemName = t.Key,
+                                     MinLevel = minLevel,
+                                     TotalStock = totalStock,
+                                     Percentage = 1 - ((double)minLevel / (double)totalStock)
+                                 };
+                ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage);
+            }
+
             ViewBag.CurrentBranchID = branchID;
-            ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage);
 
             //PieChart information
 
@@ -146,59 +169,125 @@ namespace caa_mis.Controllers
             }).ToList();
             ViewBag.Branches.Insert(0, new SelectListItem { Value = "0", Text = "All" });
 
-            var tableItems = from item in Item
-                             join stock in Stocklist on item.ID equals stock.ItemID
-                             group stock by item.Name into t
-                             let minLevel = t.Min(s => s.MinLevel)
-                             let totalStock = t.Sum(s => s.Quantity)
-                             where totalStock < minLevel // Filter out items not low in stock
-                             select new
-                             {
-                                 ItemName = t.Key,
-                                 MinLevel = minLevel,
-                                 TotalStock = totalStock,
-                                 Percentage = 1 - ((double)minLevel / (double)totalStock)
-                             };
-            ViewBag.CurrentBranchID = branch;
-            ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage);
+            if (branch == 0)
+            {
+                var tableItems = from item in Item
+                                 join stock in Stocklist on item.ID equals stock.ItemID
+                                 join b in _inventoryContext.Branches on stock.BranchID equals b.ID
+                                 group stock by new { item.Name, stock.BranchID, b.Location } into t
+                                 let minLevel = t.Min(s => s.MinLevel)
+                                 let totalStock = t.Sum(s => s.Quantity)
+                                 where totalStock < minLevel // Filter out items not low in stock
+                                 select new
+                                 {
+                                     BranchName = t.Key.Location,
+                                     ItemName = t.Key.Name,
+                                     BranchID = t.Key.BranchID,
+                                     MinLevel = minLevel,
+                                     TotalStock = totalStock,
+                                     Percentage = 1 - ((double)minLevel / (double)totalStock)
+                                 };
+                ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage);
+            }
+            else
+            {
+                var tableItems = from item in Item
+                                 join stock in Stocklist on item.ID equals stock.ItemID
+                                 join b in _inventoryContext.Branches on stock.BranchID equals b.ID
+                                 where stock.BranchID == branch
+                                 group stock by new { item.Name, b.Location } into t
+                                 let minLevel = t.Min(s => s.MinLevel)
+                                 let totalStock = t.Sum(s => s.Quantity)
+                                 where totalStock < minLevel // Filter out items not low in stock
+                                 select new
+                                 {
 
-            return View(tableItems);
+                                     BranchName = t.Key.Location,
+                                     ItemName = t.Key.Name,
+                                     MinLevel = minLevel,
+                                     TotalStock = totalStock,
+                                     Percentage = 1 - ((double)minLevel / (double)totalStock)
+                                 };
+                ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage);
+            }
+            ViewBag.CurrentBranchID = branch;
+
+            return View();
         }
 
         public IActionResult DownloadLowInStock(int branch = 0)
         {
-            var items = _inventoryContext.Items.Include(s => s.Stocks).ToList();
-            var stocklist = _inventoryContext.Stocks.Where(s => s.Quantity > 0);
+            var Item = _inventoryContext.Items.Include(s => s.Stocks).ToList();
+            var Stocklist = _inventoryContext.Stocks.Where(s => s.Quantity > 0);
             if (branch != 0)
             {
-                stocklist = stocklist.Where(s => s.BranchID == branch);
+                Stocklist = Stocklist.Where(s => s.BranchID == branch);
             }
-            var categories = _inventoryContext.Categories.ToList();
-            var branches = _inventoryContext.Branches.ToList();
+            var Category = _inventoryContext.Categories.ToList();
+            var Branch = _inventoryContext.Branches.ToList();
 
-            var tableItems = from item in items
-                             join stock in stocklist on item.ID equals stock.ItemID
-                             group stock by item.Name into t
-                             let minLevel = t.Min(s => s.MinLevel)
-                             let totalStock = t.Sum(s => s.Quantity)
-                             where totalStock < minLevel // Filter out items not low in stock
-                             select new
-                             {
-                                 ItemName = t.Key,
-                                 MinLevel = minLevel,
-                                 TotalStock = totalStock
-                                 //Percentage = 1 - ((double)minLevel / (double)totalStock)
-                             };
+            ViewBag.Branches = Branch.Select(b => new SelectListItem
+            {
+                Value = b.ID.ToString(),
+                Text = b.Location
+            }).ToList();
+            ViewBag.Branches.Insert(0, new SelectListItem { Value = "0", Text = "All" });
+
+            if (branch == 0)
+            {
+                var tableItems = from item in Item
+                                 join stock in Stocklist on item.ID equals stock.ItemID
+                                 join b in _inventoryContext.Branches on stock.BranchID equals b.ID
+                                 group stock by new { item.Name, stock.BranchID, b.Location } into t
+                                 let minLevel = t.Min(s => s.MinLevel)
+                                 let totalStock = t.Sum(s => s.Quantity)
+                                 where totalStock < minLevel // Filter out items not low in stock
+                                 select new
+                                 {
+                                     BranchName = t.Key.Location,
+                                     ItemName = t.Key.Name,
+                                     BranchID = t.Key.BranchID,
+                                     MinLevel = minLevel,
+                                     TotalStock = totalStock
+                                 };
+                ViewBag.TableItem = tableItems;
+            }
+            else
+            {
+                var tableItems = from item in Item
+                                 join stock in Stocklist on item.ID equals stock.ItemID
+                                 join b in _inventoryContext.Branches on stock.BranchID equals b.ID
+                                 where stock.BranchID == branch
+                                 group stock by new { item.Name, b.Location } into t
+                                 let minLevel = t.Min(s => s.MinLevel)
+                                 let totalStock = t.Sum(s => s.Quantity)
+                                 where totalStock < minLevel // Filter out items not low in stock
+                                 select new
+                                 {
+
+                                     BranchName = t.Key.Location,
+                                     ItemName = t.Key.Name,
+                                     MinLevel = minLevel,
+                                     TotalStock = totalStock
+                                 };
+                ViewBag.TableItem = tableItems;
+            }
 
             using var excel = new ExcelPackage();
             var worksheet = excel.Workbook.Worksheets.Add("Low In Stock Items");
+            var range = worksheet.Cells["A3:E100"];
+
             worksheet.Cells["A1"].Value = "Low In Stock Items Report";
+            worksheet.Cells["A1:E1"].Merge = true;
+            
+            worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-            worksheet.Cells["A3"].LoadFromCollection(tableItems, true);
+            worksheet.Cells["A3"].LoadFromCollection(ViewBag.TableItem, true);
 
-            worksheet.Cells[3, 1, 3, 3].Style.Font.Bold = true;
-            worksheet.Cells[3, 1, 3, 3].Style.Fill.PatternType = ExcelFillStyle.Solid;
-            worksheet.Cells[3, 1, 3, 3].Style.Fill.BackgroundColor.SetColor(Color.LightCyan);
+            worksheet.Cells[3, 1, 3, 5].Style.Font.Bold = true;
+            worksheet.Cells[3, 1, 3, 5].Style.Fill.PatternType = ExcelFillStyle.Solid;
+            worksheet.Cells[3, 1, 3, 5].Style.Fill.BackgroundColor.SetColor(Color.LightCyan);
 
             worksheet.Cells.AutoFitColumns();
 
@@ -213,7 +302,7 @@ namespace caa_mis.Controllers
             worksheet.Cells[1, 1].Style.Font.Size = 14;
             worksheet.Cells[2, 1].Value = "Created: " + localDate.ToShortTimeString() + " on " +
                 localDate.ToShortDateString();
-
+            worksheet.Cells["A2:C2"].Merge = true;
             var data = excel.GetAsByteArray();
             var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
             var fileName = "LowInStockItems.xlsx";
