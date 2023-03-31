@@ -44,7 +44,7 @@ namespace caa_mis.Controllers
             }
 
             //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-primary";
+            ViewData["Filtering"] = "btn-secondary";
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
@@ -76,7 +76,7 @@ namespace caa_mis.Controllers
             if (ItemID.HasValue)
             {
                 item = item.Where(p => p.ItemID == ItemID);
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
 
             //Before we sort, see if we have called for a change of filtering or sorting
@@ -533,18 +533,18 @@ namespace caa_mis.Controllers
             if (OriginID != null && OriginID.Length > 0)
             {
                 sumQ = sumQ.Where(s => OriginID.Contains(s.OriginID));
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
             if (DestinationID != null && DestinationID.Length > 0)
             {
                 sumQ = sumQ.Where(s => DestinationID.Contains(s.OriginID));
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
 
             if (!String.IsNullOrEmpty(SearchString))
             {
                 sumQ = sumQ.Where(i => i.EmployeeName.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
 
             ViewData["OriginID"] = BranchList(OriginID);
@@ -725,7 +725,7 @@ namespace caa_mis.Controllers
             if (ItemID.HasValue)
             {
                 item = item.Where(p => p.ItemID == ItemID);
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
 
             //Before we sort, see if we have called for a change of filtering or sorting

@@ -107,7 +107,7 @@
                                             @Html.DisplayNameFor(model => model.Cost)
                                         </dt>
                                         <dd class="col-9">
-                                            @Html.DisplayFor(modelItem => item.Cost)
+                                            @String.Format("{0:C}", item.Cost)
                                         </dd>
                                     </dl>
                                 </p>
@@ -177,7 +177,7 @@
                                 @Html.DisplayFor(modelItem => item.SKUNumber)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Cost)
+                                @String.Format("{0:C}", item.Cost)
                             </td>
                             <td>
                                 @{
