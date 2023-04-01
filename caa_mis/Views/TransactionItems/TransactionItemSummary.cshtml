@@ -6,13 +6,18 @@
 
 <h2>Transferred Products</h2>
 <p>
-    <a asp-action="DownloadTransactionItems" class="btn btn-info float-end">Download Products</a>
+    <a asp-action="DownloadTransactionItems" id="download-report-button" class="btn btn-info float-end">Download Transfer Report</a>
 </p>
+<div id="report-loading-indicator" class="progress float-end" style="display:none;">
+    <div class="progress-label">Downloading report...</div>
+    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 70%"></div>
+</div>
+
 <form asp-controller="TransactionItems" asp-action="TransactionItemSummary" method="get">
     <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
     <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
     <div class="form-horizontal">
-        <button class="btn  @(ViewData["Filtering"]) btn-outline-primary" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+        <button class="btn btn-primary @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
             Filter/Search
         </button>
         <div class="collapse" id="collapseFilter">

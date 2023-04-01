@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using Org.BouncyCastle.Utilities;
 using System.Collections;
 using Microsoft.AspNetCore.Authorization;
+using NuGet.Versioning;
 
 namespace caa_mis.Controllers
 {
@@ -62,12 +63,12 @@ namespace caa_mis.Controllers
             if (CategoryID.HasValue)
             {
                 inventory = inventory.Where(p => p.CategoryID == CategoryID);
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
             if (ItemStatusID.HasValue)
             {
                 inventory = inventory.Where(p => p.ItemStatusID == ItemStatusID);
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
             else
             {
@@ -76,18 +77,18 @@ namespace caa_mis.Controllers
             if (ManufacturerID.HasValue)
             {
                 inventory = inventory.Where(p => p.ManufacturerID == ManufacturerID);
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
             if (!String.IsNullOrEmpty(SearchString))
             {
                 inventory = inventory.Where(p => p.Name.ToUpper().Contains(SearchString.ToUpper())
                                        || p.Description.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
             if (!String.IsNullOrEmpty(SearchSKU))
             {
                 inventory = inventory.Where(p => p.SKUNumber.ToUpper().Contains(SearchSKU.ToUpper()));
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
 
             //Before we sort, see if we have called for a change of filtering or sorting
@@ -424,13 +425,13 @@ namespace caa_mis.Controllers
             if (BranchID != null && BranchID.Length > 0)
             {
                 sumQ = sumQ.Where(s => BranchID.Contains(s.BranchID));
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
 
             if (!String.IsNullOrEmpty(SearchString))
             {
                 sumQ = sumQ.Where(i => i.ItemName.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
 
             ViewData["BranchID"] = BranchList(BranchID);
@@ -549,6 +550,40 @@ namespace caa_mis.Controllers
             ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
             var pagedData = await PaginatedList<StockSummaryByBranchVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
             return View(pagedData);
+        }
+
+        public IActionResult GenerateBarcode()
+        {
+            return View();
+        }
+        [HttpPost, ActionName("PrintBarcode")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PrintBarcode(string Products, string actionButton)
+        {
+            var toPrint = await _context.Items.ToListAsync();
+
+            if (actionButton == "Generate Filtered")
+            {
+               
+                List<string> pr = Products.Split(',').ToList();
+                pr = pr.Select(t => t.Trim()).ToList();
+                pr.Remove(" ");
+                try
+                {
+                    var filteredOrders = from order in _context.Items
+                                         where pr.Contains(order.SKUNumber)
+                                         select order;
+                    return View(filteredOrders);
+                }
+                catch
+                {
+                    TempData["ErrorMessage"] = "Invalid Format Submitted. SKU must be separated with comma ex. CAA1234, CAA2345, CAA3245";
+                    return View();
+                }
+            }
+           
+            
+            return View(toPrint);
         }
         private SelectList CategorySelectList(int? selectedId)
         {
