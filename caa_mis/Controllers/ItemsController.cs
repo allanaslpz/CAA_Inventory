@@ -54,7 +54,7 @@ namespace caa_mis.Controllers
                                     .Include(i => i.Category)
                                     .Include(i => i.ItemStatus)
                                     .Include(i => i.ItemThumbnail)
-                                    .Include(i => i.Manufacturer)
+                                    //.Include(i => i.Manufacturer)
                                     .Include(i => i.Stocks).ThenInclude(s => s.Branch)
                                     .AsNoTracking();
 

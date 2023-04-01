@@ -100,7 +100,9 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="Manufacturer" class="control-label">Vendor</label>
-                     <select asp-for="ManufacturerID" class="form-control form-select" asp-items="ViewBag.ManufacturerID"></select>
+                    <select asp-for="ManufacturerID" class="form-control form-select" asp-items="ViewBag.ManufacturerID">
+                        <option value="">-- Select --</option>
+                    </select>
                     <span asp-validation-for="ManufacturerID" class="text-danger"></span>
                 </div>
                 <div class="form-group">
