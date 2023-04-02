@@ -475,7 +475,7 @@ namespace caa_mis.Controllers
         {
 
             IQueryable<ProductListVM> sumQ = _context.ProductList.OrderBy(p=>p.Name);
-            IQueryable<Item> items = _context.Items.OrderBy(p => p.Name);
+            IQueryable<Item> items = _context.Items.Where(p => p.ItemStatusID == 1).OrderBy(p => p.Name);
 
             IQueryable<Item> result;
             IQueryable<ProductListVM> result2;
