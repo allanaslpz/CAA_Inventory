@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<caa_mis.Models.Transaction>
 
 @{
-    ViewData["Title"] = "Transfers";
+    ViewData["Title"] = "Stock In";
 }
 
-<h1>Transfers</h1>
+<h4>Stock In</h4>
 
 <p>
     <a asp-action="Create" class="btn btn-primary float-left">Create New Transfer</a>
@@ -99,7 +99,7 @@
                                 <a asp-action="Edit" asp-route-id="@item.ID">[ Edit ]</a>
                                     
                              }
-                            <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@item.ID">[ Details ]</a>
+                            <a asp-action="Index" asp-controller="StockInItems" asp-route-TransactionID="@item.ID">[ Details ]</a>
                             @if (item.TransactionStatus.Name == "Open")
                             {
                                 <a asp-action="Delete" asp-route-id="@item.ID">[ Delete ]</a>
@@ -159,7 +159,7 @@
                                     <a asp-action="Edit" asp-route-id="@item.ID">[ Edit ]</a>
 
                                 }
-                                <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@item.ID">[ Details ]</a>
+                                <a asp-action="Index" asp-controller="StockInItems" asp-route-TransactionID="@item.ID">[ Details ]</a>
                                 @if (item.TransactionStatus.Name == "Open")
                                 {
                                     <a asp-action="Delete" asp-route-id="@item.ID">[ Delete ]</a>
