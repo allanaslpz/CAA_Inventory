@@ -186,11 +186,18 @@ namespace caa_mis.Controllers
 
             if (itemExists == null)
             {
-                if (ModelState.IsValid)
+                if (transactionItem.Quantity > 0)
                 {
-                    _context.Add(bI);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    if (ModelState.IsValid)
+                    {
+                        _context.Add(bI);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "The changes cannot be saved. Quantity cannot be negative or 0.";
                 }
             }
             else
@@ -234,27 +241,43 @@ namespace caa_mis.Controllers
             {
                 return NotFound();
             }
+            var itemExists = _context.BulkItems
+               .Where(p => p.BulkID == bulkItem.BulkID && p.ItemID == bulkItem.ItemID)
+               .FirstOrDefault();
 
-            if (ModelState.IsValid)
+            if (itemExists == null)
             {
-                try
+                if (bulkItem.Quantity > 0)
                 {
-                    _context.Update(bulkItem);
-                    await _context.SaveChangesAsync();
-                    return Redirect(ViewData["returnURL"].ToString());
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BulkItemExists(bulkItem.ID))
+                    if (ModelState.IsValid)
                     {
-                        return NotFound();
+                        try
+                        {
+                            _context.Update(bulkItem);
+                            await _context.SaveChangesAsync();
+                            return Redirect(ViewData["returnURL"].ToString());
+                        }
+                        catch (DbUpdateConcurrencyException)
+                        {
+                            if (!BulkItemExists(bulkItem.ID))
+                            {
+                                return NotFound();
+                            }
+                            else
+                            {
+                                throw;
+                            }
+                        }
                     }
                     else
                     {
-                        throw;
+                        TempData["ErrorMessage"] = "The changes cannot be saved. Quantity cannot be negative or 0.";
                     }
                 }
-                
+                else
+                {
+                    TempData["ErrorMessage"] = "The changes cannot be saved. There is already an existing product in your list.";
+                }
             }
             PopulateDropDownLists(bulkItem);
             return View(bulkItem);

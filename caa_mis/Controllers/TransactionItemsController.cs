@@ -221,18 +221,25 @@ namespace caa_mis.Controllers
 
             if (itemExists == null)
             {
-                if (validateOnHand(transactionItem.TransactionID, transactionItem.ProductID, transactionItem.Quantity))
+                if (transactionItem.Quantity > 0)
                 {
-                    if (ModelState.IsValid)
+                    if (validateOnHand(transactionItem.TransactionID, transactionItem.ProductID, transactionItem.Quantity))
                     {
-                        _context.Add(tI);
-                        await _context.SaveChangesAsync();
-                        return Redirect(ViewData["returnURL"].ToString());
+                        if (ModelState.IsValid)
+                        {
+                            _context.Add(tI);
+                            await _context.SaveChangesAsync();
+                            return Redirect(ViewData["returnURL"].ToString());
+                        }
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "The changes cannot be saved because the quantity entered is higher than the available stock in the branch.";
                     }
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "The changes cannot be saved because the quantity entered is higher than the available stock in the branch.";
+                    TempData["ErrorMessage"] = "The changes cannot be saved. Quantity cannot be negative or 0.";
                 }
             }
             else
@@ -310,25 +317,32 @@ namespace caa_mis.Controllers
             };
             if (validateOnHand(transactionItem.TransactionID, transactionItem.ItemID, transactionItem.Quantity))
             {
-                if (ModelState.IsValid)
+                if (transactionItem.Quantity > 0)
                 {
-                    try
+                    if (ModelState.IsValid)
                     {
-                        _context.Update(tI);
-                        await _context.SaveChangesAsync();
-                        return Redirect(ViewData["returnURL"].ToString());
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!TransactionItemExists(transactionItem.ID))
+                        try
                         {
-                            return NotFound();
+                            _context.Update(tI);
+                            await _context.SaveChangesAsync();
+                            return Redirect(ViewData["returnURL"].ToString());
                         }
-                        else
+                        catch (DbUpdateConcurrencyException)
                         {
-                            throw;
+                            if (!TransactionItemExists(transactionItem.ID))
+                            {
+                                return NotFound();
+                            }
+                            else
+                            {
+                                throw;
+                            }
                         }
                     }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "The changes cannot be saved. Quantity cannot be negative or 0.");
                 }
             }
             else

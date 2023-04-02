@@ -493,7 +493,8 @@ namespace caa_mis.Controllers
                 .Where(m => m.TransactionID == id)
                 .AsNoTracking();
 
-            //do stock in
+            //do
+            //
             foreach (var item in transactionItems)
             {
                 //check if stock record already have the item
