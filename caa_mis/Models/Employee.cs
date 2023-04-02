@@ -1,4 +1,5 @@
 ﻿
+using caa_mis.ViewModels;
 using System.ComponentModel.DataAnnotations;
 
 namespace caa_mis.Models
@@ -28,7 +29,17 @@ namespace caa_mis.Models
         [Required]
         [StringLength(50)]
         [Display(Name = "Last Name")]
-        public string LastName { get; set; }
+        public string LastName { get; set; }        
+
+        [Required(ErrorMessage = "Email Address is required.")]
+        [StringLength(255)]
+        [DataType(DataType.EmailAddress)]
+        public string Email { get; set; }
+
+        [Display(Name = "Branch")]
+        public BranchRoles BranchRoles { get; set; } = BranchRoles.None;//Not needed
+
+        //public UserVM UserVM { get; set; }
 
         public Archived Status { get; set; }
 

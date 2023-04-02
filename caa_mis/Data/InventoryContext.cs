@@ -51,6 +51,11 @@ namespace caa_mis.Data
                 .ToView(nameof(StockSummaryByBranch))
                 .HasKey(a => a.ID);
 
+            //Add a unique index to the Employee Email
+            modelBuilder.Entity<Employee>()
+            .HasIndex(a => new { a.Email })
+            .IsUnique();
+
             modelBuilder
                 .Entity<EventSummaryVM>()
                 .ToView(nameof(EventSummary))

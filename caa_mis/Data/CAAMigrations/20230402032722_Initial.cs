@@ -49,6 +49,8 @@ namespace caa_mis.Data.CAAMigrations
                         .Annotation("Sqlite:Autoincrement", true),
                     FirstName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    BranchRoles = table.Column<int>(type: "INTEGER", nullable: false),
                     Status = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
@@ -504,6 +506,12 @@ namespace caa_mis.Data.CAAMigrations
                 column: "TransactionStatusID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Employees_Email",
+                table: "Employees",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EventItems_EventID",
                 table: "EventItems",
                 column: "EventID");
@@ -621,7 +629,6 @@ namespace caa_mis.Data.CAAMigrations
                 name: "IX_Transactions_TransactionTypeID",
                 table: "Transactions",
                 column: "TransactionTypeID");
-
             ExtraMigration.Steps(migrationBuilder);
         }
 

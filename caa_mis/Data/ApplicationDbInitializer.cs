@@ -32,20 +32,20 @@ namespace caa_mis.Data
                     }
                 }
 
-                //Create Branches
-                var branchRoleManager = applicationBuilder.ApplicationServices.CreateScope()
-                    .ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                string[] branchNames = { "Grimsby", "Welland", "Thorold", "Niagara Falls", "St. Catharines" };
+                ////Create Branches
+                //var branchRoleManager = applicationBuilder.ApplicationServices.CreateScope()
+                //    .ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                //string[] branchNames = { "Grimsby", "Welland", "Thorold", "Niagara Falls", "St. Catharines" };
 
-                IdentityResult branchResult;
-                foreach (var branchName in branchNames)
-                {
-                    var branchExist = await branchRoleManager.RoleExistsAsync(branchName);
-                    if (!branchExist)
-                    {
-                        branchResult = await branchRoleManager.CreateAsync(new IdentityRole(branchName));
-                    }
-                }
+                //IdentityResult branchResult;
+                //foreach (var branchName in branchNames)
+                //{
+                //    var branchExist = await branchRoleManager.RoleExistsAsync(branchName);
+                //    if (!branchExist)
+                //    {
+                //        branchResult = await branchRoleManager.CreateAsync(new IdentityRole(branchName));
+                //    }
+                //}
 
                 //Create Users
                 var userManager = applicationBuilder.ApplicationServices.CreateScope()

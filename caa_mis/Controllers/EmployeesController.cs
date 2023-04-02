@@ -9,6 +9,7 @@ using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.Utilities;
 using Microsoft.AspNetCore.Authorization;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace caa_mis.Controllers
 {
@@ -23,7 +24,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Employee
-        public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchName, string SearchDesc, InOut? InOutStatus, Archived? Status,
+        public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchName, string SearchEmail, string SearchDesc, Archived? Status,
             int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Name")
         {
             //Clear the sort/filter/paging URL Cookie for Controller
@@ -36,7 +37,7 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "FirstName", "LastName", "Status" };
+            string[] sortOptions = new[] { "FirstName", "LastName","Email","BranchRoles", "Status" };
 
             var Employee = _context.Employees
                                     .AsNoTracking();
@@ -52,7 +53,12 @@ namespace caa_mis.Controllers
                 Employee = Employee.Where(p => p.LastName.ToUpper().Contains(SearchDesc.ToUpper()));
                 ViewData["Filtering"] = "btn-danger";
             }
-            if (InOutStatus != null)
+            if (!String.IsNullOrEmpty(SearchEmail))
+            {
+                Employee = Employee.Where(p => p.Email.ToUpper().Contains(SearchEmail.ToUpper()));
+                ViewData["Filtering"] = "btn-danger";
+            }
+            if (Status != null)
             {
                 Employee = Employee.Where(p => p.Status == Status);
                 ViewData["Filtering"] = "btn-danger";
@@ -104,6 +110,19 @@ namespace caa_mis.Controllers
                 {
                     Employee = Employee
                         .OrderBy(p => p.LastName);
+                }
+            }
+            else if (sortField == "Email")
+            {
+                if (sortDirection == "asc")
+                {
+                    Employee = Employee
+                        .OrderByDescending(p => p.Email);
+                }
+                else
+                {
+                    Employee = Employee
+                        .OrderBy(p => p.Email);
                 }
             }
             else if (sortField == "Status")
@@ -178,7 +197,7 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,FirstName,LastName")] Employee employee)
+        public async Task<IActionResult> Create([Bind("ID,FirstName,LastName,Email,BranchRoles")] Employee employee)
         {
             if (ModelState.IsValid)
             {
@@ -210,7 +229,7 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,FirstName,LastName,Status")] Employee employee)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,FirstName,LastName,Email,BranchRoles,Status")] Employee employee)
         {
             if (id != employee.ID)
             {

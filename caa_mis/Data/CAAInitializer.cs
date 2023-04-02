@@ -210,26 +210,31 @@ namespace caa_mis.Data
                     {
                         FirstName = "Edmund Kevin",
                         LastName = "Rone",
+                        Email = "edmund@outlook.com"
                     },
                     new Employee
                     {
                         FirstName = "Allan Antonio",
                         LastName = "Lopez",
+                        Email = "allan@outlook.com"
                     },
                     new Employee
                     {
                         FirstName = "Michael Laurence",
                         LastName = "Barde",
+                        Email = "mike@outlook.com"
                     },
                     new Employee
                     {
                         FirstName = "Luisito Jr",
                         LastName = "Villaflor",
+                        Email = "lui@outlook.com"
                     },
                     new Employee
                     {
                         FirstName = "Tsogt",
                         LastName = "Batjargal",
+                        Email = "tsogo@outlook.com"
                     });
                     context.SaveChanges();
                 }
