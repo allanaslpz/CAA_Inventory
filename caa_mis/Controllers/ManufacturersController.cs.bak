@@ -352,13 +352,13 @@ namespace caa_mis.Controllers
             {
                 if (_context.Manufacturers == null)
                 {
-                    return Problem("Entity set 'InventoryContext.Manufacturers' is null.");
+                    return Problem("Entity set 'InventoryContext.Suppliers'  is null.");
                 }
-                var manufacturer = await _context.Manufacturers.FindAsync(id);
+                var supplier = await _context.Suppliers.FindAsync(id);
 
-                if (manufacturer != null)
+                if (supplier != null)
                 {
-                    manufacturer.Status = Archived.Disabled;
+                    supplier.Status = Archived.Disabled;
                 }
 
                 await _context.SaveChangesAsync();

@@ -42,7 +42,7 @@ namespace caa_mis.Controllers
             }
 
             //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-secondary";
+            ViewData["Filtering"] = "btn-outline-primary";
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
@@ -69,7 +69,7 @@ namespace caa_mis.Controllers
             if (ItemID.HasValue)
             {
                 item = item.Where(p => p.ItemID == ItemID);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             //Before we sort, see if we have called for a change of filtering or sorting
@@ -190,25 +190,18 @@ namespace caa_mis.Controllers
 
             if (itemExists == null)
             {
-                if (transactionItem.Quantity > 0)
+                if (validateOnHand(transactionItem.TransactionID, transactionItem.ProductID, transactionItem.Quantity))
                 {
-                    if (validateOnHand(transactionItem.TransactionID, transactionItem.ProductID, transactionItem.Quantity))
+                    if (ModelState.IsValid)
                     {
-                        if (ModelState.IsValid)
-                        {
-                            _context.Add(bI);
-                            await _context.SaveChangesAsync();
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
-                    else
-                    {
-                        TempData["ErrorMessage"] = "The changes cannot be saved because the quantity entered is higher than the available stock in the branch.";
+                        _context.Add(bI);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "The changes cannot be saved. Quantity cannot be negative or 0.";
+                    TempData["ErrorMessage"] = "The changes cannot be saved because the quantity entered is higher than the available stock in the branch.";
                 }
             }
             else
@@ -254,33 +247,26 @@ namespace caa_mis.Controllers
             }
             if (validateOnHand(EventItem.EventID, EventItem.ItemID, EventItem.Quantity))
             {
-                if (EventItem.Quantity > 0)
+                if (ModelState.IsValid)
                 {
-                    if (ModelState.IsValid)
+                    try
                     {
-                        try
-                        {
-                            _context.Update(EventItem);
-                            await _context.SaveChangesAsync();
-                            return Redirect(ViewData["returnURL"].ToString());
-                        }
-                        catch (DbUpdateConcurrencyException)
-                        {
-                            if (!EventItemExists(EventItem.ID))
-                            {
-                                return NotFound();
-                            }
-                            else
-                            {
-                                throw;
-                            }
-                        }
-                
+                        _context.Update(EventItem);
+                        await _context.SaveChangesAsync();
+                        return Redirect(ViewData["returnURL"].ToString());
                     }
-                }
-                else
-                {
-                    ModelState.AddModelError("", "The changes cannot be saved. Quantity cannot be negative or 0.");
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!EventItemExists(EventItem.ID))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                
                 }
             }
             else
@@ -345,13 +331,13 @@ namespace caa_mis.Controllers
             if (BranchID != null && BranchID.Length > 0)
             {
                 sumQ = sumQ.Where(s => BranchID.Contains(s.BranchID));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }            
 
             if (!String.IsNullOrEmpty(SearchString))
             {
                 sumQ = sumQ.Where(i => i.EmployeeName.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             ViewData["BranchID"] = BranchList(BranchID);

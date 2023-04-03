@@ -47,14 +47,13 @@ namespace caa_mis.Controllers
             PopulateDropDownLists();
             ViewDataReturnURL();
 
-            var inventory = from a in _context.Transactions
+            var inventory = _context.Transactions
                 .Include(t => t.Destination)
                 .Include(t => t.Employee)
                 .Include(t => t.Origin)
                 .Include(t => t.TransactionStatus)
                 .Include(t => t.TransactionType)
-                where a.TransactionTypeID == 2
-                select a;
+                .AsNoTracking();
 
             if (TransactionTypeID.HasValue)
             {
@@ -494,8 +493,7 @@ namespace caa_mis.Controllers
                 .Where(m => m.TransactionID == id)
                 .AsNoTracking();
 
-            //do
-            //
+            //do stock in
             foreach (var item in transactionItems)
             {
                 //check if stock record already have the item

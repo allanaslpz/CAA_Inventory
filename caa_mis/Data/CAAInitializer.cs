@@ -155,7 +155,7 @@ namespace caa_mis.Data
                         City = "Thorold",
                         Province = "ON",
                         PostalCode = "L2V4Y6",
-                        Phone = "9053091959",
+                        Phone = "9059848585",
                         Email = "test.site@zoho.com",
                         Status = Archived.Disabled
                     });

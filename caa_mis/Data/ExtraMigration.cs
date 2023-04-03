@@ -55,7 +55,6 @@ namespace caa_mis.Data
                     SELECT s.ItemID as ID, s.BranchID, s.Quantity, i.Name, i.SKUNumber
                     FROM STOCKS s
                     INNER JOIN ITEMS i ON (s.ItemID = i.ID)
-                    WHERE i.ItemStatusID = 1
                 ");
         }
     }
