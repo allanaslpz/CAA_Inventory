@@ -116,9 +116,6 @@
                 <thead>
                     <tr>
                         <th>
-                            <input type="submit" name="actionButton" value="Type" class="btn btn-link" />
-                        </th>
-                        <th>
                             <input type="submit" name="actionButton" value="Description" class="btn btn-link" />
                         </th>
                         <th>
@@ -140,9 +137,6 @@
                     @foreach (var item in Model)
                     {
                         <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.TransactionType.Name)
-                            </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Description)
                             </td>

@@ -38,9 +38,6 @@ namespace caa_mis.Controllers
                 return Redirect(ViewData["returnURL"].ToString());
             }
 
-            //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-primary";
-
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
             string[] sortOptions = new[] { "Product Name", "Quantity" };
@@ -66,7 +63,7 @@ namespace caa_mis.Controllers
             if (ItemID.HasValue)
             {
                 item = item.Where(p => p.ItemID == ItemID);
-                ViewData["Filtering"] = "btn-danger";
+                ViewData["Filtering"] = "btn-secondary";
             }
 
             //Before we sort, see if we have called for a change of filtering or sorting
