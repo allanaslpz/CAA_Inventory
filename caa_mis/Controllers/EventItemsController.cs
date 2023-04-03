@@ -40,10 +40,7 @@ namespace caa_mis.Controllers
                 //Go back to the proper return URL for the Transactions controller
                 return Redirect(ViewData["returnURL"].ToString());
             }
-
-            //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-secondary";
-
+                        
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
             string[] sortOptions = new[] { "Product Name", "Quantity" };
@@ -354,9 +351,7 @@ namespace caa_mis.Controllers
                 ViewData["Filtering"] = "btn-secondary";
             }
 
-            ViewData["BranchID"] = BranchList(BranchID);
-            // Save filtered data to cookie
-            CachingFilteredData(sumQ);
+            ViewData["BranchID"] = BranchList(BranchID);            
 
             //Before we sort, see if we have called for a change of filtering or sorting
             if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
@@ -486,6 +481,10 @@ namespace caa_mis.Controllers
                         .ThenByDescending(p => p.EventDate);
                 }
             }
+
+            // Save filtered data to cookie
+            CachingFilteredData(sumQ);
+
             //Set sort for next time
             ViewData["sortField"] = sortField;
             ViewData["sortDirection"] = sortDirection;
