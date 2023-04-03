@@ -25,6 +25,9 @@ namespace caa_mis.Controllers
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
 
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             //PopulateDropDownLists();
 
             //List of sort options.
@@ -38,22 +41,22 @@ namespace caa_mis.Controllers
             if (!String.IsNullOrEmpty(SearchName))
             {
                 transactionTypes = transactionTypes.Where(p => p.Name.ToUpper().Contains(SearchName.ToUpper()));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             if (!String.IsNullOrEmpty(SearchDesc))
             {
                 transactionTypes = transactionTypes.Where(p => p.Description.ToUpper().Contains(SearchDesc.ToUpper()));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             if (InOutStatus != null)
             {
                 transactionTypes = transactionTypes.Where(p => p.InOut == InOutStatus);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             if (Status != null)
             {
                 transactionTypes = transactionTypes.Where(p => p.Status == Status);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             //Before we sort, see if we have called for a change of filtering or sorting

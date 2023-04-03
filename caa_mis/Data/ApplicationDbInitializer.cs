@@ -107,7 +107,7 @@ namespace caa_mis.Data
 
                     if (result.Succeeded)
                     {
-                        userManager.AddToRoleAsync(user, "Admin").Wait();
+                        userManager.AddToRoleAsync(user, "Supervisor").Wait();
                     }
                 }
                 if (userManager.FindByEmailAsync("luwi.floor01@apple.com").Result == null)
