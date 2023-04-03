@@ -20,12 +20,12 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin, Supervisor")]
-    public class TransactionsController : CustomControllers.CognizantController
+    public class StockInController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public TransactionsController(InventoryContext context, UserManager<IdentityUser> userManager)
+        public StockInController(InventoryContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _userManager = userManager;
@@ -53,7 +53,7 @@ namespace caa_mis.Controllers
                 .Include(t => t.Origin)
                 .Include(t => t.TransactionStatus)
                 .Include(t => t.TransactionType)
-                where a.TransactionTypeID == 2
+                where a.TransactionTypeID == 1
                 select a;
 
             if (TransactionTypeID.HasValue)
@@ -236,7 +236,7 @@ namespace caa_mis.Controllers
             {
                 _context.Add(transaction);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "TransactionItems", new { TransactionID = transaction.ID });
+                return RedirectToAction("Index", "StockInItems", new { TransactionID = transaction.ID });
             }
             PopulateDropDownLists(transaction);
             return View(transaction);
@@ -279,7 +279,7 @@ namespace caa_mis.Controllers
                 {
                     _context.Update(transaction);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction("Index", "TransactionItems", new { TransactionID = transaction.ID });
+                    return RedirectToAction("Index", "StockInItems", new { TransactionID = transaction.ID });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -436,7 +436,7 @@ namespace caa_mis.Controllers
             }
             else
             {
-                TempData["ErrorMessage"] = "Cannot Release this transfer, there are Items that are currently out of stock.";
+                TempData["ErrorMessage"] = "Cannot Release this stock in, there are Items that are currently out of stock.";
             }
 
             return RedirectToAction(nameof(Index));
