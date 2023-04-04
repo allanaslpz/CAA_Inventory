@@ -1,8 +1,5 @@
 using caa_mis.Data;
-using caa_mis.Utilities;
-using caa_mis.ViewModels;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json;
@@ -29,10 +26,10 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.Configure<IdentityOptions>(options =>
 {
     // Password settings.
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequireUppercase = true;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
     options.Password.RequiredLength = 6;
     options.Password.RequiredUniqueChars = 1;
 
@@ -43,7 +40,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 
     // User settings.
     options.User.AllowedUserNameCharacters =
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-=_+<>,./?;:'";
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
 
 });
@@ -58,16 +55,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
     options.SlidingExpiration = true;
 });
-
-//For email service configuration
-builder.Services.AddSingleton<IEmailConfiguration>(builder.Configuration
-    .GetSection("EmailConfiguration").Get<EmailConfiguration>());
-
-//For the Identity System
-builder.Services.AddTransient<IEmailSender, EmailSender>();
-
-//Email with added methods for production use.
-builder.Services.AddTransient<IMyEmailSender, MyEmailSender>();
 
 builder.Services.AddControllersWithViews();
 

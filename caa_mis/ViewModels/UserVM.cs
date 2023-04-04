@@ -12,7 +12,10 @@ namespace caa_mis.ViewModels
         public string UserName { get; set; }
 
         [Display(Name = "Roles")]
-        public List<string> UserRoles { get; set; }     
+        public List<string> UserRoles { get; set; }        
+
+        //[Display(Name = "Branches")]
+        //public List<string> Branch { get; set; }
 
         public bool Assigned { get; set; }
 
