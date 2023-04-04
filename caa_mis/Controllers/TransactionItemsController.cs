@@ -35,6 +35,9 @@ namespace caa_mis.Controllers
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
 
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             ViewDataReturnURL();
 
             if (!TransactionID.HasValue)
@@ -44,7 +47,7 @@ namespace caa_mis.Controllers
             }
 
             //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-primary";
+            ViewData["Filtering"] = "btn-danger";
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
@@ -221,18 +224,25 @@ namespace caa_mis.Controllers
 
             if (itemExists == null)
             {
-                if (validateOnHand(transactionItem.TransactionID, transactionItem.ProductID, transactionItem.Quantity))
+                if (transactionItem.Quantity > 0)
                 {
-                    if (ModelState.IsValid)
+                    if (validateOnHand(transactionItem.TransactionID, transactionItem.ProductID, transactionItem.Quantity))
                     {
-                        _context.Add(tI);
-                        await _context.SaveChangesAsync();
-                        return Redirect(ViewData["returnURL"].ToString());
+                        if (ModelState.IsValid)
+                        {
+                            _context.Add(tI);
+                            await _context.SaveChangesAsync();
+                            return Redirect(ViewData["returnURL"].ToString());
+                        }
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "The changes cannot be saved because the quantity entered is higher than the available stock in the branch.";
                     }
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "The changes cannot be saved because the quantity entered is higher than the available stock in the branch.";
+                    TempData["ErrorMessage"] = "The changes cannot be saved. Quantity cannot be negative or 0.";
                 }
             }
             else
@@ -310,25 +320,32 @@ namespace caa_mis.Controllers
             };
             if (validateOnHand(transactionItem.TransactionID, transactionItem.ItemID, transactionItem.Quantity))
             {
-                if (ModelState.IsValid)
+                if (transactionItem.Quantity > 0)
                 {
-                    try
+                    if (ModelState.IsValid)
                     {
-                        _context.Update(tI);
-                        await _context.SaveChangesAsync();
-                        return Redirect(ViewData["returnURL"].ToString());
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!TransactionItemExists(transactionItem.ID))
+                        try
                         {
-                            return NotFound();
+                            _context.Update(tI);
+                            await _context.SaveChangesAsync();
+                            return Redirect(ViewData["returnURL"].ToString());
                         }
-                        else
+                        catch (DbUpdateConcurrencyException)
                         {
-                            throw;
+                            if (!TransactionItemExists(transactionItem.ID))
+                            {
+                                return NotFound();
+                            }
+                            else
+                            {
+                                throw;
+                            }
                         }
                     }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "The changes cannot be saved. Quantity cannot be negative or 0.");
                 }
             }
             else
@@ -461,7 +478,7 @@ namespace caa_mis.Controllers
         {
 
             IQueryable<ProductListVM> sumQ = _context.ProductList.OrderBy(p=>p.Name);
-            IQueryable<Item> items = _context.Items.OrderBy(p => p.Name);
+            IQueryable<Item> items = _context.Items.Where(p => p.ItemStatusID == 1).OrderBy(p => p.Name);
 
             IQueryable<Item> result;
             IQueryable<ProductListVM> result2;
@@ -527,6 +544,9 @@ namespace caa_mis.Controllers
             //NOTE: make sure this array has matching values to the column headings
             string[] sortOptions = new[] { "EmployeeName", "OriginName", "DestinationName", 
                                             "TransactionStatusName", "ItemName", "Quantity"};
+
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
 
             IQueryable<TransactionItemSummaryVM> sumQ = _context.TransactionItemSummary;
 
@@ -694,9 +714,6 @@ namespace caa_mis.Controllers
                 //Go back to the proper return URL for the Transactions controller
                 return Redirect(ViewData["returnURL"].ToString());
             }
-
-            //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-primary";
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings

@@ -37,6 +37,7 @@ namespace caa_mis.Controllers
         {
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
+
             //Change colour of the button when filtering by setting this default
             ViewData["Filtering"] = "btn-outline-primary";
 
@@ -47,13 +48,14 @@ namespace caa_mis.Controllers
             PopulateDropDownLists();
             ViewDataReturnURL();
 
-            var inventory = _context.Transactions
+            var inventory = from a in _context.Transactions
                 .Include(t => t.Destination)
                 .Include(t => t.Employee)
                 .Include(t => t.Origin)
                 .Include(t => t.TransactionStatus)
                 .Include(t => t.TransactionType)
-                .AsNoTracking();
+                where a.TransactionTypeID == 2
+                select a;
 
             if (TransactionTypeID.HasValue)
             {
@@ -493,7 +495,8 @@ namespace caa_mis.Controllers
                 .Where(m => m.TransactionID == id)
                 .AsNoTracking();
 
-            //do stock in
+            //do
+            //
             foreach (var item in transactionItems)
             {
                 //check if stock record already have the item
@@ -608,9 +611,7 @@ namespace caa_mis.Controllers
         {
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
-            //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-primary";
-
+            
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
             string[] sortOptions = new[] { "Type", "Description", "Origin", "Destination", "Transaction Date"};
