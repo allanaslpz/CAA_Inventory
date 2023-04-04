@@ -8,7 +8,7 @@
 
 <p>
     <a asp-action="Create" class="btn btn-primary float-left">Create New</a>
-    <button class="btn btn-primary @(ViewData["Filtering"]) float-end" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+    <button class="btn @(ViewData["Filtering"]) btn-toolbar float-end" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
         Filter/Search
     </button>
 </p>

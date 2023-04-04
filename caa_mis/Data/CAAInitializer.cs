@@ -79,6 +79,89 @@ namespace caa_mis.Data
                 }
 
                 // Vendors Seed Data //
+                if (!context.Manufacturers.Any())
+                {
+                    context.Manufacturers.AddRange(
+                    new Manufacturer
+                    {
+                        Name = "Walmart",
+                        Address1 = "102 Primeway Dr",
+                        City = "Welland",
+                        Province = "ON",
+                        PostalCode = "L3B0A1",
+                        Phone = "9057353500",
+                        Email = "walmart.welland@gmail.com",
+                        Status = Archived.Enabled
+                    },
+                    new Manufacturer
+                    {
+                        Name = "Sobeys",
+                        Address1 = "400 Scott St",
+                        City = "St. Catharines",
+                        Province = "ON",
+                        PostalCode = "L2M3W4",
+                        Phone = "9059359974",
+                        Email = "sobeys.scott.niagara@outlook.com",
+                        Status = Archived.Enabled
+                    },
+                    new Manufacturer
+                    {
+                        Name = "Staples",
+                        Address1 = "7190 Morrison St",
+                        City = "Niagara Falls",
+                        Province = "ON",
+                        PostalCode = "L2E7K5",
+                        Phone = "9053580650",
+                        Email = "staples.falls@yahoo.com",
+                        Status = Archived.Enabled
+                    },
+                    new Manufacturer
+                    {
+                        Name = "Costco Wholesale",
+                        Address1 = "7500 Pin Oak Dr",
+                        City = "Niagara Falls",
+                        Province = "ON",
+                        PostalCode = "L2H2E9",
+                        Phone = "3654470200",
+                        Email = "costco.niagara@aol.com",
+                        Status = Archived.Enabled
+                    },
+                    new Manufacturer
+                    {
+                        Name = "Canadian Tire",
+                        Address1 = "158 Primeway Dr",
+                        City = "Welland",
+                        Province = "ON",
+                        PostalCode = "L3B0A1",
+                        Phone = "9057327501",
+                        Email = "canadian.tire@icloud.com",
+                        Status = Archived.Enabled
+                    },
+                    new Manufacturer
+                    {
+                        Name = "RONA",
+                        Address1 = "359 S Service Rd",
+                        City = "Grimsby",
+                        Province = "ON",
+                        PostalCode = "L3M4E8",
+                        Phone = "9053091959",
+                        Email = "rona.grimsby@protonmail.com",
+                        Status = Archived.Enabled
+                    },
+                    new Manufacturer
+                    {
+                        Name = "Test CAA Site",
+                        Address1 = "3271 Schmon Pkwy",
+                        City = "Thorold",
+                        Province = "ON",
+                        PostalCode = "L2V4Y6",
+                        Phone = "9059848585",
+                        Email = "test.site@zoho.com",
+                        Status = Archived.Disabled
+                    });
+                }
+
+                // Vendors Seed Data //
                 if (!context.Suppliers.Any())
                 {
                     context.Suppliers.AddRange(
@@ -298,6 +381,7 @@ namespace caa_mis.Data
                         Description = "Cool and trending sunglasses",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Swag").ID,
+                        ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Walmart").ID,
                     },
                     new Item
                     {
@@ -307,6 +391,7 @@ namespace caa_mis.Data
                         Description = "Clickable pen",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Swag").ID,
+                        ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Staples").ID,
                     },
                     new Item
                     {
@@ -316,6 +401,7 @@ namespace caa_mis.Data
                         Description = "100% Cotton Towels",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Swag").ID,
+                        ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Costco Wholesale").ID,
                     },
                     new Item
                     {
@@ -325,6 +411,7 @@ namespace caa_mis.Data
                         Description = "White T-Shirt with CAA Logo",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Swag").ID,
+                        ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Walmart").ID,
                     },
                     new Item
                     {
@@ -334,6 +421,7 @@ namespace caa_mis.Data
                         Description = "Large red tent",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Equipment").ID,
+                        ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Canadian Tire").ID,
                     },
                     new Item
                     {
@@ -343,6 +431,7 @@ namespace caa_mis.Data
                         Description = "White long foldable table",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Equipment").ID,
+                        ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "RONA").ID,
                     },
                     new Item
                     {
@@ -352,6 +441,7 @@ namespace caa_mis.Data
                         Description = "Blue table cloth ",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Equipment").ID,
+                        ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Sobeys").ID,
                     },
                     new Item
                     {
@@ -361,6 +451,7 @@ namespace caa_mis.Data
                         Description = "Large Poster of CAA",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Equipment").ID,
+                        ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Test CAA Site").ID,
                     },
                     new Item
                     {
@@ -370,6 +461,7 @@ namespace caa_mis.Data
                         Description = "Giveaway Stickers with CAA brand",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Swag").ID,
+                        ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Staples").ID,
                     },
                     new Item
                     {
@@ -379,6 +471,17 @@ namespace caa_mis.Data
                         Description = "Foldable Chair",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Equipment").ID,
+                        ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Costco Wholesale").ID,
+                    },
+                    new Item
+                    {
+                        Name = "Laptop",
+                        SKUNumber = "CAA480919",
+                        Cost = 1500,
+                        Description = "2023 Lenovo T480 ThinkPad",
+                        ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
+                        CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Equipment").ID,
+                        ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Staples").ID,
                     });
 
                     context.SaveChanges();
@@ -521,6 +624,13 @@ namespace caa_mis.Data
                         ItemID = context.Items.FirstOrDefault(i => i.Name == "Roll-up Poster").ID,
                         MinLevel = 60,
                         Quantity = 9,
+                    },
+                    new Stock
+                    {
+                        BranchID = context.Branches.FirstOrDefault(b => b.Location == "Thorold").ID,
+                        ItemID = context.Items.FirstOrDefault(i => i.Name == "Laptop").ID,
+                        MinLevel = 1,
+                        Quantity = 5,
                     });
                     context.SaveChanges();
                 }
@@ -549,7 +659,7 @@ namespace caa_mis.Data
                             EmployeeID = employeeIDs[random.Next(employeeIDCount)],
                             TransactionStatusID = transactionStatusIDs[random.Next(transactionStatusIDCount)],
                             TransactionTypeID = transactionTypeIDs[random.Next(transactionTypeIDCount)],
-                            OriginID = branchIDs[random.Next(branchIDCount-1)],
+                            OriginID = branchIDs[random.Next(branchIDCount - 1)],
                             DestinationID = branchIDs[random.Next(branchIDCount - 1)],
                             TransactionDate = DateTime.Today.AddDays(random.Next(-100, 6)),
                             ReceivedDate = DateTime.Today.AddDays(random.Next(-100, 6)),
@@ -584,7 +694,7 @@ namespace caa_mis.Data
                 //Event Seed Data
                 string[] eventName = new string[] { "Natioanal Indigenous Day", "Canada Day", "Funding",
                                                     "Saint-Patricks Day", "Niagara College Graduation", "Canada 150",
-                "Games of La Francophonie", "Canadian Multiculturalism Day", "National Acadian Day"};
+                "Games of La Francophonie", "Canadian Multiculturalism Day", "Boxing Day"};
                 int eventNameCount = eventName.Length;
                 if (!context.Events.Any())
                 {
@@ -627,7 +737,7 @@ namespace caa_mis.Data
                         context.EventItems.Add(ei2);
 
 
-                    }                        
+                    }
                     context.SaveChanges();
                 }
 

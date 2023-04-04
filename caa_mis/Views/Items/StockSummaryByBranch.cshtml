@@ -4,7 +4,7 @@
     ViewData["Title"] = "Stock Summary by Branch";
 }
 
-<h2>Stock Summary By Branch</h2>
+<h1>Stock Summary By Branch</h1>
 <p>
     <a asp-action="DownloadStockItems" id="download-report-button" class="btn btn-info float-end">Download Stock Report</a>
 </p>
@@ -18,7 +18,7 @@
     <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
     <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
     <div class="form-horizontal">
-        <button class="btn btn-primary @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+        <button class="btn @(ViewData["Filtering"]) btn-toolbar float-left" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
             Filter/Search
         </button>
         <div class="collapse" id="collapseFilter">
@@ -35,7 +35,7 @@
                         @Html.TextBox("SearchString", null, new { @class = "form-control p-2" })
                     </div>
                     <div class="form-group col-md-4 align-self-end">
-                        <input type="submit" name="actionButton" value="Filter" class="btn btn-outline-primary" />
+                        <input type="submit" name="actionButton" value="Apply" class="btn btn-outline-primary" />
                         <a asp-action="StockSummaryByBranch" class="btn btn-outline-dark">Clear</a>
                     </div>
                 </div>

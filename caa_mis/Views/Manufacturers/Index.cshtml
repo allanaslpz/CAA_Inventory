@@ -1,14 +1,14 @@
-﻿@model IEnumerable<caa_mis.Models.TransactionStatus>
+﻿@model IEnumerable<caa_mis.Models.Manufacturer>
 
 @{
-    ViewData["Title"] = "Inventory Statuses";
+    ViewData["Title"] = "Vendors";
 }
 
 <h1>@ViewData["Title"]</h1>
 
 <p>
     <a asp-action="Create" class="btn btn-primary float-left">Create New</a>
-    <button class="btn btn-toolbar @(ViewData["Filtering"]) float-end" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+    <button class="btn @(ViewData["Filtering"]) btn-toolbar float-end" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
         Filter/Search
     </button>
 </p>
@@ -27,7 +27,7 @@
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">
                                         <input type="checkbox" class="" value="desc"
-                                               @((ViewData["sortDirection"].ToString() != "asc" ? "checked=\"checked\"" : ""))
+                                        @((ViewData["sortDirection"].ToString() != "asc" ? "checked=\"checked\"" : ""))
                                                name="sortDirectionCheck" />&nbsp;&nbsp;Descending
                                     </div>
                                 </div>
@@ -40,8 +40,8 @@
                         @Html.TextBox("SearchName", null, new { @class = "form-control p-2" })
                     </div>
                     <div class="form-group col-md-4">
-                        <label class="control-label">Search Description:</label>
-                        @Html.TextBox("SearchDesc", null, new { @class = "form-control p-2" })
+                        <label class="control-label">Search Phone:</label>
+                        @Html.TextBox("SearchPhone", null, new { @class = "form-control p-2" })
                     </div>
                     <div class="form-group col-md-4">
                         <label class="control-label">Filter by Status:</label>
@@ -65,10 +65,52 @@
                     <div class="card-body">
                         <dl class="row lh-1">
                             <dt class="col-3 text-truncate">
-                                @Html.DisplayNameFor(model => model.Description)
+                                @Html.DisplayNameFor(model => model.Name)
                             </dt>
                             <dd class="col-9">
-                                @Html.DisplayFor(modelItem => item.Description)
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </dd>
+                            <dt class="col-3 text-truncate">
+                                @Html.DisplayNameFor(model => model.Address1)
+                            </dt>
+                            <dd class="col-9">
+                                @Html.DisplayFor(modelItem => item.Address1)
+                            </dd>
+                            <dt class="col-3 text-truncate">
+                                @Html.DisplayNameFor(model => model.Address2)
+                            </dt>
+                            <dd class="col-9">
+                                @Html.DisplayFor(modelItem => item.Address2)
+                            </dd>
+                            <dt class="col-3 text-truncate">
+                                @Html.DisplayNameFor(model => model.City)
+                            </dt>
+                            <dd class="col-9">
+                                @Html.DisplayFor(modelItem => item.City)
+                            </dd>
+                            <dt class="col-3 text-truncate">
+                                @Html.DisplayNameFor(model => model.Province)
+                            </dt>
+                            <dd class="col-9">
+                                @Html.DisplayFor(modelItem => item.Province)
+                            </dd>
+                            <dt class="col-3 text-truncate">
+                                @Html.DisplayNameFor(model => model.PostalCode)
+                            </dt>
+                            <dd class="col-9">
+                                @Html.DisplayFor(modelItem => item.PostalCode)
+                            </dd>
+                            <dt class="col-3 text-truncate">
+                                @Html.DisplayNameFor(model => model.Phone)
+                            </dt>
+                            <dd class="col-9">
+                                @Html.DisplayFor(modelItem => item.Phone)
+                            </dd>
+                            <dt class="col-3 text-truncate">
+                                @Html.DisplayNameFor(model => model.Email)
+                            </dt>
+                            <dd class="col-9">
+                                @Html.DisplayFor(modelItem => item.Email)
                             </dd>
                             <dt class="col-3 text-truncate">
                                 @Html.DisplayNameFor(model => model.Status)
@@ -95,7 +137,25 @@
                             <input type="submit" name="actionButton" value="Name" class="btn btn-link" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Description" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Address 1" class="btn btn-link" />
+                        </th>
+                        <th>
+                            <input type="submit" name="actionButton" value="Address 2" class="btn btn-link" />
+                        </th>
+                        <th>
+                            <input type="submit" name="actionButton" value="City" class="btn btn-link" />
+                        </th>
+                        <th>
+                            <input type="submit" name="actionButton" value="Province" class="btn btn-link" />
+                        </th>
+                        <th>
+                            <input type="submit" name="actionButton" value="Postal Code" class="btn btn-link" />
+                        </th>
+                        <th>
+                            <input type="submit" name="actionButton" value="Phone" class="btn btn-link" />
+                        </th>
+                        <th>
+                            <input type="submit" name="actionButton" value="Email" class="btn btn-link" />
                         </th>
                         <th>
                             <input type="submit" name="actionButton" value="Status" class="btn btn-link" />
@@ -104,14 +164,32 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model)
+                    @foreach (var item in Model) 
                     {
                         <tr>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Name)
                             </td>
                             <td>
-                                @Html.DisplayFor(modelItem => item.Description)
+                                @Html.DisplayFor(modelItem => item.Address1)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Address2)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.City)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Province)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.PostalCode)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Phone)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Email)
                             </td>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Status)

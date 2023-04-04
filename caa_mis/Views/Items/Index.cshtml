@@ -9,7 +9,7 @@
 
 <p>
     <a asp-action="Create" class="btn btn-primary float-left">Create New Product</a>
-    <button class="btn btn-primary @(ViewData["Filtering"]) float-end" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+    <button class="btn btn-toolbar @(ViewData["Filtering"]) float-end" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
         Filter/Search
     </button>
     @*<a asp-action="DownloadItems" class="btn btn-info float-end">Download Product</a>  *@
@@ -153,7 +153,7 @@
                             <input type="submit" disabled="disabled" value="Quantity" class="btn btn-link" style="color: blue;" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Total" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Total Quantity" class="btn btn-link" />
                         </th>
                         <th></th>
                     </tr>
