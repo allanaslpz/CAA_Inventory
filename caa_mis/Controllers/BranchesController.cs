@@ -32,7 +32,7 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Name", "Location" };
+            string[] sortOptions = new[] { "Name","Address", "Location", "Phone Number", "Status" };
 
             var branches = _context.Branches
                                     .AsNoTracking();
@@ -88,6 +88,19 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.Name);
                 }
             }
+            else if (sortField == "Address")
+            {
+                if (sortDirection == "asc")
+                {
+                    branches = branches
+                        .OrderByDescending(p => p.Address);
+                }
+                else
+                {
+                    branches = branches
+                        .OrderBy(p => p.Address);
+                }
+            }
             else if (sortField == "Location")
             {
                 if (sortDirection == "asc")
@@ -100,7 +113,20 @@ namespace caa_mis.Controllers
                     branches = branches
                         .OrderBy(p => p.Location);
                 }
-            }           
+            }
+            else if (sortField == "Phone Number")
+            {
+                if (sortDirection == "asc")
+                {
+                    branches = branches
+                        .OrderByDescending(p => p.PhoneNumber);
+                }
+                else
+                {
+                    branches = branches
+                        .OrderBy(p => p.PhoneNumber);
+                }
+            }
             else if (sortField == "Status")
             {
                 if (sortDirection == "asc")
@@ -173,7 +199,7 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Description,InOut")] Branch branches)
+        public async Task<IActionResult> Create([Bind("ID,Name,Address,Location,PhoneNumber")] Branch branches)
         {
             if (ModelState.IsValid)
             {
@@ -205,7 +231,7 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description,InOut,Status")] Branch branches)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Address,Location,PhoneNumber,Status")] Branch branches)
         {
             if (id != branches.ID)
             {

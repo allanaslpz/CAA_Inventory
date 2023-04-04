@@ -22,6 +22,9 @@ namespace caa_mis.Controllers
         // GET: User
         public async Task<IActionResult> Index()
         {
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             var users = await (from u in _context.Users
                                .OrderBy(u => u.UserName)
                                select new UserVM

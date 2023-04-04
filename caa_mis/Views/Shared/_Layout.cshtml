@@ -26,30 +26,32 @@
                                 Inventory
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Incoming">Receive Transfers</a></li>
+                                @*<li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Incoming">Receive Transfers</a></li>*@
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Items" asp-action="Index">Products</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="StockIn" asp-action="Index">Stock Ins</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Index">Transfers</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Events" asp-action="Index">Events</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Administration
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Branches" asp-action="Index">Branches</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Employees" asp-action="Index">Employees</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="TransactionTypes" asp-action="Index">Event Types</a></li>
-                                <li><hr /></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="TransactionStatus" asp-action="Index">Inventory Status</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Categories" asp-action="Index">Product Categories</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="ItemStatus" asp-action="Index">Product Status</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Suppliers" asp-action="Index">Vendors</a></li>
-                            </ul>
-                        </li>
-                        @*<li class="nav-item dropdown">
+                        </li>                        
+                        
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Administration
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Branches" asp-action="Index">Branches</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Employees" asp-action="Index">Employees</a></li>
+                                    <!--<li><a class="dropdown-item" asp-area="" asp-controller="TransactionTypes" asp-action="Index">Event Types</a></li>-->
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="TransactionStatus" asp-action="Index">Inventory Status</a></li>
+                                    <li><hr /></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Categories" asp-action="Index">Product Categories</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="ItemStatus" asp-action="Index">Product Status</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Manufacturers" asp-action="Index">Vendors</a></li>
+                                </ul>
+                            </li>
+                            @*<li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Report
                         </a>
@@ -59,18 +61,19 @@
                         <li><a class="dropdown-item" asp-area="" asp-controller="TransactionItems" asp-action="TransactionItemSummary">Transferred Product Summary</a></li>
                         </ul>
                         </li>*@
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="">Reports</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Setting
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Bulks" asp-action="Index">Inventory Reset</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="UserRoles" asp-action="">User Roles</a></li>
-                            </ul>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Reports" asp-action="">Reports</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Setting
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Bulks" asp-action="Index">Inventory Reset</a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="UserRoles" asp-action="">User Roles</a></li>
+                                </ul>
+                            </li>                        
+                        
                         <li class="nav-item">
                             <a class="nav-link text-dark" onclick="toggleSidebar()" href="#">Help</a>
                         </li>
@@ -102,20 +105,32 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>
 </html>
 
+<script>
+        $(document).ready(function () {
+            $('#download-report-button').click(function () {
+                $('#report-loading-indicator').show();
+                setTimeout(function () {
+                    $('#report-loading-indicator').hide();
+                }, 9000); // Change the timeout value to match your report download time
+            });
+        });
+    </script>
 
 <script>
     // Define a lookup object for the help text
     var helpTextLookup = {
-        "/items": "This is the page where you can manage product information.",
+        "/items": "This is the page where you can manage product information. <br> *SKU - It is our stock keeping unit barcode <br> *Cost - It shows current stock product cost <br> *Branch, Quantity - It shows each product count by each branch",
         "/transactions/incoming": "This is the page where you can transfer items between locations.",
-        "/transactions": "This is the page where you can receive items from suppliers.",
-        "/events": "This is the page where you can create new events and see all events.",
+        "/transactions": "This is the page where you can receive items from suppliers. <br> *Origin - It is original branch that product belongs<br> *Destination - It is a branch that product belongs after transfer<br> *Date - It is a transaction start date<br> *Status - RELEASED is product transaction is ongoing but released from origin branch, OPEN is ongoing but not released yet. RECEIVED is transfer process it finished.",
+        "/events": "This is the page where you can create new events and see all events.<br> *Date - It is a event start date<br> *Status - RELEASED is product transaction is ongoing but released from origin branch, OPEN is ongoing but not released yet. RECEIVED is transfer process it finished.",
         "/branches": "This is the page where you can create new branch and see all branches.",
         "/employees": "This is the page where you can create new employee and see all employees and archive existing employees.",
         "/transactiontypes": "This is the page where you can create new event types and see all event types.",
@@ -126,7 +141,10 @@
         "/reports": "This is the page where you can reports for inventory items, event items, and all transfered items.",
         "/bulks": "This is the page where you can bulk change on item list using import excel file.",
         "/userroles": "This is the page where you can manage user roles information.",
-        "/register": "This is the page where you can create new application logins for new employees."
+        "/register": "This is the page where you can create new application logins for new employees.",
+        "/eventitems/eventsummary": "This is the page where you can see all event products list.<br> *Branch - It is a event that happened branch",
+        "/transactionitems/transactionitemsummary": "This is the page where you can see all transferred products list.<br> *Quantity - It shows many products transfering or transferred to that branch",
+        "/items/stocksummarybybranch": "This is the page where you can see all products in each branch stock.<br> *Quantity - It is a current quantity in stock also including transfering products with OPEN status. Once product status changed to released. It will be decreased current branch will added destination branch"
     };
 
     // Listen for the Help button click event

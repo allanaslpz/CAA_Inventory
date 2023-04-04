@@ -28,10 +28,11 @@ namespace caa_mis.Controllers
         // GET: Events
         public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, 
             int? TransactionStatusID, int? BranchID,int? EmployeeID,
-            int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "BranchID")
+            int? page, int? pageSizeID, string actionButton, string sortDirection = "desc", string sortField = "Date")
         {
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
+
             //Change colour of the button when filtering by setting this default
             ViewData["Filtering"] = "btn-outline-primary";
 

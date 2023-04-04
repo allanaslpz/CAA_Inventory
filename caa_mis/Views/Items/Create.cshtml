@@ -4,7 +4,7 @@
     ViewData["Title"] = "Create";
 }
 
-<h4>New Product</h4>
+<h1>Create New Product</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -38,7 +38,7 @@
                 <span asp-validation-for="Scale" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Cost" class="control-label">Cost Per Item<span style="color:red;">*</span></label>
+                <label asp-for="Cost" class="control-label">Cost Per Item ($)<span style="color:red;">*</span></label>
                 <input asp-for="Cost" class="form-control" />
                 <span asp-validation-for="Cost" class="text-danger"></span>
             </div>
@@ -49,8 +49,9 @@
             </div>
             <div class="form-group">
                 <label asp-for="Manufacturer" class="control-label">Vendor</label>
-                <input asp-for="Manufacturer" class="form-control" />
-                <span asp-validation-for="Manufacturer" class="text-danger"></span>
+                <select asp-for="ManufacturerID" class="form-control form-select" asp-items="ViewBag.ManufacturerID">
+                    <option value="">-- Select --</option>
+                </select>
             </div>
             <div class="form-group">
                 <label asp-for="ItemStatusID" class="control-label"></label>

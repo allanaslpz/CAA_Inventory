@@ -4,72 +4,95 @@
     ViewData["Title"] = "Details";
 }
 
-<h4>@Model.Name Details</h4>
+<h1>@Model.Name Details</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+             @{
+                if (Model.ItemPhoto?.Content != null)
+                {
+                        @:<div>
+                        string imageBase64 = Convert.ToBase64String(Model.ItemPhoto.Content);
+                        string imageSrc = string.Format("data:" + Model.ItemPhoto.MimeType + ";base64,{0}", imageBase64);
+                            <img src="@imageSrc" alt="Photo of @Model.Name" title="Photo of @Model.Name" class="img-fluid rounded" />
+                        @:</div><hr />
+                }
+            }
+            
+            <div class="form-group">
+                <svg id="barcode"
+                    jsbarcode-textAlign="center"
+                    jsbarcode-width=3
+                    jsbarcode-fontSize=25
+                    jsbarcode-value=@Model.SKUNumber
+                    jsbarcode-textmargin="0"
+                    jsbarcode-fontoptions="bold">
+                </svg>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <dl >
+                 <dt class = "col-sm-2">
+                    @Html.DisplayNameFor(model => model.Name)
+                </dt>
+                <dd class = "col-sm-10">
+                    @Html.DisplayFor(model => model.Name)
+                </dd>
+                <dt class = "col-sm-2">
+                    @Html.DisplayNameFor(model => model.Category)
+                </dt>
+                <dd class = "col-sm-10">
+                    @Html.DisplayFor(model => model.Category.Name)
+                </dd>
+                <dt class = "col-sm-2">
+                    @Html.DisplayNameFor(model => model.SKUNumber)
+                </dt>
+                <dd class = "col-sm-10">
+                    @Html.DisplayFor(model => model.SKUNumber)
+                </dd>
+                <dt class = "col-sm-2">
+                    @Html.DisplayNameFor(model => model.Description)
+                </dt>
+                <dd class = "col-sm-10">
+                    @Html.DisplayFor(model => model.Description)
+                </dd>
+                <dt class = "col-sm-2">
+                    Measurement
+                </dt>
+                <dd class = "col-sm-10">
+                    @Html.DisplayFor(model => model.Scale)
+                </dd>
+                <dt class = "col-sm-2">
+                    Cost Per Item
+                </dt>
+                <dd class = "col-sm-10">
+                    $@Html.DisplayFor(model => model.Cost)
+                </dd>
+                <dt class = "col-sm-2">
+                    Vendor
+                </dt>
+                <dd class = "col-sm-10">
+                    @Html.DisplayFor(model => model.Manufacturer.Name)
+                </dd>
+                <dt class = "col-sm-2">
+                    @Html.DisplayNameFor(model => model.ItemStatus)
+                </dt>
+                <dd class = "col-sm-10">
+                    @Html.DisplayFor(model => model.ItemStatus.Name)
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>
 
 <div>
-    <hr />
-    @{
-        if (Model.ItemPhoto?.Content != null)
-        {
-                @:<div>
-                string imageBase64 = Convert.ToBase64String(Model.ItemPhoto.Content);
-                string imageSrc = string.Format("data:" + Model.ItemPhoto.MimeType + ";base64,{0}", imageBase64);
-                    <img src="@imageSrc" alt="Photo of @Model.Name" title="Photo of @Model.Name" class="img-fluid rounded" />
-                @:</div><hr />
-        }
-    }
-    <dl class="row">
-         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SKUNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SKUNumber)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Scale)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Scale)
-        </dd>
-        <dt class = "col-sm-2">
-            Cost Per Item
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cost)
-        </dd>
-        <dt class = "col-sm-2">
-            Vendor
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Manufacturer)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ItemStatus)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ItemStatus.Name)
-        </dd>
-    </dl>
+    <a asp-action="Edit" asp-route-id="@Model?.ID" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.ID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+   
+    <script type="text/javascript">
+        JsBarcode("#barcode").init();
+    </script>
+}

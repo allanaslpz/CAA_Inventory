@@ -36,6 +36,9 @@ namespace caa_mis.Controllers
             var Stocklist = _inventoryContext.Stocks.Where(s => s.Quantity > 0).ToList();
             var Branch = _inventoryContext.Branches.ToList();
 
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             ViewBag.Branches = Branch.Select(b => new SelectListItem
             {
                 Value = b.ID.ToString(),

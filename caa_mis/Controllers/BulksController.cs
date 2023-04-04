@@ -31,6 +31,7 @@ namespace caa_mis.Controllers
         {
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
+
             //Change colour of the button when filtering by setting this default
             ViewData["Filtering"] = "btn-outline-primary";
 

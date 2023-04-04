@@ -20,7 +20,7 @@ namespace caa_mis.Data
                 //Create Roles
                 var RoleManager = applicationBuilder.ApplicationServices.CreateScope()
                     .ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                string[] roleNames = { "Admin", "Supervisor", "Security"};
+                string[] roleNames = { "Admin", "Supervisor", "Security" };
 
                 IdentityResult roleResult;
                 foreach (var roleName in roleNames)
@@ -107,7 +107,7 @@ namespace caa_mis.Data
 
                     if (result.Succeeded)
                     {
-                        userManager.AddToRoleAsync(user, "Supervisor").Wait();
+                        userManager.AddToRoleAsync(user, "Admin").Wait();
                     }
                 }
                 if (userManager.FindByEmailAsync("luwi.floor01@apple.com").Result == null)
