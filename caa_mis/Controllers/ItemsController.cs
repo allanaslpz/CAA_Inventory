@@ -40,9 +40,6 @@ namespace caa_mis.Controllers
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
 
-            //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-primary";
-
             PopulateDropDownLists();
 
             //List of sort options.
@@ -434,9 +431,7 @@ namespace caa_mis.Controllers
                 ViewData["Filtering"] = "btn-secondary";
             }
 
-            ViewData["BranchID"] = BranchList(BranchID);
-            // Save filtered data to cookie
-            CachingFilteredData(sumQ);
+            ViewData["BranchID"] = BranchList(BranchID);            
 
             //Before we sort, see if we have called for a change of filtering or sorting
             if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
@@ -526,19 +521,22 @@ namespace caa_mis.Controllers
             }
             else //Sorting by Name
             {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.ItemName)
-                        .ThenBy(p => p.Quantity);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.ItemName)
-                        .ThenByDescending(p => p.Quantity);
-                }
+                //if (sortDirection == "asc")
+                //{
+                //    sumQ = sumQ
+                //        .OrderBy(p => p.ItemName)
+                //        .ThenBy(p => p.Quantity);
+                //}
+                //else
+                //{
+                //    sumQ = sumQ
+                //        .OrderByDescending(p => p.ItemName)
+                //        .ThenByDescending(p => p.Quantity);
+                //}
             }
+
+            // Save filtered data to cookie
+            CachingFilteredData(sumQ);
 
             //Set sort for next time
             ViewData["sortField"] = sortField;

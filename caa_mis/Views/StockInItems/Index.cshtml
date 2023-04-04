@@ -1,20 +1,63 @@
-﻿@model IEnumerable<caa_mis.Models.BulkItem>
+﻿@model IEnumerable<caa_mis.Models.TransactionItem>
 
 @{
-    ViewData["Title"] = "Initial Inventory Items";
-    caa_mis.Models.Bulk transaction = (caa_mis.Models.Bulk)ViewBag.Transactions;
-}
+    ViewData["Title"] = "Stock In Details";
+    caa_mis.Models.Transaction transaction = (caa_mis.Models.Transaction)ViewBag.Transactions;
 
-<h4>Inventory Items</h4>
+}
+<h1>Stock In Details</h1>
 <hr />
 <div class="row">
     <div class="col-6">
         <dl class="row">
             <dt class="col-md-4">
-                Branch
+                @Html.DisplayNameFor(model => transaction.Employee)
             </dt>
             <dd class="col-md-8">
-                @Html.DisplayFor(model => transaction.Branch.Name)
+                @Html.DisplayFor(model => transaction.Employee.FirstName)
+            </dd>
+             <dt class="col-md-4">
+                @Html.DisplayNameFor(model => transaction.Destination)
+            </dt>
+            <dd class="col-md-8">
+                @Html.DisplayFor(model => transaction.Destination.Name)
+            </dd>
+           @* <dt class="col-md-4">
+                @Html.DisplayNameFor(model => transaction.Origin)
+            </dt>
+            <dd class="col-md-8">
+                @Html.DisplayFor(model => transaction.Origin.Name)
+            </dd>*@
+            
+            @*<dt class="col-md-4">
+                @Html.DisplayNameFor(model => transaction.ReceivedDate)
+            </dt>
+            <dd class="col-md-8">
+                @Html.DisplayFor(model => transaction.ReceivedDate)
+            </dd>*@
+           
+            <dt class="col-md-4">
+                @Html.DisplayNameFor(model => transaction.Description)
+            </dt>
+            <dd class="col-md-8">
+                @Html.DisplayFor(model => transaction.Description)
+            </dd>
+            
+        </dl>
+    </div>
+    <div class="col-6">
+        <dl class="row">
+            <dt class="col-md-4">
+               Date
+            </dt>
+            <dd class="col-md-8">
+                @Html.DisplayFor(model => transaction.TransactionDate)
+            </dd>
+            <dt class="col-md-4">
+                @Html.DisplayNameFor(model => transaction.Shipment)
+            </dt>
+            <dd class="col-md-8">
+                @Html.DisplayFor(model => transaction.Shipment)
             </dd>
             <dt class="col-md-4">
                 Status
@@ -23,30 +66,17 @@
                 @Html.DisplayFor(model => transaction.TransactionStatus.Name)
             </dd>
             
-
-        </dl>
-    </div>
-<div class="col-6">
-        <dl class="row">
-            <dt class="col-md-4">
-                @Html.DisplayNameFor(model => transaction.Date)
-            </dt>
-            <dd class="col-md-8">
-                @Html.DisplayFor(model => transaction.Date)
-            </dd>
-            <dt class="col-md-4">
-                @Html.DisplayNameFor(model => transaction.Employee.FullName)
-            </dt>
-            <dd class="col-md-8">
-                @Html.DisplayFor(model => transaction.Employee.FullName)
-            </dd>
+            
+            
+            
         </dl>
     </div>
 </div>
+
 <form asp-action="Index" method="get">
     <div class="form-horizontal">
         <input type="hidden" name="TransactionID" value="@transaction.ID" />
-        <button class="btn btn-primary @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+        <button class="btn @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
                 Filter/Search
             </button>
         <div class="collapse" id="collapseFilter">
@@ -73,7 +103,7 @@
                     </div>
                     <div class="form-group col-md-4 align-self-end">
                         <input type="submit" name="actionButton" value="Apply" class="btn btn-outline-primary" />
-                        <a asp-action="Index" asp-route-BulkID="@transaction.ID" class="btn btn-outline-dark">Clear</a>
+                        <a asp-action="Index" asp-route-TransactionID="@transaction.ID" class="btn btn-outline-dark">Clear</a>
                     </div>
                 </div>
             </div>
@@ -84,19 +114,22 @@
     <hr />
     @if (transaction.TransactionStatus.Name == "Open")
     {
+   
         <div id="productDetails">
             <h5>Add Product</h5>
             <form asp-action="Create">
-            @if (TempData.ContainsKey("ErrorMessage"))
-            {
-                <span class="text-danger">@TempData["ErrorMessage"]</span>
-            }
+                @if (TempData.ContainsKey("ErrorMessage"))
+                {
+                    <span class="text-danger">@TempData["ErrorMessage"]</span>
+                }
                 <div class="row alert alert-light">
                     <div class="col-sm">
                         <div class="form-group col-sm col-lg">
                             <label for="ProductName" clas="bold">Product</label>
-                            <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Start typing a product..." required>
+                            <input type="text" class="form-control" id="ProductName" name="ProductName" placeholder="Start typing a product or sku..." required>
                             <input type="hidden" name="ProductID" id="ProductID" />
+                       @* @Html.DropDownList("ProductID",null,null, htmlAttributes: new { @class = "form-control" })*@
+
                         <input type="hidden" name="TransactionID" id="TransactionID" value="@transaction.ID" />
                         </div>
                     </div>
@@ -105,6 +138,7 @@
                             <label for="Quantity">Quantity</label>
                        
                             <input type="number" class="form-control" id="Quantity" name="Quantity" placeholder="1" value="1" required>
+                            
                         </div>
                     </div>
                     <div class="col-sm">
@@ -113,6 +147,7 @@
                             <input type="submit" value="Add Product" class="btn btn-primary" />
                         </div>
                     </div>
+                
                 </div>
             </form>
         </div>
@@ -191,10 +226,10 @@
                             {
                             <td>
                                 
-                                    <a asp-controller="BulkItems" asp-action="Edit" asp-route-id="@item.ID">
+                                    <a asp-controller="StockInItems" asp-action="Edit" asp-route-id="@item.ID">
                                         <span class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Edit Item">&#x270D;</span>
                                     </a>
-                                    <a asp-controller="BulkItems" asp-action="Delete" asp-route-id="@item.ID">
+                                    <a asp-controller="StockInItems" asp-action="Delete" asp-route-id="@item.ID">
                                         <span class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Delete Item">&#x274C;</span>
                                     </a>
 
@@ -212,11 +247,11 @@
     <p>
     @if (transaction.TransactionStatus.Name == "Open")
     {
-            <a asp-action="Edit" asp-controller="Bulks" asp-route-id="@transaction.ID" class="btn btn-primary">Edit</a>
-            <a asp-action="Release" asp-controller="Bulks" asp-route-id="@transaction.ID" class="btn btn-info">Release</a>
+            <a asp-action="Edit" asp-controller="StockIn" asp-route-id="@transaction.ID" class="btn btn-primary">Edit</a>
+            <a asp-action="Release" asp-controller="StockIn" asp-route-id="@transaction.ID" class="btn btn-info">Release</a>
     }
 
-    <a asp-action="Index" asp-controller="Bulks" class="btn btn-secondary">Back to Transaction List</a>
+        <a asp-action="Index" asp-controller="StockIn" class="btn btn-secondary">Back to Stock In List</a>
     </p>
 </div>
 @section Scripts {
@@ -224,14 +259,14 @@
         $('#ProductName').autocomplete({
             source: function (request, response) {
                 $.ajax({
-                    url: '/TransactionItems/SearchAllProduct/',
+                    url: '/StockInItems/SearchProduct/',
                     dataType: 'json',
-                    data: {  term: $('#ProductName').val() },
+                    data: { BranchID: @transaction.OriginID, term: $('#ProductName').val() },
                     success: function (data) {
                         var result = $.map(data, function (item) {
                             console.log(item);
                             return {
-                                label: item.name,
+                                label: item.productName ? item.productName : item.name,
                                 value: item.id
                             };
                         });

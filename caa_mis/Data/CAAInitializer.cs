@@ -526,7 +526,7 @@ namespace caa_mis.Data
                 }
 
                 //Transaction Seed Data
-                byte rowCount = 10;
+                byte rowCount = 150;
                 int[] employeeIDs = context.Employees.Select(a => a.ID).ToArray();
                 int employeeIDCount = employeeIDs.Length;
                 int[] transactionStatusIDs = context.TransactionStatuses.Select(a => a.ID).ToArray();
@@ -620,7 +620,7 @@ namespace caa_mis.Data
 
                         EventItem ei2 = new()
                         {
-                            ItemID = itemIDs[random.Next(itemIDCount+1)],
+                            ItemID = itemIDs[random.Next(itemIDCount)],
                             EventID = eventIDs[i],
                             Quantity = random.Next(1, 34)
                         };

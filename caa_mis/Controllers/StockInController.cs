@@ -20,12 +20,12 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin, Supervisor")]
-    public class TransactionsController : CustomControllers.CognizantController
+    public class StockInController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public TransactionsController(InventoryContext context, UserManager<IdentityUser> userManager)
+        public StockInController(InventoryContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _userManager = userManager;
@@ -37,7 +37,9 @@ namespace caa_mis.Controllers
         {
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
-            
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
             string[] sortOptions = new[] { "Type", "Description", "Origin", "Destination", "Date", "Status" };
@@ -51,28 +53,28 @@ namespace caa_mis.Controllers
                 .Include(t => t.Origin)
                 .Include(t => t.TransactionStatus)
                 .Include(t => t.TransactionType)
-                where a.TransactionTypeID == 2
+                where a.TransactionTypeID == 1
                 select a;
 
             if (TransactionTypeID.HasValue)
             {
                 inventory = inventory.Where(p => p.TransactionTypeID == TransactionTypeID);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             if (TransactionStatusID.HasValue)
             {
                 inventory = inventory.Where(p => p.TransactionStatusID == TransactionStatusID);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             if (DestinationID.HasValue)
             {
                 inventory = inventory.Where(p => p.DestinationID == DestinationID);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             if (!String.IsNullOrEmpty(SearchString))
             {
                 inventory = inventory.Where(p => p.Description.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             //Before we sort, see if we have called for a change of filtering or sorting
@@ -234,7 +236,7 @@ namespace caa_mis.Controllers
             {
                 _context.Add(transaction);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "TransactionItems", new { TransactionID = transaction.ID });
+                return RedirectToAction("Index", "StockInItems", new { TransactionID = transaction.ID });
             }
             PopulateDropDownLists(transaction);
             return View(transaction);
@@ -277,7 +279,7 @@ namespace caa_mis.Controllers
                 {
                     _context.Update(transaction);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction("Index", "TransactionItems", new { TransactionID = transaction.ID });
+                    return RedirectToAction("Index", "StockInItems", new { TransactionID = transaction.ID });
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -434,7 +436,7 @@ namespace caa_mis.Controllers
             }
             else
             {
-                TempData["ErrorMessage"] = "Cannot Release this transfer, there are Items that are currently out of stock.";
+                TempData["ErrorMessage"] = "Cannot Release this stock in, there are Items that are currently out of stock.";
             }
 
             return RedirectToAction(nameof(Index));
@@ -608,7 +610,9 @@ namespace caa_mis.Controllers
         {
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
-            
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
             string[] sortOptions = new[] { "Type", "Description", "Origin", "Destination", "Transaction Date"};
@@ -628,17 +632,17 @@ namespace caa_mis.Controllers
             if (TransactionTypeID.HasValue)
             {
                 inventory = inventory.Where(p => p.TransactionTypeID == TransactionTypeID);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             if (DestinationID.HasValue)
             {
                 inventory = inventory.Where(p => p.DestinationID == DestinationID);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             if (!String.IsNullOrEmpty(SearchString))
             {
                 inventory = inventory.Where(p => p.Description.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             //Before we sort, see if we have called for a change of filtering or sorting

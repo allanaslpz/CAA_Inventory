@@ -19,11 +19,11 @@ using Microsoft.CodeAnalysis.Operations;
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin, Supervisor")]
-    public class TransactionItemsController : CustomControllers.CognizantController
+    public class StockInItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
 
-        public TransactionItemsController(InventoryContext context)
+        public StockInItemsController(InventoryContext context)
         {
             _context = context;
         }
@@ -475,7 +475,7 @@ namespace caa_mis.Controllers
         {
 
             IQueryable<ProductListVM> sumQ = _context.ProductList.OrderBy(p=>p.Name);
-            IQueryable<Item> items = _context.Items.Where(p => p.ItemStatusID == 1).OrderBy(p => p.Name);
+            IQueryable<Item> items = _context.Items.OrderBy(p => p.Name);
 
             IQueryable<Item> result;
             IQueryable<ProductListVM> result2;
@@ -708,6 +708,9 @@ namespace caa_mis.Controllers
                 //Go back to the proper return URL for the Transactions controller
                 return Redirect(ViewData["returnURL"].ToString());
             }
+
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings

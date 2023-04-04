@@ -4,13 +4,14 @@
     ViewData["Title"] = "Create";
 }
 
-<h4>Create New Transfer</h4>
+<h4>Create New Stock In</h4>
 <hr />
 
 <form asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input type="hidden" name="TransactionStatusID" id="TransactionStatusID" value="1">
-    <input type="hidden" name="TransactionTypeID" id="TransactionTypeID" value="2">
+    <input type="hidden" name="TransactionTypeID" id="TransactionTypeID" value="1" />
+    <input type="hidden" name="OriginID" id="TransactionTypeID" value="1">
     <div class="row">
         <div class="col-md-4 mb-3">
             <label asp-for="EmployeeID" class="control-label"></label>
@@ -33,24 +34,13 @@
     <div class="row">
         <div class="col-md-4 mb-3">
             <div class="form-group">
-                <label asp-for="OriginID" class="control-label"></label>
-                <select asp-for="OriginID" class="form-control form-select" asp-items="ViewBag.OriginID"></select>
-                <span asp-validation-for="OriginID" class="text-danger"></span>
-            </div>
-
-        </div>
-        <div class="col-md-4 mb-3">
-            <div class="form-group">
                 <label asp-for="DestinationID" class="control-label"></label>
                 <select asp-for="DestinationID" class="form-control form-select" asp-items="ViewBag.DestinationID"></select>
                 <span asp-validation-for="DestinationID" class="text-danger"></span>
             </div>
 
         </div>
-        
-    </div>
-    <div class="row">
-       <div class="col-md-4 mb-3">
+        <div class="col-md-4 mb-3">
             <div class="form-group">
                 <label asp-for="Shipment" class="control-label">Shipment Details</label>
                 <input asp-for="Shipment" class="form-control" />
@@ -58,6 +48,9 @@
                 <span asp-validation-for="Shipment" class="text-danger"></span>
             </div>
         </div>
+    </div>
+    <div class="row">
+      
         <div class="col-md-4 mb-3">
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
