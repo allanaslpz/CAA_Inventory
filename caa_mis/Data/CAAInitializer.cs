@@ -210,19 +210,19 @@ namespace caa_mis.Data
                     {
                         FirstName = "Edmund Kevin",
                         LastName = "Rone",
-                        Email = "edmund@outlook.com"
+                        Email = "admin@outlook.com"
                     },
                     new Employee
                     {
                         FirstName = "Allan Antonio",
                         LastName = "Lopez",
-                        Email = "allan@outlook.com"
+                        Email = "super@outlook.com"
                     },
                     new Employee
                     {
                         FirstName = "Michael Laurence",
                         LastName = "Barde",
-                        Email = "mike@outlook.com"
+                        Email = "user@outlook.com"
                     },
                     new Employee
                     {
@@ -238,7 +238,7 @@ namespace caa_mis.Data
                     });
                     context.SaveChanges();
                 }
-                // Employees Seed Data //
+                // Branch Seed Data //
                 if (!context.Branches.Any())
                 {
                     context.Branches.AddRange(

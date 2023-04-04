@@ -11,7 +11,7 @@ using caa_mis.Data;
 namespace caa_mis.Data.CAAMigrations
 {
     [DbContext(typeof(InventoryContext))]
-    [Migration("20230402032722_Initial")]
+    [Migration("20230403192407_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,6 +68,9 @@ namespace caa_mis.Data.CAAMigrations
                     b.Property<int>("EmployeeID")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("EmployeeID2")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("TransactionStatusID")
                         .HasColumnType("INTEGER");
 
@@ -76,6 +79,8 @@ namespace caa_mis.Data.CAAMigrations
                     b.HasIndex("BranchID");
 
                     b.HasIndex("EmployeeID");
+
+                    b.HasIndex("EmployeeID2");
 
                     b.HasIndex("TransactionStatusID");
 
@@ -135,6 +140,9 @@ namespace caa_mis.Data.CAAMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("Active")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("BranchRoles")
                         .HasColumnType("INTEGER");
 
@@ -153,8 +161,9 @@ namespace caa_mis.Data.CAAMigrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Phone")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ID");
 
@@ -162,6 +171,42 @@ namespace caa_mis.Data.CAAMigrations
                         .IsUnique();
 
                     b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("caa_mis.Models.EmployeeMetaData", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BranchRoles")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("EmployeeMetaData");
                 });
 
             modelBuilder.Entity("caa_mis.Models.Event", b =>
@@ -179,6 +224,9 @@ namespace caa_mis.Data.CAAMigrations
                     b.Property<int>("EmployeeID")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("EmployeeID2")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -192,6 +240,8 @@ namespace caa_mis.Data.CAAMigrations
                     b.HasIndex("BranchID");
 
                     b.HasIndex("EmployeeID");
+
+                    b.HasIndex("EmployeeID2");
 
                     b.HasIndex("TransactionStatusID");
 
@@ -413,6 +463,39 @@ namespace caa_mis.Data.CAAMigrations
                     b.ToTable("Stocks");
                 });
 
+            modelBuilder.Entity("caa_mis.Models.Subscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("EmployeeMetaDataID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PushAuth")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PushEndpoint")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PushP256DH")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeID");
+
+                    b.HasIndex("EmployeeMetaDataID");
+
+                    b.ToTable("Subscriptions");
+                });
+
             modelBuilder.Entity("caa_mis.Models.Supplier", b =>
                 {
                     b.Property<int>("ID")
@@ -482,6 +565,9 @@ namespace caa_mis.Data.CAAMigrations
                     b.Property<int>("EmployeeID")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("EmployeeID2")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int?>("OriginID")
                         .IsRequired()
                         .HasColumnType("INTEGER");
@@ -506,6 +592,8 @@ namespace caa_mis.Data.CAAMigrations
                     b.HasIndex("DestinationID");
 
                     b.HasIndex("EmployeeID");
+
+                    b.HasIndex("EmployeeID2");
 
                     b.HasIndex("OriginID");
 
@@ -748,9 +836,15 @@ namespace caa_mis.Data.CAAMigrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("caa_mis.Models.Employee", "Employee")
+                    b.HasOne("caa_mis.Models.EmployeeMetaData", "Employee")
                         .WithMany("Bulks")
                         .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("caa_mis.Models.Employee", null)
+                        .WithMany("Bulks")
+                        .HasForeignKey("EmployeeID2")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -794,9 +888,15 @@ namespace caa_mis.Data.CAAMigrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("caa_mis.Models.Employee", "Employee")
+                    b.HasOne("caa_mis.Models.EmployeeMetaData", "Employee")
                         .WithMany("Events")
                         .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("caa_mis.Models.Employee", null)
+                        .WithMany("Events")
+                        .HasForeignKey("EmployeeID2")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -917,6 +1017,21 @@ namespace caa_mis.Data.CAAMigrations
                     b.Navigation("Item");
                 });
 
+            modelBuilder.Entity("caa_mis.Models.Subscription", b =>
+                {
+                    b.HasOne("caa_mis.Models.Employee", "Employee")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("caa_mis.Models.EmployeeMetaData", null)
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("EmployeeMetaDataID");
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("caa_mis.Models.Transaction", b =>
                 {
                     b.HasOne("caa_mis.Models.Branch", "Destination")
@@ -925,9 +1040,15 @@ namespace caa_mis.Data.CAAMigrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("caa_mis.Models.Employee", "Employee")
+                    b.HasOne("caa_mis.Models.EmployeeMetaData", "Employee")
                         .WithMany("Transactions")
                         .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("caa_mis.Models.Employee", null)
+                        .WithMany("Transactions")
+                        .HasForeignKey("EmployeeID2")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1011,6 +1132,19 @@ namespace caa_mis.Data.CAAMigrations
                     b.Navigation("Bulks");
 
                     b.Navigation("Events");
+
+                    b.Navigation("Subscriptions");
+
+                    b.Navigation("Transactions");
+                });
+
+            modelBuilder.Entity("caa_mis.Models.EmployeeMetaData", b =>
+                {
+                    b.Navigation("Bulks");
+
+                    b.Navigation("Events");
+
+                    b.Navigation("Subscriptions");
 
                     b.Navigation("Transactions");
                 });

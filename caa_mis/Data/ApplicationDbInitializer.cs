@@ -20,7 +20,7 @@ namespace caa_mis.Data
                 //Create Roles
                 var RoleManager = applicationBuilder.ApplicationServices.CreateScope()
                     .ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                string[] roleNames = { "Admin", "Supervisor", "Security" };
+                string[] roleNames = { "Admin", "Supervisor"};
 
                 IdentityResult roleResult;
                 foreach (var roleName in roleNames)
@@ -50,80 +50,49 @@ namespace caa_mis.Data
                 //Create Users
                 var userManager = applicationBuilder.ApplicationServices.CreateScope()
                     .ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-                if (userManager.FindByEmailAsync("kevin.rone05@gmail.com").Result == null)
+                if (userManager.FindByEmailAsync("admin@outlook.com").Result == null)
                 {
                     IdentityUser user = new IdentityUser
                     {
-                        UserName = "kevin.rone05@gmail.com",
-                        Email = "kevin.rone05@gmail.com"
+                        UserName = "admin@outlook.com",
+                        Email = "admin@outlook.com",
+                        EmailConfirmed = true
                     };
 
-                    IdentityResult result = userManager.CreateAsync(user, "Password").Result;
+                    IdentityResult result = userManager.CreateAsync(user, "Pa55w@rd").Result;
 
                     if (result.Succeeded)
                     {
                         userManager.AddToRoleAsync(user, "Admin").Wait();
                     }
                 }
-                if (userManager.FindByEmailAsync("m.barde04@gmail.com").Result == null)
+                if (userManager.FindByEmailAsync("super@outlook.com").Result == null)
                 {
                     IdentityUser user = new IdentityUser
                     {
-                        UserName = "m.barde04@gmail.com",
-                        Email = "m.barde04@gmail.com"
+                        UserName = "super@outlook.com",
+                        Email = "super@outlook.com",
+                        EmailConfirmed = true
                     };
 
-                    IdentityResult result = userManager.CreateAsync(user, "Password").Result;
-
-                    if (result.Succeeded)
-                    {
-                        userManager.AddToRoleAsync(user, "Admin").Wait();
-                    }
-                }
-                if (userManager.FindByEmailAsync("AA.lopez03@gmail.com").Result == null)
-                {
-                    IdentityUser user = new IdentityUser
-                    {
-                        UserName = "AA.lopez03@gmail.com",
-                        Email = "AA.lopez03@gmail.com"
-                    };
-
-                    IdentityResult result = userManager.CreateAsync(user, "Password").Result;
+                    IdentityResult result = userManager.CreateAsync(user, "Pa55w@rd").Result;
 
                     if (result.Succeeded)
                     {
                         userManager.AddToRoleAsync(user, "Supervisor").Wait();
                     }
                 }
-                if (userManager.FindByEmailAsync("tsogo02@outlook.com").Result == null)
+                if (userManager.FindByEmailAsync("user@outlook.com").Result == null)
                 {
                     IdentityUser user = new IdentityUser
                     {
-                        UserName = "tsogo02@outlook.com",
-                        Email = "tsogo02@outlook.com"
+                        UserName = "user@outlook.com",
+                        Email = "user@outlook.com",
+                        EmailConfirmed = true
                     };
 
-                    IdentityResult result = userManager.CreateAsync(user, "Password").Result;
-
-                    if (result.Succeeded)
-                    {
-                        userManager.AddToRoleAsync(user, "Supervisor").Wait();
-                    }
-                }
-                if (userManager.FindByEmailAsync("luwi.floor01@apple.com").Result == null)
-                {
-                    IdentityUser user = new IdentityUser
-                    {
-                        UserName = "luwi.floor01@apple.com",
-                        Email = "luwi.floor01@apple.com"
-                    };
-
-                    IdentityResult result = userManager.CreateAsync(user, "Password").Result;
-
-                    if (result.Succeeded)
-                    {
-                        userManager.AddToRoleAsync(user, "Supervisor").Wait();
-                    }
+                    IdentityResult result = userManager.CreateAsync(user, "Pa55w@rd").Result;
+                    //Not in any role
                 }
                 //if (userManager.FindByEmailAsync("user@outlook.com").Result == null)
                 //{

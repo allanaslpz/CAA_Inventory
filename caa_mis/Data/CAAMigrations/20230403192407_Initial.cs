@@ -42,6 +42,24 @@ namespace caa_mis.Data.CAAMigrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EmployeeMetaData",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FirstName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    LastName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    Phone = table.Column<string>(type: "TEXT", maxLength: 10, nullable: true),
+                    BranchRoles = table.Column<int>(type: "INTEGER", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Active = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeMetaData", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Employees",
                 columns: table => new
                 {
@@ -49,9 +67,10 @@ namespace caa_mis.Data.CAAMigrations
                         .Annotation("Sqlite:Autoincrement", true),
                     FirstName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Phone = table.Column<string>(type: "TEXT", maxLength: 10, nullable: true),
                     BranchRoles = table.Column<int>(type: "INTEGER", nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false)
+                    Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Active = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -140,6 +159,34 @@ namespace caa_mis.Data.CAAMigrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Subscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    PushEndpoint = table.Column<string>(type: "TEXT", maxLength: 512, nullable: true),
+                    PushP256DH = table.Column<string>(type: "TEXT", maxLength: 512, nullable: true),
+                    PushAuth = table.Column<string>(type: "TEXT", maxLength: 512, nullable: true),
+                    EmployeeID = table.Column<int>(type: "INTEGER", nullable: false),
+                    EmployeeMetaDataID = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Subscriptions_EmployeeMetaData_EmployeeMetaDataID",
+                        column: x => x.EmployeeMetaDataID,
+                        principalTable: "EmployeeMetaData",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_Subscriptions_Employees_EmployeeID",
+                        column: x => x.EmployeeID,
+                        principalTable: "Employees",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Items",
                 columns: table => new
                 {
@@ -186,7 +233,8 @@ namespace caa_mis.Data.CAAMigrations
                     EmployeeID = table.Column<int>(type: "INTEGER", nullable: false),
                     TransactionStatusID = table.Column<int>(type: "INTEGER", nullable: false),
                     BranchID = table.Column<int>(type: "INTEGER", nullable: false),
-                    Date = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    EmployeeID2 = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -198,8 +246,14 @@ namespace caa_mis.Data.CAAMigrations
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Bulks_Employees_EmployeeID",
+                        name: "FK_Bulks_EmployeeMetaData_EmployeeID",
                         column: x => x.EmployeeID,
+                        principalTable: "EmployeeMetaData",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Bulks_Employees_EmployeeID2",
+                        column: x => x.EmployeeID2,
                         principalTable: "Employees",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
@@ -221,7 +275,8 @@ namespace caa_mis.Data.CAAMigrations
                     EmployeeID = table.Column<int>(type: "INTEGER", nullable: false),
                     TransactionStatusID = table.Column<int>(type: "INTEGER", nullable: false),
                     BranchID = table.Column<int>(type: "INTEGER", nullable: false),
-                    Date = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    EmployeeID2 = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -233,8 +288,14 @@ namespace caa_mis.Data.CAAMigrations
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Events_Employees_EmployeeID",
+                        name: "FK_Events_EmployeeMetaData_EmployeeID",
                         column: x => x.EmployeeID,
+                        principalTable: "EmployeeMetaData",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Events_Employees_EmployeeID2",
+                        column: x => x.EmployeeID2,
                         principalTable: "Employees",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
@@ -260,7 +321,8 @@ namespace caa_mis.Data.CAAMigrations
                     TransactionDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     ReceivedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     Description = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
-                    Shipment = table.Column<string>(type: "TEXT", nullable: true)
+                    Shipment = table.Column<string>(type: "TEXT", nullable: true),
+                    EmployeeID2 = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -278,8 +340,14 @@ namespace caa_mis.Data.CAAMigrations
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Transactions_Employees_EmployeeID",
+                        name: "FK_Transactions_EmployeeMetaData_EmployeeID",
                         column: x => x.EmployeeID,
+                        principalTable: "EmployeeMetaData",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Transactions_Employees_EmployeeID2",
+                        column: x => x.EmployeeID2,
                         principalTable: "Employees",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
@@ -501,6 +569,11 @@ namespace caa_mis.Data.CAAMigrations
                 column: "EmployeeID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Bulks_EmployeeID2",
+                table: "Bulks",
+                column: "EmployeeID2");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Bulks_TransactionStatusID",
                 table: "Bulks",
                 column: "TransactionStatusID");
@@ -530,6 +603,11 @@ namespace caa_mis.Data.CAAMigrations
                 name: "IX_Events_EmployeeID",
                 table: "Events",
                 column: "EmployeeID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_EmployeeID2",
+                table: "Events",
+                column: "EmployeeID2");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_Name_Date",
@@ -591,6 +669,16 @@ namespace caa_mis.Data.CAAMigrations
                 column: "ItemID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Subscriptions_EmployeeID",
+                table: "Subscriptions",
+                column: "EmployeeID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subscriptions_EmployeeMetaDataID",
+                table: "Subscriptions",
+                column: "EmployeeMetaDataID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TransactionItems_ItemID",
                 table: "TransactionItems",
                 column: "ItemID");
@@ -614,6 +702,11 @@ namespace caa_mis.Data.CAAMigrations
                 name: "IX_Transactions_EmployeeID",
                 table: "Transactions",
                 column: "EmployeeID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transactions_EmployeeID2",
+                table: "Transactions",
+                column: "EmployeeID2");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_OriginID",
@@ -650,6 +743,9 @@ namespace caa_mis.Data.CAAMigrations
                 name: "ItemThumbnails");
 
             migrationBuilder.DropTable(
+                name: "Subscriptions");
+
+            migrationBuilder.DropTable(
                 name: "TransactionItems");
 
             migrationBuilder.DropTable(
@@ -672,6 +768,9 @@ namespace caa_mis.Data.CAAMigrations
 
             migrationBuilder.DropTable(
                 name: "Branches");
+
+            migrationBuilder.DropTable(
+                name: "EmployeeMetaData");
 
             migrationBuilder.DropTable(
                 name: "Employees");
