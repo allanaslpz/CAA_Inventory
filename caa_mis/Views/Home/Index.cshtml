@@ -100,6 +100,10 @@
                     var pieC = document.getElementById('PieChart');
                     var pieLabel = @Html.Raw(Json.Serialize(ViewBag.PieLabel));
                     var pieValue = @Html.Raw(Json.Serialize(ViewBag.PieValue));
+                    var pieValueWithSymbol = pieValue.map(function (val) {
+                        return "$" + val.toFixed(2);
+                    });
+
                     new Chart(pieC, {
                         type: 'pie',
                         data: {
@@ -107,15 +111,28 @@
                             datasets: [{
                                 label: 'Expenses',
                                 data: pieValue,
+                                formattedData: pieValueWithSymbol,
                                 borderWidth: 1,
                                 backgroundColor: [
                                     'red',
                                     'blue',
                                     'green',
                                     'yellow',
-                                    'orange',]
+                                    'orange',
+                                ]
                             }]
                         },
+                        options: {
+                            tooltips: {
+                                callbacks: {
+                                    label: function (tooltipItem, data) {
+                                        var dataset = data.datasets[tooltipItem.datasetIndex];
+                                        var currentValue = dataset.formattedData[tooltipItem.index];
+                                        return currentValue;
+                                    }
+                                }
+                            }
+                        }
                     });
                 </script>
             </div>
@@ -132,22 +149,42 @@
                 var ctx = document.getElementById('BarChart');
                 var barLabel = @Html.Raw(Json.Serialize(ViewBag.BarLabel));
                 var barValue = @Html.Raw(Json.Serialize(ViewBag.BarValue));
+                var barValueWithSymbol = barValue.map(function (val) {
+                    return "$" + val.toFixed(2);
+                });
+
                 new Chart(ctx, {
                     type: 'bar',
                     data: {
-                labels: barLabel,
+                        labels: barLabel,
                         datasets: [{
                             label: 'Expenses',
                             data: barValue,
+                            formattedData: barValueWithSymbol,
                             borderWidth: 1,
                             backgroundColor: [
-                              'red',
-                              'blue',
-                              'green',
-                              'yellow',
-                              'orange',]
+                                'red',
+                                'blue',
+                                'green',
+                                'yellow',
+                                'orange',
+                            ]
                         }]
-                    },                 
+                    },
+                    options: {
+                        legend: {
+                            display: false
+                        },
+                        tooltips: {
+                            callbacks: {
+                                label: function (tooltipItem, data) {
+                                    var dataset = data.datasets[tooltipItem.datasetIndex];
+                                    var currentValue = dataset.formattedData[tooltipItem.index];
+                                    return currentValue;
+                                }
+                            }
+                        }
+                    }
                 });
             </script>            
         </div>

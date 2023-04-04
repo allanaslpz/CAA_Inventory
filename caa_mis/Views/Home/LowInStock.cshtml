@@ -4,10 +4,10 @@
     ViewBag.Title = "LowInStock";
 }
 
-<h4>Low In Stock Items</h4>
+<h1>Low In Stock Items</h1>
 <br />
 <p>
-    @Html.ActionLink("Download Report", "DownloadLowInStock", new { branch = ViewBag.CurrentBranchID }, new { @class = "btn btn-info float-end" })
+    @Html.ActionLink("Download Low In Stock Report", "DownloadLowInStock", new { branch = ViewBag.CurrentBranchID }, new { @class = "btn btn-info float-end" })
 </p>
 
 @using (Html.BeginForm())

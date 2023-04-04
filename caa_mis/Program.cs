@@ -42,6 +42,7 @@ builder.Services.Configure<IdentityOptions>(options =>
     options.User.AllowedUserNameCharacters =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     options.User.RequireUniqueEmail = true;
+
 });
 
 builder.Services.ConfigureApplicationCookie(options =>
@@ -89,5 +90,16 @@ app.MapRazorPages();
 // Reference Seed Data //
 CAAInitializer.Seed(app);
 ApplicationDbInitializer.Seed(app);
+
+// Redirect to login page
+app.Use(async (context, next) =>
+{
+    if (!context.User.Identity.IsAuthenticated && context.Request.Path != "/Identity/Account/Login")
+    {
+        context.Response.Redirect("/Identity/Account/Login");
+        return;
+    }
+    await next.Invoke();
+});
 
 app.Run();
