@@ -33,6 +33,9 @@ namespace caa_mis.Controllers
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
 
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             ViewDataReturnURL();
 
             if (!EventID.HasValue)
@@ -66,7 +69,7 @@ namespace caa_mis.Controllers
             if (ItemID.HasValue)
             {
                 item = item.Where(p => p.ItemID == ItemID);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             //Before we sort, see if we have called for a change of filtering or sorting
@@ -337,18 +340,21 @@ namespace caa_mis.Controllers
             string[] sortOptions = new[] { "EmployeeName", "BranchName", "TransactionStatusName", "EventName",
                                             "EventDate", "ItemName", "EventQuantity", "StockQuantity"};
 
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             IQueryable<EventSummaryVM> sumQ = _context.EventSummary;
 
             if (BranchID != null && BranchID.Length > 0)
             {
                 sumQ = sumQ.Where(s => BranchID.Contains(s.BranchID));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }            
 
             if (!String.IsNullOrEmpty(SearchString))
             {
                 sumQ = sumQ.Where(i => i.EmployeeName.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             ViewData["BranchID"] = BranchList(BranchID);            

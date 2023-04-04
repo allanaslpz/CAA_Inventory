@@ -52,7 +52,7 @@
 <form asp-action="Index" method="get">
     <div class="form-horizontal">
         <input type="hidden" name="TransactionID" value="@transaction.ID" />
-        <button class="btn btn-primary @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+        <button class="btn btn-toolbar @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
                 Filter/Search
             </button>
         <div class="collapse" id="collapseFilter">

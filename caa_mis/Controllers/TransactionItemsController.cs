@@ -35,6 +35,9 @@ namespace caa_mis.Controllers
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
 
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             ViewDataReturnURL();
 
             if (!TransactionID.HasValue)
@@ -44,7 +47,7 @@ namespace caa_mis.Controllers
             }
 
             //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-secondary";
+            ViewData["Filtering"] = "btn-danger";
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
@@ -76,7 +79,7 @@ namespace caa_mis.Controllers
             if (ItemID.HasValue)
             {
                 item = item.Where(p => p.ItemID == ItemID);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             //Before we sort, see if we have called for a change of filtering or sorting
@@ -542,23 +545,26 @@ namespace caa_mis.Controllers
             string[] sortOptions = new[] { "EmployeeName", "OriginName", "DestinationName", 
                                             "TransactionStatusName", "ItemName", "Quantity"};
 
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             IQueryable<TransactionItemSummaryVM> sumQ = _context.TransactionItemSummary;
 
             if (OriginID != null && OriginID.Length > 0)
             {
                 sumQ = sumQ.Where(s => OriginID.Contains(s.OriginID));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             if (DestinationID != null && DestinationID.Length > 0)
             {
                 sumQ = sumQ.Where(s => DestinationID.Contains(s.OriginID));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             if (!String.IsNullOrEmpty(SearchString))
             {
                 sumQ = sumQ.Where(i => i.EmployeeName.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             ViewData["OriginID"] = BranchList(OriginID);
@@ -736,7 +742,7 @@ namespace caa_mis.Controllers
             if (ItemID.HasValue)
             {
                 item = item.Where(p => p.ItemID == ItemID);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             //Before we sort, see if we have called for a change of filtering or sorting

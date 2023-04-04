@@ -78,7 +78,14 @@ namespace caa_mis.Data.CAAMigrations
                     ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
-                    Description = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true)
+                    Address1 = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Address2 = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
+                    City = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Province = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    PostalCode = table.Column<string>(type: "TEXT", maxLength: 6, nullable: false),
+                    Phone = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -40,11 +40,14 @@ namespace caa_mis.Controllers
             //Clear the sort/filter/paging URL Cookie for Controller
             CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
 
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             PopulateDropDownLists();
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost", "Total"};
+            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost", "Total Quantity"};
 
             //by default we want to show the active
 
@@ -52,7 +55,7 @@ namespace caa_mis.Controllers
                                     .Include(i => i.Category)
                                     .Include(i => i.ItemStatus)
                                     .Include(i => i.ItemThumbnail)
-                                    .Include(i => i.Manufacturer)
+                                    //.Include(i => i.Manufacturer)
                                     .Include(i => i.Stocks).ThenInclude(s => s.Branch)
                                     .AsNoTracking();
 
@@ -60,12 +63,12 @@ namespace caa_mis.Controllers
             if (CategoryID.HasValue)
             {
                 inventory = inventory.Where(p => p.CategoryID == CategoryID);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             if (ItemStatusID.HasValue)
             {
                 inventory = inventory.Where(p => p.ItemStatusID == ItemStatusID);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             else
             {
@@ -74,18 +77,18 @@ namespace caa_mis.Controllers
             if (ManufacturerID.HasValue)
             {
                 inventory = inventory.Where(p => p.ManufacturerID == ManufacturerID);
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             if (!String.IsNullOrEmpty(SearchString))
             {
                 inventory = inventory.Where(p => p.Name.ToUpper().Contains(SearchString.ToUpper())
                                        || p.Description.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
             if (!String.IsNullOrEmpty(SearchSKU))
             {
                 inventory = inventory.Where(p => p.SKUNumber.ToUpper().Contains(SearchSKU.ToUpper()));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             //Before we sort, see if we have called for a change of filtering or sorting
@@ -148,7 +151,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.Category.Name);
                 }
             }
-            else if (sortField == "Total")
+            else if (sortField == "Total Quantity")
             {
                 if (sortDirection == "asc")
                 {
@@ -417,18 +420,21 @@ namespace caa_mis.Controllers
             //NOTE: make sure this array has matching values to the column headings
             string[] sortOptions = new[] { "BranchName", "ItemName", "ItemCost", "Quantity", "MinLevel" };
 
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             IQueryable<StockSummaryByBranchVM> sumQ = _context.StockSummaryByBranch;
 
             if (BranchID != null && BranchID.Length > 0)
             {
                 sumQ = sumQ.Where(s => BranchID.Contains(s.BranchID));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             if (!String.IsNullOrEmpty(SearchString))
             {
                 sumQ = sumQ.Where(i => i.ItemName.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-secondary";
+                ViewData["Filtering"] = "btn-danger";
             }
 
             ViewData["BranchID"] = BranchList(BranchID);            

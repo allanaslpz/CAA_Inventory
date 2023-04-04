@@ -4,7 +4,7 @@
     ViewData["Title"] = "Details";
 }
 
-<h4>@Model.Name Details</h4>
+<h1>@Model.Name Details</h1>
 
 <div class="container">
     <div class="row">
@@ -58,7 +58,7 @@
                     @Html.DisplayFor(model => model.Description)
                 </dd>
                 <dt class = "col-sm-2">
-                    @Html.DisplayNameFor(model => model.Scale)
+                    Measurement
                 </dt>
                 <dd class = "col-sm-10">
                     @Html.DisplayFor(model => model.Scale)
@@ -67,13 +67,13 @@
                     Cost Per Item
                 </dt>
                 <dd class = "col-sm-10">
-                    @Html.DisplayFor(model => model.Cost)
+                    $@Html.DisplayFor(model => model.Cost)
                 </dd>
                 <dt class = "col-sm-2">
                     Vendor
                 </dt>
                 <dd class = "col-sm-10">
-                    @Html.DisplayFor(model => model.Manufacturer)
+                    @Html.DisplayFor(model => model.Manufacturer.Name)
                 </dd>
                 <dt class = "col-sm-2">
                     @Html.DisplayNameFor(model => model.ItemStatus)
