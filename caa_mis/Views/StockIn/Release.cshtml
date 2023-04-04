@@ -5,14 +5,14 @@
     IEnumerable<caa_mis.Models.TransactionItem> Items = (IEnumerable < caa_mis.Models.TransactionItem>)ViewBag.Items;//(caa_mis.Models.TransactionItem)ViewBag.Items;
 }
 
-<h1>Release</h1>
+<h4>Release</h4>
 
-<h3>Are you sure you want to release this transfer?</h3>
+<h3>Are you sure you want to release this  Stock In?</h3>
 <p>Releasing this record will deduct or add items to you inventory</p>
 <form asp-action="Release">
     <input type="hidden" asp-for="@Model.ID" />
     <input type="submit" value="Release" class="btn btn-primary" />
-    <a asp-action="Index" asp-controller="TransactionItems" asp-route-TransactionID="@Model.ID" class="btn btn-danger">Back to Details Page</a>
+    <a asp-action="Index" asp-controller="StockInItems" asp-route-TransactionID="@Model.ID" class="btn btn-danger">Back to Details Page</a>
 </form>
 <hr />
 @if (TempData.ContainsKey("ErrorMessage"))
@@ -35,12 +35,12 @@
             <dd class="col-md-8">
                 @Html.DisplayFor(model => model.Employee.FirstName)
             </dd>
-            <dt class="col-md-4">
+            @*<dt class="col-md-4">
                 @Html.DisplayNameFor(model => model.Origin)
             </dt>
             <dd class="col-md-8">
                 @Html.DisplayFor(model => model.Origin.Name)
-            </dd>
+            </dd>*@
 
             @*<dt class="col-md-4">
                 @Html.DisplayNameFor(model => model.ReceivedDate)
@@ -49,11 +49,12 @@
                 @Html.DisplayFor(model => model.ReceivedDate)
             </dd>*@
                 <dt class="col-md-4">
-                    @Html.DisplayNameFor(model => model.Shipment)
+                    @Html.DisplayNameFor(model => model.Destination)
                 </dt>
                 <dd class="col-md-8">
-                    @Html.DisplayFor(model => model.Shipment)
+                    @Html.DisplayFor(model => model.Destination.Name)
                 </dd>
+                
             
 
         </dl>
@@ -74,11 +75,11 @@
                 @Html.DisplayFor(model => model.TransactionStatus.Name)
             </dd>
             <dt class="col-md-4">
-                @Html.DisplayNameFor(model => model.Destination)
-            </dt>
-            <dd class="col-md-8">
-                @Html.DisplayFor(model => model.Destination.Name)
-            </dd>
+                    @Html.DisplayNameFor(model => model.Shipment)
+                </dt>
+                <dd class="col-md-8">
+                    @Html.DisplayFor(model => model.Shipment)
+                </dd>
             <dt class="col-md-4">
                 @Html.DisplayNameFor(model => model.Description)
             </dt>

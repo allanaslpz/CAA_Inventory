@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using Org.BouncyCastle.Utilities;
 using System.Collections;
 using Microsoft.AspNetCore.Authorization;
+using NuGet.Versioning;
 
 namespace caa_mis.Controllers
 {
@@ -46,7 +47,7 @@ namespace caa_mis.Controllers
 
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost", "Total"};
+            string[] sortOptions = new[] { "Name", "Category", "SKUNumber", "Cost", "Total Quantity"};
 
             //by default we want to show the active
 
@@ -150,7 +151,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.Category.Name);
                 }
             }
-            else if (sortField == "Total")
+            else if (sortField == "Total Quantity")
             {
                 if (sortDirection == "asc")
                 {
@@ -419,6 +420,9 @@ namespace caa_mis.Controllers
             //NOTE: make sure this array has matching values to the column headings
             string[] sortOptions = new[] { "BranchName", "ItemName", "ItemCost", "Quantity", "MinLevel" };
 
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             IQueryable<StockSummaryByBranchVM> sumQ = _context.StockSummaryByBranch;
 
             if (BranchID != null && BranchID.Length > 0)
@@ -433,9 +437,7 @@ namespace caa_mis.Controllers
                 ViewData["Filtering"] = "btn-danger";
             }
 
-            ViewData["BranchID"] = BranchList(BranchID);
-            // Save filtered data to cookie
-            CachingFilteredData(sumQ);
+            ViewData["BranchID"] = BranchList(BranchID);            
 
             //Before we sort, see if we have called for a change of filtering or sorting
             if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
@@ -525,19 +527,22 @@ namespace caa_mis.Controllers
             }
             else //Sorting by Name
             {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.ItemName)
-                        .ThenBy(p => p.Quantity);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.ItemName)
-                        .ThenByDescending(p => p.Quantity);
-                }
+                //if (sortDirection == "asc")
+                //{
+                //    sumQ = sumQ
+                //        .OrderBy(p => p.ItemName)
+                //        .ThenBy(p => p.Quantity);
+                //}
+                //else
+                //{
+                //    sumQ = sumQ
+                //        .OrderByDescending(p => p.ItemName)
+                //        .ThenByDescending(p => p.Quantity);
+                //}
             }
+
+            // Save filtered data to cookie
+            CachingFilteredData(sumQ);
 
             //Set sort for next time
             ViewData["sortField"] = sortField;
@@ -549,6 +554,40 @@ namespace caa_mis.Controllers
             ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
             var pagedData = await PaginatedList<StockSummaryByBranchVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
             return View(pagedData);
+        }
+
+        public IActionResult GenerateBarcode()
+        {
+            return View();
+        }
+        [HttpPost, ActionName("PrintBarcode")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PrintBarcode(string Products, string actionButton)
+        {
+            var toPrint = await _context.Items.ToListAsync();
+
+            if (actionButton == "Generate Filtered")
+            {
+               
+                List<string> pr = Products.Split(',').ToList();
+                pr = pr.Select(t => t.Trim()).ToList();
+                pr.Remove(" ");
+                try
+                {
+                    var filteredOrders = from order in _context.Items
+                                         where pr.Contains(order.SKUNumber)
+                                         select order;
+                    return View(filteredOrders);
+                }
+                catch
+                {
+                    TempData["ErrorMessage"] = "Invalid Format Submitted. SKU must be separated with comma ex. CAA1234, CAA2345, CAA3245";
+                    return View();
+                }
+            }
+           
+            
+            return View(toPrint);
         }
         private SelectList CategorySelectList(int? selectedId)
         {

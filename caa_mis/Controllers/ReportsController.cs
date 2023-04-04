@@ -8,6 +8,9 @@ namespace caa_mis.Controllers
     {
         public IActionResult Index()
         {
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
             return View();
         }
 

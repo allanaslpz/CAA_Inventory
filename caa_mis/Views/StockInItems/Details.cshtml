@@ -1,14 +1,13 @@
 ﻿@model caa_mis.Models.TransactionItem
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Details";
 }
 
-<h1>Delete</h1>
+<h1>Details</h1>
 
-<h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>Transfer Item</h4>
+    <h4> Stock In</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -30,10 +29,8 @@
             @Html.DisplayFor(model => model.Quantity)
         </dd>
     </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="ID" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a href='@ViewData["returnURL"]'>Back to Transaction</a>
-    </form>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.ID">Edit</a> |
+    <a asp-action="Index">Back to List</a>
 </div>
