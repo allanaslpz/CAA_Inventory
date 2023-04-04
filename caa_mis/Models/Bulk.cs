@@ -8,7 +8,7 @@ namespace caa_mis.Models
 
         [Required]
         public int EmployeeID { get; set; }
-        public EmployeeMetaData Employee { get; set; }
+        public Employee Employee { get; set; }
 
         [Required]
         public int TransactionStatusID { get; set; }

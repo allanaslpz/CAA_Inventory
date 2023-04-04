@@ -92,17 +92,17 @@ namespace caa_mis.Data
                 .WithOne(t => t.TransactionType)
                 .HasForeignKey(t => t.TransactionTypeID);
 
-            modelBuilder.Entity<EmployeeMetaData>()
+            modelBuilder.Entity<Employee>()
                 .HasMany<Bulk>(e => e.Bulks)
                 .WithOne(b => b.Employee)
                 .HasForeignKey(b => b.EmployeeID);
 
-            modelBuilder.Entity<EmployeeMetaData>()
+            modelBuilder.Entity<Employee>()
                 .HasMany<Event>(e => e.Events)
                 .WithOne(b => b.Employee)
                 .HasForeignKey(b => b.EmployeeID);
 
-            modelBuilder.Entity<EmployeeMetaData>()
+            modelBuilder.Entity<Employee>()
                 .HasMany<Transaction>(e => e.Transactions)
                 .WithOne(t => t.Employee)
                 .HasForeignKey(t => t.EmployeeID);

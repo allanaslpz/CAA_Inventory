@@ -4,7 +4,17 @@
 @*For Cookies*@
 @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 
-<ul class="navbar-nav">
+
+<style>
+    .highlighted-div {        
+        border: 2px solid #f5c6cb;
+        font-size: 1.1em;
+        padding: 10px;
+        border-radius: 5px;
+    }
+</style>
+<div class="highlighted-div">
+    <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
         var userName = HttpContextAccessor.HttpContext.Request.Cookies["userName"] ?? UserManager.GetUserName(User);
@@ -17,7 +27,7 @@
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" asp-area="" asp-controller="EmployeeAccount" asp-action="Details">Manage Account</a></li>
                 <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-                    <button type="submit" class="nav-link btn btn-link text-bg-warning align-content-center text-dark">Logout</button>
+                    <button type="submit" class=" btn text-dark">Logout</button>
                 </form>
             </ul>
         </li>
@@ -29,3 +39,4 @@
         </li>
     }
 </ul>
+</div>
