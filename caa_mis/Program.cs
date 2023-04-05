@@ -72,7 +72,9 @@ builder.Services.AddTransient<IMyEmailSender, MyEmailSender>();
 builder.Services.AddControllersWithViews();
 
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
- 
+
+builder.Services.AddMemoryCache();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
