@@ -537,13 +537,13 @@ namespace caa_mis.Controllers
             return Json(result);
         }
 
-            public async Task<IActionResult> TransactionItemSummary(int? page, int? pageSizeID, int[] OriginID, int[] DestinationID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "OriginName")
+        public async Task<IActionResult> TransactionItemSummary(int? page, int? pageSizeID, int[] OriginID, int[] DestinationID, string sortDirectionCheck,
+                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "Origin")
         {
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "EmployeeName", "OriginName", "DestinationName", 
-                                            "TransactionStatusName", "ItemName", "Quantity"};
+            string[] sortOptions = new[] { "Employee", "Origin", "Destination",
+                                            "Transfer Status", "Product", "Quantity"};
 
             //Change colour of the button when filtering by setting this default
             ViewData["Filtering"] = "btn-outline-primary";
@@ -569,8 +569,7 @@ namespace caa_mis.Controllers
 
             ViewData["OriginID"] = BranchList(OriginID);
             ViewData["DestinationID"] = BranchList(DestinationID);
-            // Save filtered data to cookie
-            CachingFilteredData(sumQ);
+            
 
             //Before we sort, see if we have called for a change of filtering or sorting
             if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
@@ -593,7 +592,7 @@ namespace caa_mis.Controllers
             }
 
             //Now we know which field and direction to sort by
-            if (sortField == "EmployeeName")
+            if (sortField == "Employee")
             {
                 if (sortDirection == "asc")
                 {
@@ -606,7 +605,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.EmployeeName);
                 }
             }
-            else if (sortField == "OriginName")
+            else if (sortField == "Origin")
             {
                 if (sortDirection == "asc")
                 {
@@ -619,7 +618,7 @@ namespace caa_mis.Controllers
                         .OrderBy(p => p.OriginName);
                 }
             }
-            else if (sortField == "DestinationName")
+            else if (sortField == "Destination")
             {
                 if (sortDirection == "asc")
                 {
@@ -632,7 +631,7 @@ namespace caa_mis.Controllers
                         .OrderBy(p => p.DestinationName);
                 }
             }
-            else if (sortField == "TransactionStatusName")
+            else if (sortField == "Transfer Status")
             {
                 if (sortDirection == "asc")
                 {
@@ -645,7 +644,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.TransactionStatusName);
                 }
             }
-            else if (sortField == "ItemName")
+            else if (sortField == "Product")
             {
                 if (sortDirection == "asc")
                 {
@@ -692,6 +691,9 @@ namespace caa_mis.Controllers
             ViewData["sortDirection"] = sortDirection;
             //SelectList for Sorting Options
             //ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
+            
+            // Save filtered data to cookie
+            CachingFilteredData(sumQ);
 
             int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "TransactionItemSummary");
             ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);

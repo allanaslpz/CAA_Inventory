@@ -13,6 +13,8 @@ using Newtonsoft.Json;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.Drawing;
+using Microsoft.Extensions.Caching.Memory;
+using Org.BouncyCastle.Utilities;
 
 namespace caa_mis.Controllers
 {
@@ -20,10 +22,11 @@ namespace caa_mis.Controllers
     public class EventItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
-
-        public EventItemsController(InventoryContext context)
+        private readonly IMemoryCache _cache;
+        public EventItemsController(InventoryContext context, IMemoryCache memoryCache)
         {
             _context = context;
+            _cache = memoryCache;
         }
 
         // GET: EventItems
@@ -333,16 +336,18 @@ namespace caa_mis.Controllers
         }
 
         public async Task<IActionResult> EventSummary(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "BranchName")
+                                            string sortFieldID, string SearchString, string actionButton,
+                                            string sortDirection = "asc", string sortField = "Branch",
+                                            DateTime? eventStartDate = null, DateTime? eventEndDate = null)
         {
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "EmployeeName", "BranchName", "TransactionStatusName", "EventName",
-                                            "EventDate", "ItemName", "EventQuantity", "StockQuantity"};
+            string[] sortOptions = new[] { "Employee", "Branch", "Transfer Status", "Event",
+                                            "Event Date", "Product", "Quantity"};
 
             //Change colour of the button when filtering by setting this default
             ViewData["Filtering"] = "btn-outline-primary";
-
+            
             IQueryable<EventSummaryVM> sumQ = _context.EventSummary;
 
             if (BranchID != null && BranchID.Length > 0)
@@ -354,6 +359,17 @@ namespace caa_mis.Controllers
             if (!String.IsNullOrEmpty(SearchString))
             {
                 sumQ = sumQ.Where(i => i.EmployeeName.ToUpper().Contains(SearchString.ToUpper()));
+                ViewData["Filtering"] = "btn-danger";
+            }
+            if (eventStartDate != null)
+            {
+                sumQ = sumQ.Where(e => e.EventDate >= eventStartDate.Value);
+                ViewData["Filtering"] = "btn-danger";
+            }
+
+            if (eventEndDate != null)
+            {
+                sumQ = sumQ.Where(e => e.EventDate <= eventEndDate.Value);
                 ViewData["Filtering"] = "btn-danger";
             }
 
@@ -380,7 +396,7 @@ namespace caa_mis.Controllers
             }
 
             //Now we know which field and direction to sort by
-            if (sortField == "EmployeeName")
+            if (sortField == "Employee")
             {
                 if (sortDirection == "asc")
                 {
@@ -393,7 +409,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.EmployeeName);
                 }
             }
-            else if (sortField == "BranchName")
+            else if (sortField == "Branch")
             {
                 if (sortDirection == "asc")
                 {
@@ -407,7 +423,7 @@ namespace caa_mis.Controllers
                 }
             }
             
-            else if (sortField == "TransactionStatusName")
+            else if (sortField == "Transfer Status")
             {
                 if (sortDirection == "asc")
                 {
@@ -420,7 +436,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.TransactionStatusName);
                 }
             }
-            else if (sortField == "EventName")
+            else if (sortField == "Event")
             {
                 if (sortDirection == "asc")
                 {
@@ -433,7 +449,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.EventName);
                 }
             }
-            else if (sortField == "EventDate")
+            else if (sortField == "Event Date")
             {
                 if (sortDirection == "asc")
                 {
@@ -446,7 +462,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.EventDate);
                 }
             }
-            else if (sortField == "ItemName")
+            else if (sortField == "Product")
             {
                 if (sortDirection == "asc")
                 {
@@ -459,7 +475,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.ItemName);
                 }
             }
-            else if (sortField == "EventQuantity")
+            else if (sortField == "Quantity")
             {
                 if (sortDirection == "asc")
                 {
@@ -487,13 +503,17 @@ namespace caa_mis.Controllers
                         .ThenByDescending(p => p.EventDate);
                 }
             }
-
-            // Save filtered data to cookie
-            CachingFilteredData(sumQ);
+            
+            var toListSumQ = sumQ.ToList();
+            _cache.Set("cachedData", toListSumQ, TimeSpan.FromMinutes(10));
 
             //Set sort for next time
             ViewData["sortField"] = sortField;
             ViewData["sortDirection"] = sortDirection;
+
+            // Set the ViewData variables
+            ViewData["eventStartDate"] = eventStartDate;
+            ViewData["eventEndDate"] = eventEndDate;
 
             int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "EventSummary");
             ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
@@ -502,9 +522,14 @@ namespace caa_mis.Controllers
         }
         public IActionResult DownloadEventItems()
         {
-            //retrieving filtered data from cookie
-            var items = JsonConvert.DeserializeObject<IEnumerable<EventSummaryVM>>(
-            Request.Cookies["filteredData"]);
+            var items = _cache.Get<IEnumerable<EventSummaryVM>>("cachedData");            
+
+            if (items == null)
+            {
+                // If data is not in cache, retrieve it from the database and add it to the cache
+                items = _context.EventSummary.AsNoTracking()
+                .ToList();
+            }
 
             int numRows = items.Count();
 
