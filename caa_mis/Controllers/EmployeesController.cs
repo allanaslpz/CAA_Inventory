@@ -84,15 +84,37 @@ namespace caa_mis.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    _context.Add(employee);
-                    await _context.SaveChangesAsync();
+                    // Set default password for new employees
+                    string defaultPassword = "Pa55w@rd";
 
-                    InsertIdentityUser(employee.Email, selectedRoles);
+                    // Create a new IdentityUser instance with the employee's email and default password
+                    var user = new IdentityUser
+                    {
+                        UserName = employee.Email,
+                        Email = employee.Email
+                    };
+                    var result = await _userManager.CreateAsync(user, defaultPassword);
+                    if (result.Succeeded)
+                    {
+                        // Add the employee to the Employees DbSet
+                        _context.Add(employee);
+                        await _context.SaveChangesAsync();
 
-                    //Send Email to new Employee - commented out till email configured
-                    //await InviteUserToResetPassword(employee, null);
+                        // Assign roles to the user
+                        await _userManager.AddToRolesAsync(user, selectedRoles);
 
-                    return RedirectToAction(nameof(Index));
+                        //Send Email to new Employee - commented out till email configured
+                        //await InviteUserToResetPassword(employee, null);
+
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
+                    }
                 }
             }
             catch (DbUpdateException dex)
