@@ -7,17 +7,19 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<p>
+<p class="d-inline">
     <a asp-action="Create" class="btn btn-primary float-left">Create New Product</a>
-    <button class="btn btn-toolbar @(ViewData["Filtering"]) float-end" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
-        Filter/Search
-    </button>
-    @*<a asp-action="DownloadItems" class="btn btn-info float-end">Download Product</a>  *@
-    <a asp-action="DownloadItems" id="download-report-button" class="btn btn-info float-end">Download Product</a>
-    <div id="report-loading-indicator" class="progress float-end" style="display:none;">
-        <div class="progress-label">Downloading report...</div>
-        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 70%"></div>
-    </div>
+<p class="d-inline float-end">
+    <button class="btn btn-toolbar @(ViewData["Filtering"]) d-inline" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
+            Filter/Search
+        </button>
+   
+        <a asp-action="DownloadItems" id="download-report-button" class="btn btn-info ml-1">Download Product</a>
+        <div id="report-loading-indicator" class="progress" style="display:none;">
+            <div class="progress-label">Downloading report...</div>
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 70%"></div>
+        </div>
+    </p>
 </p>
 
 <form asp-action="Index" method="get">
@@ -119,9 +121,12 @@
                             </figcaption>
                         </figure>
                         <div class="card-footer">
-                            <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                            <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                            <a asp-action="Delete" asp-route-id="@item.ID">Discontinue</a>
+                            <a asp-action="Edit" asp-route-id="@item.ID">[ Edit ]</a> 
+                            <a asp-action="Details" asp-route-id="@item.ID">[ Details ]</a> 
+                            @if (item.ItemStatusID == 1)
+                            {
+                                <a asp-action="Delete" asp-route-id="@item.ID">[ Discontinue ]</a>
+                            }
                         </div>
                     </div>
                 </div>
@@ -250,10 +255,12 @@
                             </td>
                             <td>
                                 
-                                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                                <a asp-action="Delete" asp-route-id="@item.ID">Discontinue</a> 
-                                
+                                <a asp-action="Edit" asp-route-id="@item.ID">[ Edit ]</a> 
+                                <a asp-action="Details" asp-route-id="@item.ID">[ Details ]</a>
+                                @if (item.ItemStatusID == 1)
+                                {
+                                    <a asp-action="Delete" asp-route-id="@item.ID">[ Discontinue ]</a>
+                                }
                             </td>
                         </tr>
                     }

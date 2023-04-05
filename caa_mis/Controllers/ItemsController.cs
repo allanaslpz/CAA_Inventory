@@ -21,6 +21,7 @@ using Org.BouncyCastle.Utilities;
 using System.Collections;
 using Microsoft.AspNetCore.Authorization;
 using NuGet.Versioning;
+using System.Drawing.Printing;
 
 namespace caa_mis.Controllers
 {
@@ -381,6 +382,8 @@ namespace caa_mis.Controllers
                 .Include(i => i.ItemStatus)
                 .Include(i => i.Manufacturer)
                 .FirstOrDefaultAsync(m => m.ID == id);
+
+             
             if (item == null)
             {
                 return NotFound();
@@ -400,8 +403,19 @@ namespace caa_mis.Controllers
             }
             var item = await _context.Items
                 .Include(i => i.ItemPhoto)
+                .Include(i => i.Category)
+                .Include(i => i.ItemStatus)
+                .Include(i => i.Manufacturer)
                 .FirstOrDefaultAsync(i => i.ID == id);
+
+            var quantity = _context.Stocks.Where(s => s.ItemID == item.ID).Sum(s => s.Quantity);
             
+            if (quantity > 0)
+            {
+                TempData["ErrorMessage"] = "You are not permitted to take action. It is not possible to discontinue a product that you presently possess inventory of.";
+                return View(item);
+            }
+
             item.ItemStatusID = 2; //Set the status to "Discontinued";
             
             if (item != null)
@@ -560,6 +574,14 @@ namespace caa_mis.Controllers
         {
             return View();
         }
+
+        public IActionResult Print(string sku, string name)
+        {
+            ViewData["sku"] = sku;
+            ViewData["name"] = name;
+            return View();
+        }
+
         [HttpPost, ActionName("PrintBarcode")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PrintBarcode(string Products, string actionButton)

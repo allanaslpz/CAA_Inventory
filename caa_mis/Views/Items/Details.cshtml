@@ -30,6 +30,9 @@
                     jsbarcode-fontoptions="bold">
                 </svg>
             </div>
+            <div>
+                <a asp-action="Print" asp-route-sku="@Model.SKUNumber" asp-route-name="@Model.Name" class="btn btn-primary">Print</a>
+            </div>
         </div>
         <div class="col-md-6">
             <dl >
