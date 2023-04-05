@@ -4,7 +4,7 @@
     ViewData["Title"] = "Account";
 }
 
-<h2>Account for: @Model.FullName</h2>
+<h1>Account for: @Model.FullName</h1>
 
 
 <div>
@@ -32,12 +32,12 @@
         <dd class="col-sm-6">
             @Html.DisplayFor(model => model.PhoneNumber)
         </dd>
-        <dt class="col-sm-4">
+       @* <dt class="col-sm-4">
             @Html.DisplayNameFor(model => model.NumberOfPushSubscriptions)
         </dt>
         <dd class="col-sm-6">
             @Html.DisplayFor(model => model.NumberOfPushSubscriptions)
-        </dd>
+        </dd>*@
     </dl>
 </div>
 <div>
