@@ -414,11 +414,11 @@ namespace caa_mis.Controllers
         }
         
         public async Task<IActionResult> StockSummaryByBranch(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "BranchName")
+                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "Branch")
         {
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "BranchName", "ItemName", "ItemCost", "Quantity", "MinLevel" };
+            string[] sortOptions = new[] { "Branch", "Product", "Cost", "Quantity", "Min Level" };
 
             //Change colour of the button when filtering by setting this default
             ViewData["Filtering"] = "btn-outline-primary";
@@ -460,7 +460,7 @@ namespace caa_mis.Controllers
             }
 
             //Now we know which field and direction to sort by
-            if (sortField == "BranchName")
+            if (sortField == "Branch")
             {
                 if (sortDirection == "asc")
                 {
@@ -473,7 +473,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.BranchName);
                 }
             }
-            else if (sortField == "ItemName")
+            else if (sortField == "Product")
             {
                 if (sortDirection == "asc")
                 {
@@ -486,7 +486,7 @@ namespace caa_mis.Controllers
                         .OrderBy(p => p.ItemName);
                 }
             }
-            else if (sortField == "ItemCost")
+            else if (sortField == "Cost")
             {
                 if (sortDirection == "asc")
                 {
@@ -512,7 +512,7 @@ namespace caa_mis.Controllers
                         .OrderByDescending(p => p.Quantity);
                 }
             }
-            else if (sortField == "MinLevel")
+            else if (sortField == "Min Level")
             {
                 if (sortDirection == "asc")
                 {
@@ -527,18 +527,18 @@ namespace caa_mis.Controllers
             }
             else //Sorting by Name
             {
-                //if (sortDirection == "asc")
-                //{
-                //    sumQ = sumQ
-                //        .OrderBy(p => p.ItemName)
-                //        .ThenBy(p => p.Quantity);
-                //}
-                //else
-                //{
-                //    sumQ = sumQ
-                //        .OrderByDescending(p => p.ItemName)
-                //        .ThenByDescending(p => p.Quantity);
-                //}
+                if (sortDirection == "asc")
+                {
+                    sumQ = sumQ
+                        .OrderBy(p => p.ItemName)
+                        .ThenBy(p => p.Quantity);
+                }
+                else
+                {
+                    sumQ = sumQ
+                        .OrderByDescending(p => p.ItemName)
+                        .ThenByDescending(p => p.Quantity);
+                }
             }
 
             // Save filtered data to cookie
