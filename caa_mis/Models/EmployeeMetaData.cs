@@ -5,7 +5,7 @@ using System.Security.AccessControl;
 
 namespace caa_mis.Models
 {
-    public class Employee
+    public class EmployeeMetaData
     {
         public int ID { get; set; }
 

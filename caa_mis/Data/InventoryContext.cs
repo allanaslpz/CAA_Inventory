@@ -31,10 +31,11 @@ namespace caa_mis.Data
         public DbSet<Manufacturer> Manufacturers { get; set; }
         public DbSet<ItemPhoto> ItemPhotos { get; set; }
         public DbSet<ItemThumbnail> ItemThumbnails { get; set; }        
-        public DbSet<Employee> Employees { get; set; }
         public DbSet<StockSummaryByBranchVM> StockSummaryByBranch { get; set; }
         public DbSet<EventSummaryVM> EventSummary { get; set; }
         public DbSet<TransactionItemSummaryVM> TransactionItemSummary { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Subscription> Subscriptions { get; set; }
 
         public DbSet<ProductListVM> ProductList { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -50,6 +51,11 @@ namespace caa_mis.Data
                 .Entity<StockSummaryByBranchVM>()
                 .ToView(nameof(StockSummaryByBranch))
                 .HasKey(a => a.ID);
+
+            //Add a unique index to the Employee Email
+            modelBuilder.Entity<Employee>()
+            .HasIndex(a => new { a.Email })
+            .IsUnique();
 
             modelBuilder
                 .Entity<EventSummaryVM>()
@@ -86,17 +92,17 @@ namespace caa_mis.Data
                 .WithOne(t => t.TransactionType)
                 .HasForeignKey(t => t.TransactionTypeID);
 
-            modelBuilder.Entity<Employee>()
+            modelBuilder.Entity<EmployeeMetaData>()
                 .HasMany<Bulk>(e => e.Bulks)
                 .WithOne(b => b.Employee)
                 .HasForeignKey(b => b.EmployeeID);
 
-            modelBuilder.Entity<Employee>()
+            modelBuilder.Entity<EmployeeMetaData>()
                 .HasMany<Event>(e => e.Events)
                 .WithOne(b => b.Employee)
                 .HasForeignKey(b => b.EmployeeID);
 
-            modelBuilder.Entity<Employee>()
+            modelBuilder.Entity<EmployeeMetaData>()
                 .HasMany<Transaction>(e => e.Transactions)
                 .WithOne(t => t.Employee)
                 .HasForeignKey(t => t.EmployeeID);
