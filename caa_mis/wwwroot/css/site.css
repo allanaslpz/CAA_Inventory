@@ -155,3 +155,7 @@ main {
 * html .ui-autocomplete {
     height: 200px;
 }
+
+.ml-1 {
+    margin-left: 2px !important;
+}

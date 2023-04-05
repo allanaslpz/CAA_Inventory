@@ -10,7 +10,9 @@
     {
         <span class="text-danger">@TempData["ErrorMessage"]</span>
     }
-    <p><a asp-action="GenerateBarcode" class="btn btn-secondary float-end">Return to Barcode Filters</a></p>
+    <p class="float-end"><a asp-action="GenerateBarcode" class="btn btn-secondary ">Return to Barcode Filters</a>
+        <button onclick="window.print()" class="btn btn-secondary">Print</button>
+    </p>
     @foreach (var item in Model)
 {
    
