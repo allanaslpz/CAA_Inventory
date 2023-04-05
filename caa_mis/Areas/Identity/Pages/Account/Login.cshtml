@@ -5,6 +5,11 @@
     ViewData["Title"] = "Log in";
 }
 
+
+
+<div class="background-container">
+    <img src="/images/CAAlogin.jpg" alt="Background" class="background-image" />
+</div>
 <div class="main-container">
     <div class="login-form mt-4 text-center">
         <h1 class="text-center text-3xl">@ViewData["Title"]</h1>
@@ -21,6 +26,7 @@
                     <input asp-for="Input.Password" id="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Password">
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             </div>
             <div class="flex items-center justify-between">
                 <div class="flex items-center">
@@ -46,28 +52,62 @@
 
 @section Styles {
     <style>
-        html, body {
+
+        .background-container {
+            position: fixed;
+            top: 200px;
+            left: 75px;
+            width: 100%;
             height: 100%;
-            margin: 0;
-            background-image: url('/images/CAAlogin.jpg');
-            background-size: cover;
-            background-position: center;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .background-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            max-width: 1000px; /* set the maximum width of the image */
+            max-height: 526px; /* set the maximum height of the image */
         }
 
         .main-container {
-            min-height: 100vh;
+            position: absolute;
+            right: 75px;
             display: flex;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+            width: 50%; /* Adjust this value as needed */
         }
 
         .login-form {
             background-color: rgba(255, 255, 255, 0.7);
             padding: 1rem;
             border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 500px; /* Set a max-width to avoid it from expanding too much on larger screens */
             margin: auto;
         }
+
+            .login-form h2 {
+                text-align: center;
+                margin-bottom: 1rem;
+                font-weight: bold;
+            }
+
+        .form-group.row {
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .text-danger {
+            color: red;
+        }
+
+
     </style>
 }
+
