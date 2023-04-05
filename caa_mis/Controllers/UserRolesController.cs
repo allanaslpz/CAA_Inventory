@@ -30,7 +30,7 @@ namespace caa_mis.Controllers
                                select new UserVM
                                {
                                    Id = u.Id,
-                                   UserName = u.UserName                                   
+                                   UserName = u.UserName
                                }).ToListAsync();
             foreach (var u in users)
             {

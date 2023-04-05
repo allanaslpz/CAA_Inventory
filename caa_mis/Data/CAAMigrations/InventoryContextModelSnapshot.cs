@@ -133,6 +133,17 @@ namespace caa_mis.Data.CAAMigrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("Active")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BranchRoles")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -143,10 +154,14 @@ namespace caa_mis.Data.CAAMigrations
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Phone")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.ToTable("Employees");
                 });
@@ -430,6 +445,34 @@ namespace caa_mis.Data.CAAMigrations
                     b.HasIndex("ItemID");
 
                     b.ToTable("Stocks");
+                });
+
+            modelBuilder.Entity("caa_mis.Models.Subscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("EmployeeID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PushAuth")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PushEndpoint")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PushP256DH")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeID");
+
+                    b.ToTable("Subscriptions");
                 });
 
             modelBuilder.Entity("caa_mis.Models.Supplier", b =>
@@ -936,6 +979,17 @@ namespace caa_mis.Data.CAAMigrations
                     b.Navigation("Item");
                 });
 
+            modelBuilder.Entity("caa_mis.Models.Subscription", b =>
+                {
+                    b.HasOne("caa_mis.Models.Employee", "Employee")
+                        .WithMany("Subscriptions")
+                        .HasForeignKey("EmployeeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("caa_mis.Models.Transaction", b =>
                 {
                     b.HasOne("caa_mis.Models.Branch", "Destination")
@@ -1030,6 +1084,8 @@ namespace caa_mis.Data.CAAMigrations
                     b.Navigation("Bulks");
 
                     b.Navigation("Events");
+
+                    b.Navigation("Subscriptions");
 
                     b.Navigation("Transactions");
                 });

@@ -5,7 +5,7 @@ using System.Security.AccessControl;
 
 namespace caa_mis.Models
 {
-    public class Employee
+    public class EmployeeMetaData
     {
         public int ID { get; set; }
 
@@ -56,7 +56,7 @@ namespace caa_mis.Models
         [DataType(DataType.PhoneNumber)]
         [StringLength(10)]
         public string Phone { get; set; }
-
+        
         [Display(Name = "Branch")]
         public BranchRoles BranchRoles { get; set; } = BranchRoles.None;//Not needed
 

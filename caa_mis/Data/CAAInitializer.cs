@@ -293,30 +293,35 @@ namespace caa_mis.Data
                     {
                         FirstName = "Edmund Kevin",
                         LastName = "Rone",
+                        Email = "admin@outlook.com"
                     },
                     new Employee
                     {
                         FirstName = "Allan Antonio",
                         LastName = "Lopez",
+                        Email = "super@outlook.com"
                     },
                     new Employee
                     {
                         FirstName = "Michael Laurence",
                         LastName = "Barde",
+                        Email = "user@outlook.com"
                     },
                     new Employee
                     {
                         FirstName = "Luisito Jr",
                         LastName = "Villaflor",
+                        Email = "lui@outlook.com"
                     },
                     new Employee
                     {
                         FirstName = "Tsogt",
                         LastName = "Batjargal",
+                        Email = "tsogo@outlook.com"
                     });
                     context.SaveChanges();
                 }
-                // Employees Seed Data //
+                // Branch Seed Data //
                 if (!context.Branches.Any())
                 {
                     context.Branches.AddRange(
