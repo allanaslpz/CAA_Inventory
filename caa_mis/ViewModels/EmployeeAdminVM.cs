@@ -18,5 +18,7 @@ namespace caa_mis.ViewModels
 
         [Display(Name = "Roles")]
         public List<string> UserRoles { get; set; } = new List<string>();
+
+        
     }
 }
