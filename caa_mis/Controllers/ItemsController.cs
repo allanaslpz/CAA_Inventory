@@ -21,6 +21,7 @@ using Org.BouncyCastle.Utilities;
 using System.Collections;
 using Microsoft.AspNetCore.Authorization;
 using NuGet.Versioning;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace caa_mis.Controllers
 {
@@ -28,9 +29,11 @@ namespace caa_mis.Controllers
     public class ItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
-        public ItemsController(InventoryContext context)
+        private readonly IMemoryCache _cache;
+        public ItemsController(InventoryContext context, IMemoryCache memoryCache)
         {
             _context = context;
+            _cache = memoryCache;
         }
 
         // GET: Items
@@ -187,7 +190,9 @@ namespace caa_mis.Controllers
             ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
 
             // Save filtered data to cookie
-            CachingFilteredData(inventory);
+            //CachingFilteredData(inventory);
+            var toListInventory = inventory.ToList();
+            _cache.Set("cachedData", toListInventory, TimeSpan.FromMinutes(10));
 
             //Handle Paging
             int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "Items");
@@ -682,24 +687,37 @@ namespace caa_mis.Controllers
 
         public IActionResult DownloadItems()
         {
-            //retrieving filtered data from cookie
-            var filteredData = JsonConvert.DeserializeObject<IEnumerable<Item>>(
-            Request.Cookies["filteredData"]);
+            var cached = _cache.Get<IEnumerable<Item>>("cachedData");
 
-            var items = from a in filteredData
-                        orderby a.Name ascending
+            if (cached == null)
+            {
+                // If data is not in cache, retrieve it from the database and add it to the cache
+                cached = _context.Items
+                    .Include(i => i.Category)
+                    .Include(i => i.ItemStatus)
+                    .Include(i => i.ItemThumbnail)
+                    //.Include(i => i.Manufacturer)
+                    .Include(i => i.Stocks).ThenInclude(s => s.Branch)
+                    .AsNoTracking()
+                    .ToList();
+
+                _cache.Set("cachedData", cached, TimeSpan.FromMinutes(10));
+            }
+
+            var items = from a in cached                        
                         select new
                         {
                             a.ID,
-                            SKU_Number = a.SKUNumber,
+                            SKU = a.SKUNumber,
                             Item = a.Name,
                             a.Description,
                             a.CategoryID,
                             a.ItemStatusID,
                             a.Cost,
                         };
-            int numRows = items.Count();
 
+            int numRows = items.Count();
+                        
             if (numRows > 0)
             {
                 using ExcelPackage excel = new();
