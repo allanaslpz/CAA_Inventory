@@ -49,7 +49,10 @@ namespace caa_mis.Data.CAAMigrations
                         .Annotation("Sqlite:Autoincrement", true),
                     FirstName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false)
+                    Phone = table.Column<string>(type: "TEXT", maxLength: 10, nullable: true),
+                    BranchRoles = table.Column<int>(type: "INTEGER", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Active = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -142,6 +145,28 @@ namespace caa_mis.Data.CAAMigrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TransactionTypes", x => x.ID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Subscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    PushEndpoint = table.Column<string>(type: "TEXT", maxLength: 512, nullable: true),
+                    PushP256DH = table.Column<string>(type: "TEXT", maxLength: 512, nullable: true),
+                    PushAuth = table.Column<string>(type: "TEXT", maxLength: 512, nullable: true),
+                    EmployeeID = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Subscriptions_Employees_EmployeeID",
+                        column: x => x.EmployeeID,
+                        principalTable: "Employees",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -511,6 +536,12 @@ namespace caa_mis.Data.CAAMigrations
                 column: "TransactionStatusID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Employees_Email",
+                table: "Employees",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_EventItems_EventID",
                 table: "EventItems",
                 column: "EventID");
@@ -590,6 +621,11 @@ namespace caa_mis.Data.CAAMigrations
                 column: "ItemID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Subscriptions_EmployeeID",
+                table: "Subscriptions",
+                column: "EmployeeID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TransactionItems_ItemID",
                 table: "TransactionItems",
                 column: "ItemID");
@@ -628,7 +664,6 @@ namespace caa_mis.Data.CAAMigrations
                 name: "IX_Transactions_TransactionTypeID",
                 table: "Transactions",
                 column: "TransactionTypeID");
-
             ExtraMigration.Steps(migrationBuilder);
         }
 
@@ -648,6 +683,9 @@ namespace caa_mis.Data.CAAMigrations
 
             migrationBuilder.DropTable(
                 name: "ItemThumbnails");
+
+            migrationBuilder.DropTable(
+                name: "Subscriptions");
 
             migrationBuilder.DropTable(
                 name: "TransactionItems");
