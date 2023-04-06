@@ -15,6 +15,7 @@ using OfficeOpenXml.Style;
 using System.Drawing;
 using Microsoft.Extensions.Caching.Memory;
 using Org.BouncyCastle.Utilities;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace caa_mis.Controllers
 {
@@ -336,7 +337,7 @@ namespace caa_mis.Controllers
         }
 
         public async Task<IActionResult> EventSummary(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string actionButton,
+                                            string sortFieldID, string SearchString, string Products, string actionButton,
                                             string sortDirection = "asc", string sortField = "Branch",
                                             DateTime? eventStartDate = null, DateTime? eventEndDate = null)
         {
@@ -372,6 +373,71 @@ namespace caa_mis.Controllers
                 sumQ = sumQ.Where(e => e.EventDate <= eventEndDate.Value);
                 ViewData["Filtering"] = "btn-danger";
             }
+
+
+            if (!string.IsNullOrEmpty(Products))
+            {
+                sumQ = sumQ.Where(e => e.ItemName.Contains(Products));
+            }
+
+            //if (!string.IsNullOrEmpty(Products))
+            //{
+
+            //    List<string> pr = Products.Split(',').ToList();
+            //    pr = pr.Select(t => t.Trim()).ToList();
+            //    pr.Remove(" ");
+            //    try
+            //    {
+            //        var filteredItems = from item in _context.Items
+            //                             where pr.Contains(item.Name)
+            //                             select item.Name;
+
+            //        sumQ = sumQ.Where(e => filteredItems.Contains(e.ItemName));
+            //    }
+            //    catch
+            //    {
+            //        TempData["ErrorMessage"] = "Invalid Format Submitted. Product Name must be separated with comma ex. Table, Chair, Tent...";
+            //        return View();
+            //    }
+            //}
+
+            //if (!string.IsNullOrEmpty(Products))
+            //{
+            //    List<string> pr = Products.Split(',').Select(p => p.Trim()).ToList();
+
+            //    // Get the IDs of the items that match the product names
+            //    var itemIds = _context.Items
+            //        .Where(item => pr.Contains(item.Name))
+            //        .Select(item => item.ID)
+            //        .ToList();
+
+            //    // Filter the event summary based on the matching item IDs
+            //    sumQ = sumQ.Where(summary => itemIds.Contains(summary.ItemID));
+            //}
+
+            if (!string.IsNullOrEmpty(Products))
+            {
+                List<string> pr = Products.Split(',').Select(t => t.Trim()).ToList();
+                pr.Remove("");
+
+                var filteredItems = _context.Items
+                    .Where(item => pr.Contains(item.Name))
+                    .Select(item => item.Name);
+
+                foreach (var item in filteredItems)
+                {
+                    Console.WriteLine(item); // Check which items are being filtered
+                }
+
+                sumQ = sumQ.Where(summary => filteredItems.Contains(summary.ItemName));
+            }
+
+            if (!sumQ.Any())
+            {
+                Console.WriteLine("No records found"); // Check if there are any matching records
+            }
+
+
 
             ViewData["BranchID"] = BranchList(BranchID);            
 

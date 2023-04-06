@@ -32,6 +32,12 @@
                     <div class="form-group col-md-4">
                         <label class="control-label">Search Product:</label>
                         @Html.TextBox("SearchString", null, new { @class = "form-control p-2" })
+                        @*<input type="text" class="form-control p-2" name="productName" value="@ViewData["productName"]" placeholder="Product Name" />
+*@                      
+                        @Html.TextBox("Products", null, new { @name="Products", @id="Products", @class = "form-control p-2" })
+                        @*<input type="text" name="Products" value="@ViewData["productName"]" placeholder="Product Name" id="Products" class="col-10" />
+                        *@<input type="hidden" name="ProductIDs" id="ProductIDs" />
+
                         <label class="control-label">Event Date:(Start and End)</label>
                         <div class="input-group">
                             <input type="date" class="form-control me-md-4" name="eventStartDate" value="@ViewData["eventStartDate"]" placeholder="Start Date" />
@@ -103,3 +109,65 @@
     </table>
     <partial name="_PagingNavBar" />
 </form>
+@section Scripts {
+    <script type="text/javascript">
+        function split(val) {
+            return val.split(/,\s*/);
+        }
+        function extractLast(term) {
+            return split(term).pop();
+        }
+        jQuery("#clr").click(function () {
+            $("#Products").val("");
+        });
+        $('#Products')
+            .on("keydown", function (event) {
+                if (event.keyCode === $.ui.keyCode.TAB &&
+                    $(this).autocomplete("instance").menu.active) {
+                    event.preventDefault();
+                }
+            })
+            .autocomplete({
+                source: function (request, response) {
+
+                    $.ajax({
+                        url: '/TransactionItems/SearchProduct/',
+                        dataType: 'json',
+                        data: { BranchID: 1, term: extractLast(request.term) },
+                        success: function (data) {
+                            var result = $.map(data, function (item) {
+                                return {
+                                    label: item.name,
+                                    value: item.id
+                                };
+                            });
+                            return response(result);
+                        }
+                    });
+                },
+                focus: function () {
+                    // prevent value inserted on focus
+                    return false;
+                },
+                select: function (event, ui) {
+
+                    var terms = split(this.value);
+                    // remove the current input
+                    terms.pop();
+
+                    // add the selected item
+                    terms.push(ui.item.label);
+                    // add placeholder to get the comma-and-space at the end
+                    terms.push("");
+                    this.value = terms.join(", ");
+                    return false;
+
+                },
+                minLength: 0,
+            }).focus(function () {
+                // trigger the search when the input field receives focus
+                $(this).autocomplete("search", "");
+            });
+
+    </script>
+}
