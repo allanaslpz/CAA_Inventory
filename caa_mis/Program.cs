@@ -109,12 +109,21 @@ ApplicationDbInitializer.Seed(app);
 // Redirect to login page
 app.Use(async (context, next) =>
 {
-    if (!context.User.Identity.IsAuthenticated && context.Request.Path != "/Identity/Account/Login")
+    var allowedPaths = new List<string>
+    {
+        "/Identity/Account/Login",
+        "/Identity/Account/ForgotPassword",
+        "/Identity/Account/ForgotPasswordConfirmation", // Add this if you have a reset password page
+    };
+
+    if (!context.User.Identity.IsAuthenticated && !allowedPaths.Contains(context.Request.Path))
     {
         context.Response.Redirect("/Identity/Account/Login");
         return;
     }
     await next.Invoke();
 });
+
+
 
 app.Run();
