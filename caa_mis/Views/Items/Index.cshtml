@@ -205,11 +205,9 @@
                                             {
                                                 condList += c[i].Branch.Name + " <br />";
                                             }
-                                            <a class="" role="button" data-bs-toggle="collapse" href="#collapseHistory@(item.ID)"
-                                   aria-expanded="false" aria-controls="collapseHistory@(item.ID)">
-                                                @firstCond <span class="badge bg-info">@condCount</span>
-                                            </a>
-                                            <div class="collapse" id="collapseHistory@(item.ID)">
+                                            <div>
+                                                @firstCond
+                                                <br />
                                                 @Html.Raw(condList)
                                             </div>
                                         }
@@ -234,11 +232,9 @@
 											{
                                                 qList += c[i].Quantity + " <br />";
 											}
-											<a class="" role="button" data-bs-toggle="collapse" href="#collapseHistory@(item.ID)"
-								                aria-expanded="false" aria-controls="collapseHistory@(item.ID)">
-                                                @firstCond <span class="badge bg-info">@qCount</span>
-											</a>
-											<div class="collapse" id="collapseHistory@(item.ID)">
+											<div>
+                                                @firstCond
+                                                <br />
                                                 @Html.Raw(qList)
 											</div>
 										}
