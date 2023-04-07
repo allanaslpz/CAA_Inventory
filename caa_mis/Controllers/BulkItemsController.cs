@@ -9,11 +9,13 @@ using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.ViewModels;
 using caa_mis.Utilities;
-
+using DNTBreadCrumb.Core;
 
 namespace caa_mis.Controllers
 {
-    
+    [BreadCrumb(Title = "Inventory Reset", Order = 0, IgnoreAjaxRequests = true, Url = "Bulks")]
+    [BreadCrumb(Title = "Inventory Reset Details", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
+
     public class BulkItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -134,6 +136,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: BulkItems/Details/5
+        [BreadCrumb(Title = "Details", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Details(int? id)
         {
             ViewDataReturnURL();
@@ -156,6 +159,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: BulkItems/Create
+        [BreadCrumb(Title = "Create", Order = 1, IgnoreAjaxRequests = true)]
         public IActionResult Create()
         {
            
@@ -210,6 +214,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: BulkItems/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
             ViewDataReturnURL();
@@ -284,6 +289,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: BulkItems/Delete/5
+        [BreadCrumb(Title = "Delete", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Delete(int? id)
         {
             ViewDataReturnURL();

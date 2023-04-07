@@ -16,10 +16,13 @@ using System.Drawing;
 using Microsoft.Extensions.Caching.Memory;
 using Org.BouncyCastle.Utilities;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+using DNTBreadCrumb.Core;
+using System.Security.Policy;
 
 namespace caa_mis.Controllers
 {
-    
+    [BreadCrumb(Title = "Events", Order = 0, IgnoreAjaxRequests = true, Url = "Transactions")]
+    [BreadCrumb(Title = "Event Details", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class EventItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -225,6 +228,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: EventItems/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
             ViewDataReturnURL();
@@ -296,6 +300,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: EventItems/Delete/5
+        [BreadCrumb(Title = "Delete", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Delete(int? id)
         {
             ViewDataReturnURL();
@@ -336,276 +341,8 @@ namespace caa_mis.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> EventSummary(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
-                                            string sortFieldID, string Products, string actionButton,
-                                            string sortDirection = "asc", string sortField = "Branch",
-                                            DateTime? eventStartDate = null, DateTime? eventEndDate = null)
-        {
-            //List of sort options.
-            //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Employee", "Branch", "Transfer Status", "Event",
-                                            "Event Date", "Product", "Quantity"};
-
-            //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-primary";
-            
-            IQueryable<EventSummaryVM> sumQ = _context.EventSummary;
-
-            if (BranchID != null && BranchID.Length > 0)
-            {
-                sumQ = sumQ.Where(s => BranchID.Contains(s.BranchID));
-                ViewData["Filtering"] = "btn-danger";
-            }            
-
-            if (eventStartDate != null)
-            {
-                sumQ = sumQ.Where(e => e.EventDate >= eventStartDate.Value);
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-            if (eventEndDate != null)
-            {
-                sumQ = sumQ.Where(e => e.EventDate <= eventEndDate.Value);
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-            if (!string.IsNullOrEmpty(Products))
-            {
-                List<string> pr = Products.Split(',').Select(t => t.Trim()).ToList();
-                pr.Remove("");
-                try
-                {
-                    var filteredItems = _context.Items
-                    .Where(item => pr.Contains(item.Name))
-                    .Select(item => item.Name);
-                    sumQ = sumQ.Where(summary => filteredItems.Contains(summary.ItemName));
-                }
-                catch
-                {
-                    TempData["ErrorMessage"] = "Invalid Format Submitted. Product must be separated with comma ex. Chair, Table,...";
-                    return View();
-                }
-
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-
-            ViewData["BranchID"] = BranchList(BranchID);            
-
-            //Before we sort, see if we have called for a change of filtering or sorting
-            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
-            {
-                page = 1;//Reset page to start
-
-                if (sortOptions.Contains(actionButton))//Change of sort is requested
-                {
-                    if (actionButton == sortField) //Reverse order on same field
-                    {
-                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
-                    }
-                    sortField = actionButton;//Sort by the button clicked
-                }
-                else //Sort by the controls in the filter area
-                {
-                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
-                    sortField = sortFieldID;
-                }
-            }
-
-            //Now we know which field and direction to sort by
-            if (sortField == "Employee")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.EmployeeName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.EmployeeName);
-                }
-            }
-            else if (sortField == "Branch")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.BranchName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.BranchName);
-                }
-            }
-            
-            else if (sortField == "Transfer Status")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.TransactionStatusName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.TransactionStatusName);
-                }
-            }
-            else if (sortField == "Event")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.EventName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.EventName);
-                }
-            }
-            else if (sortField == "Event Date")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.EventDate);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.EventDate);
-                }
-            }
-            else if (sortField == "Product")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.ItemName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.ItemName);
-                }
-            }
-            else if (sortField == "Quantity")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.EventQuantity);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.ItemName);
-                }
-            }
-            else //Sorting by Name
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.BranchName)
-                        .ThenBy(p => p.EventDate);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.BranchName)
-                        .ThenByDescending(p => p.EventDate);
-                }
-            }
-            
-            var toListSumQ = sumQ.ToList();
-            _cache.Set("cachedData", toListSumQ, TimeSpan.FromMinutes(10));
-
-            //Set sort for next time
-            ViewData["sortField"] = sortField;
-            ViewData["sortDirection"] = sortDirection;
-
-            // Set the ViewData variables
-            ViewData["eventStartDate"] = eventStartDate;
-            ViewData["eventEndDate"] = eventEndDate;
-
-            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "EventSummary");
-            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
-            var pagedData = await PaginatedList<EventSummaryVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
-            return View(pagedData);
-        }
-        public IActionResult DownloadEventItems()
-        {
-            var items = _cache.Get<IEnumerable<EventSummaryVM>>("cachedData");            
-
-            if (items == null)
-            {
-                // If data is not in cache, retrieve it from the database and add it to the cache
-                items = _context.EventSummary.AsNoTracking()
-                .ToList();
-            }
-
-            int numRows = items.Count();
-
-            if (numRows > 0)
-            {
-                using ExcelPackage excel = new();
-                var workSheet = excel.Workbook.Worksheets.Add("EventProducts");
-
-                workSheet.Cells[3, 1].LoadFromCollection(items, true);
-                workSheet.Column(10).Style.Numberformat.Format = "yyyy-mm-dd";
-                //Set Style and backgound colour of headings
-                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 13])
-                {
-                    headings.Style.Font.Bold = true;
-                    var fill = headings.Style.Fill;
-                    fill.PatternType = ExcelFillStyle.Solid;
-                    fill.BackgroundColor.SetColor(Color.LightCyan);
-                }
-
-                //Autofit columns
-                workSheet.Cells.AutoFitColumns();
-
-                //Add a title and timestamp at the top of the report
-                workSheet.Cells[1, 1].Value = "Event Product Report";
-                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 13])
-                {
-                    Rng.Merge = true; //Merge columns start and end range
-                    Rng.Style.Font.Bold = true; //Font should be bold
-                    Rng.Style.Font.Size = 18;
-                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                }
-                //Since the time zone where the server is running can be different, adjust to 
-                //Local for us.
-                DateTime utcDate = DateTime.UtcNow;
-                TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-                DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
-                using (ExcelRange Rng = workSheet.Cells[2, 13])
-                {
-                    Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
-                        localDate.ToShortDateString();
-
-                    Rng.Style.Font.Size = 12;
-                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                }
-
-                try
-                {
-                    Byte[] theData = excel.GetAsByteArray();
-                    string filename = "EventProducts.xlsx";
-                    string mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    return File(theData, mimeType, filename);
-                }
-                catch (Exception)
-                {
-                    return BadRequest("Could not build and download the file.");
-                }
-            }
-            return NotFound("No data.");
-        }
+       
+       
 
         public bool validateOnHand(int TransactionID, int ProductID, int Quantity)
         {

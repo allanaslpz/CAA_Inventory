@@ -10,10 +10,12 @@ using caa_mis.Models;
 using caa_mis.Utilities;
 using caa_mis.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using DNTBreadCrumb.Core;
 
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin")]
+    [BreadCrumb(Title = "Bulks", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class BulksController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -141,6 +143,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Bulks/Details/5
+        [BreadCrumb(Title = "Details", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Details(int? id)
         {
             ViewDataReturnURL();
@@ -164,6 +167,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Bulks/Create
+        [BreadCrumb(Title = "Create", Order = 1, IgnoreAjaxRequests = true)]
         public IActionResult Create()
         {
             PopulateDropDownLists();
@@ -189,6 +193,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Bulks/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
 
@@ -246,6 +251,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Bulks/Delete/5
+        [BreadCrumb(Title = "Delete", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Delete(int? id)
         {
             ViewDataReturnURL();
@@ -288,8 +294,10 @@ namespace caa_mis.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        
+
         // GET: Transactions/Release/5
+        [BreadCrumb(Title = "Release", Order = 1, IgnoreAjaxRequests = true)]
+
         public async Task<IActionResult> Release(int? id)
         {
             ViewDataReturnURL();

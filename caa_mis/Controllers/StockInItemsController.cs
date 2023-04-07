@@ -15,10 +15,13 @@ using OfficeOpenXml;
 using System.Drawing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.CodeAnalysis.Operations;
+using DNTBreadCrumb.Core;
 
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin, Supervisor")]
+    [BreadCrumb(Title = "Stock Items", Order = 0, IgnoreAjaxRequests = true, Url = "StockIn")]
+    [BreadCrumb(Title = "Stock Items Detail", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class StockInItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -29,6 +32,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: TransactionItems
+       
         public async Task<IActionResult> Index(int? TransactionID, string sortDirectionCheck, string sortFieldID, int? ItemID,
             int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Product Name")
         {
@@ -255,6 +259,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: TransactionItems/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
             ViewDataReturnURL();
@@ -276,6 +281,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: TransactionItems/Edit/5
+       
         public async Task<IActionResult> EditIncoming(int? id)
         {
             ViewDataReturnURL();
@@ -301,6 +307,7 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+       
         public async Task<IActionResult> Edit(int id, [Bind("ID,ItemID,TransactionID,Quantity")] TransactionItem transactionItem)
         {
             ViewDataReturnURL();
@@ -401,6 +408,7 @@ namespace caa_mis.Controllers
             return View(transactionItem);
         }
         // GET: TransactionItems/Delete/5
+        [BreadCrumb(Title = "Delete", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Delete(int? id)
         {
             ViewDataReturnURL();

@@ -11,10 +11,12 @@ using caa_mis.Utilities;
 using caa_mis.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.Storage;
+using DNTBreadCrumb.Core;
 
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin, Supervisor")]
+    [BreadCrumb(Title = "Events", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class EventsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -142,6 +144,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Events/Details/5
+        [BreadCrumb(Title = "Details", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Details(int? id)
         {
             ViewDataReturnURL();
@@ -165,6 +168,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Events/Create
+        [BreadCrumb(Title = "Create", Order = 1, IgnoreAjaxRequests = true)]
         public IActionResult Create()
         {
             PopulateDropDownLists();
@@ -209,6 +213,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Events/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
 
@@ -267,6 +272,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Events/Delete/5
+        [BreadCrumb(Title = "Delete", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Delete(int? id)
         {
             ViewDataReturnURL();
@@ -309,8 +315,10 @@ namespace caa_mis.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        
+
         // GET: Transactions/Release/5
+
+        [BreadCrumb(Title = "Release", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Release(int? id)
         {
             ViewDataReturnURL();

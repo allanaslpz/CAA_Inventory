@@ -16,10 +16,14 @@ using System.Drawing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.CodeAnalysis.Operations;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+using DNTBreadCrumb.Core;
+using System.Security.Policy;
 
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin, Supervisor")]
+    [BreadCrumb(Title = "Transfers", Order = 0, IgnoreAjaxRequests = true, Url = "Transactions")]
+    [BreadCrumb(Title = "Transfer Details", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class TransactionItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -256,6 +260,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: TransactionItems/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
             ViewDataReturnURL();
@@ -402,6 +407,7 @@ namespace caa_mis.Controllers
             return View(transactionItem);
         }
         // GET: TransactionItems/Delete/5
+        [BreadCrumb(Title = "Delete", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Delete(int? id)
         {
             ViewDataReturnURL();
@@ -538,183 +544,7 @@ namespace caa_mis.Controllers
             return Json(result);
         }
 
-        public async Task<IActionResult> TransactionItemSummary(int? page, int? pageSizeID, int[] OriginID, int[] DestinationID, string sortDirectionCheck,
-                                            string sortFieldID, string Products, string actionButton, string sortDirection = "asc", string sortField = "Origin")
-        {
-            //List of sort options.
-            //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Employee", "Origin", "Destination",
-                                            "Transfer Status", "Product", "Quantity"};
-
-            //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-primary";
-
-            IQueryable<TransactionItemSummaryVM> sumQ = _context.TransactionItemSummary;
-
-            if (OriginID != null && OriginID.Length > 0)
-            {
-                sumQ = sumQ.Where(s => OriginID.Contains(s.OriginID));
-                ViewData["Filtering"] = "btn-danger";
-            }
-            if (DestinationID != null && DestinationID.Length > 0)
-            {
-                sumQ = sumQ.Where(s => DestinationID.Contains(s.OriginID));
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-            if (!string.IsNullOrEmpty(Products))
-            {
-                List<string> pr = Products.Split(',').Select(t => t.Trim()).ToList();
-                pr.Remove("");
-                try
-                {
-                    var filteredItems = _context.Items
-                    .Where(item => pr.Contains(item.Name))
-                    .Select(item => item.Name);
-                    sumQ = sumQ.Where(summary => filteredItems.Contains(summary.ItemName));
-                }
-                catch
-                {
-                    TempData["ErrorMessage"] = "Invalid Format Submitted. Product must be separated with comma ex. Chair, Table,...";
-                    return View();
-                }
-
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-            ViewData["OriginID"] = BranchList(OriginID);
-            ViewData["DestinationID"] = BranchList(DestinationID);
-            
-
-            //Before we sort, see if we have called for a change of filtering or sorting
-            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
-            {
-                page = 1;//Reset page to start
-
-                if (sortOptions.Contains(actionButton))//Change of sort is requested
-                {
-                    if (actionButton == sortField) //Reverse order on same field
-                    {
-                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
-                    }
-                    sortField = actionButton;//Sort by the button clicked
-                }
-                else //Sort by the controls in the filter area
-                {
-                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
-                    sortField = sortFieldID;
-                }
-            }
-
-            //Now we know which field and direction to sort by
-            if (sortField == "Employee")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.EmployeeName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.EmployeeName);
-                }
-            }
-            else if (sortField == "Origin")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.OriginName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.OriginName);
-                }
-            }
-            else if (sortField == "Destination")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.DestinationName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.DestinationName);
-                }
-            }
-            else if (sortField == "Transfer Status")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.TransactionStatusName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.TransactionStatusName);
-                }
-            }
-            else if (sortField == "Product")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.ItemName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.ItemName);
-                }
-            }
-            else if (sortField == "Quantity")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.Quantity);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.Quantity);
-                }
-            }
-            else //Sorting by Name
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.OriginName)
-                        .ThenBy(p => p.DestinationName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.OriginName)
-                        .ThenByDescending(p => p.DestinationName);
-                }
-            }
-
-            //Set sort for next time
-            ViewData["sortField"] = sortField;
-            ViewData["sortDirection"] = sortDirection;
-            //SelectList for Sorting Options
-            //ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
-            
-            // Save filtered data to cookie
-            CachingFilteredData(sumQ);
-
-            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "TransactionItemSummary");
-            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
-            var pagedData = await PaginatedList<TransactionItemSummaryVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
-            return View(pagedData);
-        }
+       
 
 
         //Incoming stock items
@@ -870,70 +700,7 @@ namespace caa_mis.Controllers
         {
             FilteredDataCaching.SaveFilteredData(HttpContext, "filteredData", sumQ, 120);
         }
-        public IActionResult DownloadTransactionItems()
-        {
-            //retrieving filtered data from cookie
-            var items = JsonConvert.DeserializeObject<IEnumerable<TransactionItemSummaryVM>>(
-            Request.Cookies["filteredData"]);
-
-            int numRows = items.Count();
-
-            if (numRows > 0)
-            {
-                using ExcelPackage excel = new();
-                var workSheet = excel.Workbook.Worksheets.Add("Transferred Products");
-
-                workSheet.Cells[3, 1].LoadFromCollection(items, true);
-
-                //Set Style and backgound colour of headings
-                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 11])
-                {
-                    headings.Style.Font.Bold = true;
-                    var fill = headings.Style.Fill;
-                    fill.PatternType = ExcelFillStyle.Solid;
-                    fill.BackgroundColor.SetColor(Color.LightCyan);
-                }
-
-                //Autofit columns
-                workSheet.Cells.AutoFitColumns();
-
-                //Add a title and timestamp at the top of the report
-                workSheet.Cells[1, 1].Value = "Transferred Products Report";
-                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 11])
-                {
-                    Rng.Merge = true; //Merge columns start and end range
-                    Rng.Style.Font.Bold = true; //Font should be bold
-                    Rng.Style.Font.Size = 18;
-                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                }
-                //Since the time zone where the server is running can be different, adjust to 
-                //Local for us.
-                DateTime utcDate = DateTime.UtcNow;
-                TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-                DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
-                using (ExcelRange Rng = workSheet.Cells[2, 11])
-                {
-                    Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
-                        localDate.ToShortDateString();
-
-                    Rng.Style.Font.Size = 12;
-                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                }
-
-                try
-                {
-                    Byte[] theData = excel.GetAsByteArray();
-                    string filename = "TransferredProducts.xlsx";
-                    string mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    return File(theData, mimeType, filename);
-                }
-                catch (Exception)
-                {
-                    return BadRequest("Could not build and download the file.");
-                }
-            }
-            return NotFound("No data.");
-        }
+        
 
     }
 }

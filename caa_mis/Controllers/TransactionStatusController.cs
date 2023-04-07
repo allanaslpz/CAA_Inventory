@@ -9,10 +9,12 @@ using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.Utilities;
 using Microsoft.AspNetCore.Authorization;
+using DNTBreadCrumb.Core;
 
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin, Supervisor")]
+    [BreadCrumb(Title = "Inventory Status", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class TransactionStatusController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -147,6 +149,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: TransactionStatus/Details/5
+        [BreadCrumb(Title = "Details", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.TransactionStatuses == null)
@@ -165,6 +168,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: TransactionStatus/Create
+        [BreadCrumb(Title = "Create", Order = 1, IgnoreAjaxRequests = true)]
         public IActionResult Create()
         {
             return View();
@@ -196,6 +200,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: TransactionStatus/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.TransactionStatuses == null)
@@ -255,6 +260,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: TransactionStatus/Archive/5
+        [BreadCrumb(Title = "Archive", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Archive(int? id)
         {
             if (id == null || _context.TransactionStatuses == null)
