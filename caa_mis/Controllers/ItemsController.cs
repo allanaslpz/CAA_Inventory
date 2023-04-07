@@ -192,8 +192,7 @@ namespace caa_mis.Controllers
             //SelectList for Sorting Options
             ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
 
-            // Save filtered data to cookie
-            //CachingFilteredData(inventory);
+            // Save filtered data to cache
             var toListInventory = inventory.ToList();
             _cache.Set("cachedData", toListInventory, TimeSpan.FromMinutes(10));
 
@@ -498,10 +497,7 @@ namespace caa_mis.Controllers
             ViewData["returnURL"] = MaintainURL.ReturnURL(HttpContext, ControllerName());
         }
 
-        private void CachingFilteredData<T>(IQueryable<T> sumQ)
-        {
-            FilteredDataCaching.SaveFilteredData(HttpContext, "filteredData", sumQ, 120);
-        }
+        
         private async Task AddPicture(Item item, IFormFile thePicture)
         {
             //Get the picture and save it with the Patient (2 sizes)
