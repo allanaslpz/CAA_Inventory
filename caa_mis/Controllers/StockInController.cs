@@ -236,6 +236,7 @@ namespace caa_mis.Controllers
             if (ModelState.IsValid)
             {
                 _context.Add(transaction);
+                TempData["SuccessMessage"] = "Created stock in successfully, status: Open.";
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index", "StockInItems", new { TransactionID = transaction.ID });
             }
@@ -279,6 +280,7 @@ namespace caa_mis.Controllers
                 try
                 {
                     _context.Update(transaction);
+                    TempData["SuccessMessage"] = "Updated stock in details successfully.";
                     await _context.SaveChangesAsync();
                     return RedirectToAction("Index", "StockInItems", new { TransactionID = transaction.ID });
                 }
@@ -337,7 +339,7 @@ namespace caa_mis.Controllers
             {
                 _context.Transactions.Remove(transaction);
             }
-            
+            TempData["SuccessMessage"] = "Deleted stock in successfully.";
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -430,8 +432,8 @@ namespace caa_mis.Controllers
                 if (ModelState.IsValid)
                 {
                     _context.Transactions.Attach(trans).Property(x => x.TransactionStatusID).IsModified = true;
+                    TempData["SuccessMessage"] = "Release is successful.";
                     _context.SaveChanges();
-
                     return Redirect(ViewData["returnURL"].ToString());
                 }
             }

@@ -13,20 +13,52 @@
     <div class="row">
         <div class="col">
             <div class="card border border-light">
-                <a href="@Url.Action("Index","Transactions")" class="btn btn-primary stretched-link">
+                <a href="@Url.Action("Create","Items")" class="btn btn-primary stretched-link">
                     <div class="card-body">
-                        <i class="fas fa-file-signature fa-4x"></i>
-                        <p class="card-text"><h5>Transfers</h5></p>
+                        <i class="fas  fa-boxes-packing fa-3x"></i>
+                        <p class="card-text"><h5>Add New Products</h5></p>
                     </div>
                 </a>
             </div>
         </div>
         <div class="col mb-3">
             <div class="card">
-                <a href="@Url.Action("Index","Items")" class="btn btn-primary stretched-link">
+                <a href="@Url.Action("Create","StockIn")" class="btn btn-primary stretched-link">
+                <div class="card-body">
+                        <i class="fas fa-file-signature fa-3x"></i>
+                        <p class="card-text"><h5>Add Item in Stock</h5></p>
+                </div>
+                </a>
+            </div>
+        </div>
+        <div class="col mb-3">
+            <div class="card">
+                <a href="@Url.Action("Create","Transactions")" class="btn btn-primary stretched-link">
                     <div class="card-body">
-                        <i class="fas fa-magnifying-glass  fa-4x"></i>
-                        <p class="card-text"><h5>Products</h5></p>
+                        <i class="fas  fa-arrow-right-arrow-left  fa-3x"></i>
+                        <p class="card-text"><h5>Transfer Items</h5></p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+                <div class="col mb-3">
+            <div class="card">
+                <a href="@Url.Action("Create","Events")" class="btn btn-primary stretched-link">
+                    <div class="card-body">
+                        <i class="fas  fa-calendar-days  fa-3x"></i>
+                        <p class="card-text"><h5>Create Events</h5></p>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col mb-3">
+            <div class="card">
+                <a href="@Url.Action("GenerateBarcode","Items")" class="btn btn-primary stretched-link">
+                    <div class="card-body">
+                        <i class="fas fa-tags fa-3x"></i>
+                        <p class="card-text"><h5>Generate BarCode</h5></p>
                     </div>
                 </a>
             </div>
@@ -34,14 +66,14 @@
         <div class="col mb-3">
             <div class="card">
                 <a href="@Url.Action("Index","Reports")" class="btn btn-primary stretched-link">
-                <div class="card-body">
-                        <i class="fas  fa-chart-line  fa-4x"></i>
-                        <p class="card-text"><h5>Reports</h5></p>
-                </div>
+                    <div class="card-body">
+                        <i class="fas fa-table fa-3x"></i>
+                        <p class="card-text"><h5>All Reports</h5></p>
+                    </div>
                 </a>
             </div>
         </div>
-    </div> 
+    </div>
 </div>
 
 <div class="row row-cols-1 row-cols-md-3 g-4">
