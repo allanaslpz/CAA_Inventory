@@ -337,7 +337,7 @@ namespace caa_mis.Controllers
         }
 
         public async Task<IActionResult> EventSummary(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string Products, string actionButton,
+                                            string sortFieldID, string Products, string actionButton,
                                             string sortDirection = "asc", string sortField = "Branch",
                                             DateTime? eventStartDate = null, DateTime? eventEndDate = null)
         {
@@ -357,11 +357,6 @@ namespace caa_mis.Controllers
                 ViewData["Filtering"] = "btn-danger";
             }            
 
-            if (!String.IsNullOrEmpty(SearchString))
-            {
-                sumQ = sumQ.Where(i => i.EmployeeName.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-danger";
-            }
             if (eventStartDate != null)
             {
                 sumQ = sumQ.Where(e => e.EventDate >= eventStartDate.Value);
@@ -374,69 +369,25 @@ namespace caa_mis.Controllers
                 ViewData["Filtering"] = "btn-danger";
             }
 
-
-            if (!string.IsNullOrEmpty(Products))
-            {
-                sumQ = sumQ.Where(e => e.ItemName.Contains(Products));
-            }
-
-            //if (!string.IsNullOrEmpty(Products))
-            //{
-
-            //    List<string> pr = Products.Split(',').ToList();
-            //    pr = pr.Select(t => t.Trim()).ToList();
-            //    pr.Remove(" ");
-            //    try
-            //    {
-            //        var filteredItems = from item in _context.Items
-            //                             where pr.Contains(item.Name)
-            //                             select item.Name;
-
-            //        sumQ = sumQ.Where(e => filteredItems.Contains(e.ItemName));
-            //    }
-            //    catch
-            //    {
-            //        TempData["ErrorMessage"] = "Invalid Format Submitted. Product Name must be separated with comma ex. Table, Chair, Tent...";
-            //        return View();
-            //    }
-            //}
-
-            //if (!string.IsNullOrEmpty(Products))
-            //{
-            //    List<string> pr = Products.Split(',').Select(p => p.Trim()).ToList();
-
-            //    // Get the IDs of the items that match the product names
-            //    var itemIds = _context.Items
-            //        .Where(item => pr.Contains(item.Name))
-            //        .Select(item => item.ID)
-            //        .ToList();
-
-            //    // Filter the event summary based on the matching item IDs
-            //    sumQ = sumQ.Where(summary => itemIds.Contains(summary.ItemID));
-            //}
-
             if (!string.IsNullOrEmpty(Products))
             {
                 List<string> pr = Products.Split(',').Select(t => t.Trim()).ToList();
                 pr.Remove("");
-
-                var filteredItems = _context.Items
+                try
+                {
+                    var filteredItems = _context.Items
                     .Where(item => pr.Contains(item.Name))
                     .Select(item => item.Name);
-
-                foreach (var item in filteredItems)
+                    sumQ = sumQ.Where(summary => filteredItems.Contains(summary.ItemName));
+                }
+                catch
                 {
-                    Console.WriteLine(item); // Check which items are being filtered
+                    TempData["ErrorMessage"] = "Invalid Format Submitted. Product must be separated with comma ex. Chair, Table,...";
+                    return View();
                 }
 
-                sumQ = sumQ.Where(summary => filteredItems.Contains(summary.ItemName));
+                ViewData["Filtering"] = "btn-danger";
             }
-
-            if (!sumQ.Any())
-            {
-                Console.WriteLine("No records found"); // Check if there are any matching records
-            }
-
 
 
             ViewData["BranchID"] = BranchList(BranchID);            

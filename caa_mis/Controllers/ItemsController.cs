@@ -433,7 +433,7 @@ namespace caa_mis.Controllers
         }
         
         public async Task<IActionResult> StockSummaryByBranch(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "BranchName")
+                                            string sortFieldID, string Products, string actionButton, string sortDirection = "asc", string sortField = "BranchName")
         {
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
@@ -450,9 +450,24 @@ namespace caa_mis.Controllers
                 ViewData["Filtering"] = "btn-danger";
             }
 
-            if (!String.IsNullOrEmpty(SearchString))
+            
+            if (!string.IsNullOrEmpty(Products))
             {
-                sumQ = sumQ.Where(i => i.ItemName.ToUpper().Contains(SearchString.ToUpper()));
+                List<string> pr = Products.Split(',').Select(t => t.Trim()).ToList();
+                pr.Remove("");
+                try
+                {
+                    var filteredItems = _context.Items
+                    .Where(item => pr.Contains(item.Name))
+                    .Select(item => item.Name);
+                    sumQ = sumQ.Where(summary => filteredItems.Contains(summary.ItemName));
+                }
+                catch
+                {
+                    TempData["ErrorMessage"] = "Invalid Format Submitted. Product must be separated with comma ex. Chair, Table,...";
+                    return View();
+                }
+
                 ViewData["Filtering"] = "btn-danger";
             }
 

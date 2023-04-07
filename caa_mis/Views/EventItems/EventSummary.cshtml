@@ -20,6 +20,10 @@
         <button class="btn btn-toolbar @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
             Filter/Search
         </button>
+        @if (!Model.Any())
+        {
+            <p><b>No records found</b></p>
+        }
         <div class="collapse" id="collapseFilter">
             <div class="card card-body bg-light">
                 <div class="row">
@@ -31,12 +35,9 @@
 
                     <div class="form-group col-md-4">
                         <label class="control-label">Search Product:</label>
-                        @Html.TextBox("SearchString", null, new { @class = "form-control p-2" })
-                        @*<input type="text" class="form-control p-2" name="productName" value="@ViewData["productName"]" placeholder="Product Name" />
-*@                      
+                        
                         @Html.TextBox("Products", null, new { @name="Products", @id="Products", @class = "form-control p-2" })
-                        @*<input type="text" name="Products" value="@ViewData["productName"]" placeholder="Product Name" id="Products" class="col-10" />
-                        *@<input type="hidden" name="ProductIDs" id="ProductIDs" />
+                        <input type="hidden" name="ProductIDs" id="ProductIDs" />
 
                         <label class="control-label">Event Date:(Start and End)</label>
                         <div class="input-group">

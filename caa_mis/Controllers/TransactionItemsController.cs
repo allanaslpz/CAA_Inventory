@@ -15,6 +15,7 @@ using OfficeOpenXml;
 using System.Drawing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.CodeAnalysis.Operations;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace caa_mis.Controllers
 {
@@ -538,7 +539,7 @@ namespace caa_mis.Controllers
         }
 
         public async Task<IActionResult> TransactionItemSummary(int? page, int? pageSizeID, int[] OriginID, int[] DestinationID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "Origin")
+                                            string sortFieldID, string Products, string actionButton, string sortDirection = "asc", string sortField = "Origin")
         {
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
@@ -561,9 +562,23 @@ namespace caa_mis.Controllers
                 ViewData["Filtering"] = "btn-danger";
             }
 
-            if (!String.IsNullOrEmpty(SearchString))
+            if (!string.IsNullOrEmpty(Products))
             {
-                sumQ = sumQ.Where(i => i.EmployeeName.ToUpper().Contains(SearchString.ToUpper()));
+                List<string> pr = Products.Split(',').Select(t => t.Trim()).ToList();
+                pr.Remove("");
+                try
+                {
+                    var filteredItems = _context.Items
+                    .Where(item => pr.Contains(item.Name))
+                    .Select(item => item.Name);
+                    sumQ = sumQ.Where(summary => filteredItems.Contains(summary.ItemName));
+                }
+                catch
+                {
+                    TempData["ErrorMessage"] = "Invalid Format Submitted. Product must be separated with comma ex. Chair, Table,...";
+                    return View();
+                }
+
                 ViewData["Filtering"] = "btn-danger";
             }
 
