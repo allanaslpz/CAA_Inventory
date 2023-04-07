@@ -692,7 +692,7 @@ namespace caa_mis.Data
                 }
 
                 //Event Seed Data
-                string[] eventName = new string[] { "Natioanal Indigenous Day", "Canada Day", "Funding",
+                string[] eventName = new string[] { "National Indigenous Day", "Canada Day", "Funding",
                                                     "Saint-Patricks Day", "Niagara College Graduation", "Canada 150",
                 "Games of La Francophonie", "Canadian Multiculturalism Day", "Boxing Day"};
                 int eventNameCount = eventName.Length;

@@ -14,7 +14,7 @@
                 Filter/Search
             </button>
        
-        <a asp-action="DownloadItems" id="download-report-button" class="btn btn-info ml-1">Download Product</a>       
+        <a asp-action="DownloadItems" id="download-report-button" class="btn btn-info ml-1">Download Products</a>       
         <div id="report-loading-indicator" class="progress" style="display:none;">
             <div class="progress-label">Downloading report...</div>
             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 70%"></div>
@@ -141,25 +141,25 @@
                     <tr>
                         <th></th>
                         <th>
-                            <input type="submit" name="actionButton" value="Name" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Name" class="btn btn-link btn-1" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Category" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Category" class="btn btn-link btn-1" />
                         </th>
                         <th>
-                            <input type="submit" disabled="disabled" value="SKU" class="btn btn-link" style="color: blue;" />
+                            <input type="submit" disabled="disabled" value="SKU" class="btn btn-link btn-1" style="color: blue;" />
                         </th>
                         <th>
-                            <input type="submit" disabled="disabled" value="Cost" class="btn btn-link" style="color: blue;" />
+                            <input type="submit" disabled="disabled" value="Cost" class="btn btn-link btn-1" style="color: blue;" />
                         </th>
                         <th>
-                            <input type="submit" disabled="disabled" value="Branch" class="btn btn-link" style="color: blue;" />
+                            <input type="submit" disabled="disabled" value="Branch" class="btn btn-link btn-1" style="color: blue;" />
                         </th>
                         <th>
-                            <input type="submit" disabled="disabled" value="Quantity" class="btn btn-link" style="color: blue;" />
+                            <input type="submit" disabled="disabled" value="Quantity" class="btn btn-link btn-1" style="color: blue;" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Total Quantity" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Total Quantity" class="btn btn-link btn-1" />
                         </th>
                         <th></th>
                     </tr>
@@ -178,21 +178,20 @@
                                     }
                                 }
                             </td>
-                            <td>
+                            <td style="vertical-align: middle;" class="text-left">
                                 @Html.DisplayFor(modelItem => item.Name)
                             </td>
-                            <td>
+                            <td style="vertical-align: middle;" class="text-left">
                                 @Html.DisplayFor(modelItem => item.Category.Name)
                             </td>
-                            <td>
+                            <td style="vertical-align: middle;" class="text-left">
                                 @Html.DisplayFor(modelItem => item.SKUNumber)
                             </td>
-                            <td>
+                            <td style="vertical-align: middle;" class="text-left">
                                 @String.Format("{0:C}", item.Cost)
                             </td>
-                            <td>
-                                @{
-                                    
+                            <td style="vertical-align: middle;" class="text-left">
+                                @{                                  
                                     int condCount = item.Stocks.Count();
                                     if (condCount > 0)
                                     {
@@ -243,15 +242,20 @@
 											@firstCond
 										}
 									}
+                                    else
+                                    {
+										<div>
+											0
+										</div>
+									}
 								}
                             </td>
-                            <td>
+                            <td style="vertical-align: middle;" class="text-left">
                                 @{  // Code to Retrieve Total Quantities of Items //
                                     @item.Stocks.Sum(s => s.Quantity)
                                 }
                             </td>
-                            <td>
-                                
+                            <td style="vertical-align: middle;" class="text-left">
                                 <a asp-action="Edit" asp-route-id="@item.ID">[ Edit ]</a> 
                                 <a asp-action="Details" asp-route-id="@item.ID">[ Details ]</a>
                                 @if (item.ItemStatusID == 1)
