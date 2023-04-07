@@ -63,8 +63,8 @@ namespace caa_mis.Controllers
 
             if (actionButton == "Generate Filtered")
             {
-                
-                if(!String.IsNullOrEmpty(Products))
+
+                if (!String.IsNullOrEmpty(Products))
                 {
                     try
                     {
@@ -82,19 +82,20 @@ namespace caa_mis.Controllers
                         return View();
                     }
                 }
-               else
+                else
                 {
                     TempData["ErrorMessage"] = "Empty Field (SKU). SKU must be separated with comma ex. CAA1234, CAA2345, CAA3245";
                     return View();
                 }
 
             }
-            else{
+            else
+            {
                 return View(toPrint);
             }
-            
 
-            
+
+
         }
         [BreadCrumb(Title = "Stock Summary By Branch", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> StockSummaryByBranch(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
@@ -276,41 +277,50 @@ namespace caa_mis.Controllers
             }
 
             int numRows = items.Count();
-
             if (numRows > 0)
             {
                 using ExcelPackage excel = new();
                 var workSheet = excel.Workbook.Worksheets.Add("StockProducts");
 
-                workSheet.Cells[3, 1].LoadFromCollection(items, true);
-
-                //Set Style and backgound colour of headings
-                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 7])
-                {
-                    headings.Style.Font.Bold = true;
-                    var fill = headings.Style.Fill;
-                    fill.PatternType = ExcelFillStyle.Solid;
-                    fill.BackgroundColor.SetColor(Color.LightCyan);
+                // Define the columns to include in the report
+                var columns = new[] {
+                new {
+                    Header = "Branch",
+                    Property = nameof(StockSummaryByBranchVM.BranchName)
+                },
+                new {
+                    Header = "Product",
+                    Property = nameof(StockSummaryByBranchVM.ItemName)
+                },
+                new {
+                    Header = "Cost",
+                    Property = nameof(StockSummaryByBranchVM.ItemCost)
+                },
+                new {
+                    Header = "Quantity",
+                    Property = nameof(StockSummaryByBranchVM.Quantity)
+                },
+                new {
+                    Header = "Min Level",
+                    Property = nameof(StockSummaryByBranchVM.MinLevel)
                 }
-
-                //Autofit columns
-                workSheet.Cells.AutoFitColumns();
-
+            };
                 //Add a title and timestamp at the top of the report
                 workSheet.Cells[1, 1].Value = "Stock Product Report";
-                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 7])
+                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, columns.Length])
                 {
                     Rng.Merge = true; //Merge columns start and end range
                     Rng.Style.Font.Bold = true; //Font should be bold
                     Rng.Style.Font.Size = 18;
                     Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 }
+
                 //Since the time zone where the server is running can be different, adjust to 
                 //Local for us.
                 DateTime utcDate = DateTime.UtcNow;
                 TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
                 DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
-                using (ExcelRange Rng = workSheet.Cells[2, 7])
+                using (ExcelRange Rng = workSheet.Cells[2, columns.Length])
                 {
                     Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
                         localDate.ToShortDateString();
@@ -318,6 +328,37 @@ namespace caa_mis.Controllers
                     Rng.Style.Font.Size = 12;
                     Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                 }
+
+                // Load the column headers into the worksheet
+                int rowIndex = 3; // Start from the third row after the title and timestamp
+                for (int i = 0; i < columns.Length; i++)
+                {
+                    workSheet.Cells[rowIndex, i + 1].Value = columns[i].Header;
+                }
+
+                // Set the style and background color of the headings
+                using (ExcelRange headings = workSheet.Cells[rowIndex, 1, rowIndex, columns.Length])
+                {
+                    headings.Style.Font.Bold = true;
+                    var fill = headings.Style.Fill;
+                    fill.PatternType = ExcelFillStyle.Solid;
+                    fill.BackgroundColor.SetColor(Color.LightCyan);
+                }
+
+                // Load the column headers into the worksheet
+                rowIndex++; // Increment the row index to start after the headers
+                foreach (var item in items)
+                {
+                    workSheet.Cells[rowIndex, 1].Value = item.BranchName;
+                    workSheet.Cells[rowIndex, 2].Value = item.ItemName;
+                    workSheet.Cells[rowIndex, 3].Value = item.ItemCost;
+                    workSheet.Cells[rowIndex, 4].Value = item.Quantity;
+                    workSheet.Cells[rowIndex, 5].Value = item.MinLevel;
+                    rowIndex++;
+                }
+                    
+                //Autofit columns
+                workSheet.Cells.AutoFitColumns();
 
                 try
                 {
@@ -548,41 +589,58 @@ namespace caa_mis.Controllers
             }
 
             int numRows = items.Count();
-
             if (numRows > 0)
             {
                 using ExcelPackage excel = new();
                 var workSheet = excel.Workbook.Worksheets.Add("EventProducts");
 
-                workSheet.Cells[3, 1].LoadFromCollection(items, true);
-                workSheet.Column(10).Style.Numberformat.Format = "yyyy-mm-dd";
-                //Set Style and backgound colour of headings
-                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 13])
-                {
-                    headings.Style.Font.Bold = true;
-                    var fill = headings.Style.Fill;
-                    fill.PatternType = ExcelFillStyle.Solid;
-                    fill.BackgroundColor.SetColor(Color.LightCyan);
+                // Define the columns to include in the report
+                var columns = new[] {
+                new {
+                    Header = "Branch",
+                    Property = nameof(EventSummaryVM.BranchName)
+                },
+                new {
+                    Header = "Event",
+                    Property = nameof(EventSummaryVM.EventName)
+                },
+                new {
+                    Header = "Employee",
+                    Property = nameof(EventSummaryVM.EmployeeName)
+                },
+                new {
+                    Header = "Transfer Status",
+                    Property = nameof(EventSummaryVM.TransactionStatusName)
+                },
+                new {
+                    Header = "Event Date",
+                    Property = nameof(EventSummaryVM.EventDate)
+                },
+                new {
+                    Header = "Product",
+                    Property = nameof(EventSummaryVM.ItemName)
+                },
+                new {
+                    Header = "Quantity",
+                    Property = nameof(EventSummaryVM.EventQuantity)
                 }
-
-                //Autofit columns
-                workSheet.Cells.AutoFitColumns();
-
+            };
                 //Add a title and timestamp at the top of the report
                 workSheet.Cells[1, 1].Value = "Event Product Report";
-                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 13])
+                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, columns.Length])
                 {
                     Rng.Merge = true; //Merge columns start and end range
                     Rng.Style.Font.Bold = true; //Font should be bold
                     Rng.Style.Font.Size = 18;
                     Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 }
+
                 //Since the time zone where the server is running can be different, adjust to 
                 //Local for us.
                 DateTime utcDate = DateTime.UtcNow;
                 TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
                 DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
-                using (ExcelRange Rng = workSheet.Cells[2, 13])
+                using (ExcelRange Rng = workSheet.Cells[2, columns.Length])
                 {
                     Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
                         localDate.ToShortDateString();
@@ -590,6 +648,42 @@ namespace caa_mis.Controllers
                     Rng.Style.Font.Size = 12;
                     Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                 }
+
+                // Load the column headers into the worksheet
+                int rowIndex = 3; // Start from the third row after the title and timestamp
+                for (int i = 0; i < columns.Length; i++)
+                {
+                    workSheet.Cells[rowIndex, i + 1].Value = columns[i].Header;
+                }
+
+                // Set the style and background color of the headings
+                using (ExcelRange headings = workSheet.Cells[rowIndex, 1, rowIndex, columns.Length])
+                {
+                    headings.Style.Font.Bold = true;
+                    var fill = headings.Style.Fill;
+                    fill.PatternType = ExcelFillStyle.Solid;
+                    fill.BackgroundColor.SetColor(Color.LightCyan);
+                }
+
+                // Load the column headers into the worksheet
+                rowIndex++; // Increment the row index to start after the headers
+                foreach (var item in items)
+                {
+                    workSheet.Cells[rowIndex, 1].Value = item.BranchName;
+                    workSheet.Cells[rowIndex, 2].Value = item.EventName;
+                    workSheet.Cells[rowIndex, 3].Value = item.EmployeeName;
+                    workSheet.Cells[rowIndex, 4].Value = item.TransactionStatusName;
+                    workSheet.Cells[rowIndex, 5].Value = item.EventDate;
+                    workSheet.Cells[rowIndex, 6].Value = item.ItemName;
+                    workSheet.Cells[rowIndex, 7].Value = item.EventQuantity;
+                    rowIndex++;
+                }
+
+                // Set the number format for the date column
+                workSheet.Column(5).Style.Numberformat.Format = "yyyy-mm-dd";              
+
+                //Autofit columns
+                workSheet.Cells.AutoFitColumns();             
 
                 try
                 {
@@ -605,6 +699,7 @@ namespace caa_mis.Controllers
             }
             return NotFound("No data.");
         }
+
         [BreadCrumb(Title = "Transferred Products", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> TransactionItemSummary(int? page, int? pageSizeID, int[] OriginID, int[] DestinationID, string sortDirectionCheck,
                                            string sortFieldID, string Products, string actionButton, string sortDirection = "asc", string sortField = "Origin")
@@ -772,7 +867,7 @@ namespace caa_mis.Controllers
             //Set sort for next time
             ViewData["sortField"] = sortField;
             ViewData["sortDirection"] = sortDirection;
-            
+
             var toListSumQ = sumQ.ToList();
             _cache.Set("cachedData", toListSumQ, TimeSpan.FromMinutes(cacheTimer));
 
@@ -802,35 +897,49 @@ namespace caa_mis.Controllers
                 using ExcelPackage excel = new();
                 var workSheet = excel.Workbook.Worksheets.Add("Transferred Products");
 
-                workSheet.Cells[3, 1].LoadFromCollection(items, true);
-
-                //Set Style and backgound colour of headings
-                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 11])
-                {
-                    headings.Style.Font.Bold = true;
-                    var fill = headings.Style.Fill;
-                    fill.PatternType = ExcelFillStyle.Solid;
-                    fill.BackgroundColor.SetColor(Color.LightCyan);
+                // Define the columns to include in the report
+                var columns = new[] {
+                new {
+                    Header = "Employee",
+                    Property = nameof(TransactionItemSummaryVM.EmployeeName)
+                },
+                new {
+                    Header = "Origin",
+                    Property = nameof(TransactionItemSummaryVM.OriginName)
+                },
+                new {
+                    Header = "Destination",
+                    Property = nameof(TransactionItemSummaryVM.DestinationName)
+                },
+                new {
+                    Header = "Transfer Status",
+                    Property = nameof(TransactionItemSummaryVM.TransactionStatusName)
+                },
+                new {
+                    Header = "Product",
+                    Property = nameof(TransactionItemSummaryVM.ItemName)
+                },
+                new {
+                    Header = "Quantity",
+                    Property = nameof(TransactionItemSummaryVM.Quantity)
                 }
-
-                //Autofit columns
-                workSheet.Cells.AutoFitColumns();
-
+            };
                 //Add a title and timestamp at the top of the report
                 workSheet.Cells[1, 1].Value = "Transferred Products Report";
-                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 11])
+                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, columns.Length])
                 {
                     Rng.Merge = true; //Merge columns start and end range
                     Rng.Style.Font.Bold = true; //Font should be bold
                     Rng.Style.Font.Size = 18;
                     Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 }
+
                 //Since the time zone where the server is running can be different, adjust to 
                 //Local for us.
                 DateTime utcDate = DateTime.UtcNow;
                 TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
                 DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
-                using (ExcelRange Rng = workSheet.Cells[2, 11])
+                using (ExcelRange Rng = workSheet.Cells[2, columns.Length])
                 {
                     Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
                         localDate.ToShortDateString();
@@ -838,6 +947,38 @@ namespace caa_mis.Controllers
                     Rng.Style.Font.Size = 12;
                     Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
                 }
+
+                // Load the column headers into the worksheet
+                int rowIndex = 3; // Start from the third row after the title and timestamp
+                for (int i = 0; i < columns.Length; i++)
+                {
+                    workSheet.Cells[rowIndex, i + 1].Value = columns[i].Header;
+                }
+
+                // Set the style and background color of the headings
+                using (ExcelRange headings = workSheet.Cells[rowIndex, 1, rowIndex, columns.Length])
+                {
+                    headings.Style.Font.Bold = true;
+                    var fill = headings.Style.Fill;
+                    fill.PatternType = ExcelFillStyle.Solid;
+                    fill.BackgroundColor.SetColor(Color.LightCyan);
+                }
+
+                // Load the column headers into the worksheet
+                rowIndex++; // Increment the row index to start after the headers
+                foreach (var item in items)
+                {
+                    workSheet.Cells[rowIndex, 1].Value = item.EmployeeName;
+                    workSheet.Cells[rowIndex, 2].Value = item.OriginName;
+                    workSheet.Cells[rowIndex, 3].Value = item.DestinationName;
+                    workSheet.Cells[rowIndex, 4].Value = item.TransactionStatusName;
+                    workSheet.Cells[rowIndex, 5].Value = item.ItemName;
+                    workSheet.Cells[rowIndex, 6].Value = item.Quantity;
+                    rowIndex++;
+                }
+
+                //Autofit columns
+                workSheet.Cells.AutoFitColumns();
 
                 try
                 {
