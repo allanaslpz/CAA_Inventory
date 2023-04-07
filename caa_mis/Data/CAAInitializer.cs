@@ -49,8 +49,8 @@ namespace caa_mis.Data
                     },
                     new TransactionStatus
                     {
-                        Name = "Pending",
-                        Description = "Pending Status",
+                        Name = "Returned",
+                        Description = "Returned Status",
                         Status = Archived.Disabled
                     });
                     context.SaveChanges();
@@ -640,7 +640,7 @@ namespace caa_mis.Data
                 int[] employeeIDs = context.Employees.Select(a => a.ID).ToArray();
                 int employeeIDCount = employeeIDs.Length;
                 int[] transactionStatusIDs = context.TransactionStatuses.Select(a => a.ID).ToArray();
-                int transactionStatusIDCount = transactionStatusIDs.Length;
+                int transactionStatusIDCount = 2;
                 int[] transactionTypeIDs = context.TransactionTypes.Select(a => a.ID).ToArray();
                 int transactionTypeIDCount = transactionTypeIDs.Length;
                 int[] branchIDs = context.Branches.Select(a => a.ID).ToArray();
@@ -720,19 +720,22 @@ namespace caa_mis.Data
                 {
                     for (byte i = 0; i < eventNameCount; i++)
                     {
+                        var qty = random.Next(1, 34);
                         EventItem ei = new()
                         {
                             ItemID = itemIDs[random.Next(itemIDCount)],
                             EventID = eventIDs[i],
-                            Quantity = random.Next(1, 34)
+                            Quantity = qty,
+                            ReturnedQuantity = qty
                         };
                         context.EventItems.Add(ei);
-
+                        var qty2 = random.Next(1, 34);
                         EventItem ei2 = new()
                         {
                             ItemID = itemIDs[random.Next(itemIDCount)],
                             EventID = eventIDs[i],
-                            Quantity = random.Next(1, 34)
+                            Quantity = qty2,
+                            ReturnedQuantity = qty2
                         };
                         context.EventItems.Add(ei2);
 

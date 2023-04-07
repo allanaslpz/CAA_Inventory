@@ -251,7 +251,8 @@ namespace caa_mis.Data.CAAMigrations
                     EmployeeID = table.Column<int>(type: "INTEGER", nullable: false),
                     TransactionStatusID = table.Column<int>(type: "INTEGER", nullable: false),
                     BranchID = table.Column<int>(type: "INTEGER", nullable: false),
-                    Date = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    DateReturned = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -456,7 +457,8 @@ namespace caa_mis.Data.CAAMigrations
                         .Annotation("Sqlite:Autoincrement", true),
                     ItemID = table.Column<int>(type: "INTEGER", nullable: false),
                     EventID = table.Column<int>(type: "INTEGER", nullable: false),
-                    Quantity = table.Column<int>(type: "INTEGER", nullable: false)
+                    Quantity = table.Column<int>(type: "INTEGER", nullable: false),
+                    ReturnedQuantity = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {

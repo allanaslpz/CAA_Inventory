@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<caa_mis.Models.EventItem>
 
 @{
-    ViewData["Title"] = "Event Items";
+    ViewData["Title"] = "Return Event Items";
     caa_mis.Models.Event transaction = (caa_mis.Models.Event)ViewBag.Transactions;
 }
 
@@ -49,7 +49,7 @@
         </dl>
     </div>
 </div>
-<form asp-action="Index" method="get">
+<form asp-action="Return" method="get">
     <div class="form-horizontal">
         <input type="hidden" name="EventID" value="@transaction.ID" />
         <button class="btn btn-toolbar @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
@@ -123,7 +123,7 @@
             </form>
         </div>
         }
-<form asp-action="Index" method="get">
+<form asp-action="Return" method="get">
     <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
     <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
     <input type="hidden" name="EventID" value="@transaction.ID" />
@@ -172,18 +172,13 @@
                         <th>
                             <input type="submit" name="actionButton" value="Quantity" class="btn btn-link btn-1" />
                         </th>
-                        @if (transaction.TransactionStatus.Name == "Returned")
-                        {
-                            <th>
-                                <input type="submit" name="actionButton" value="Returned Quantity" class="btn btn-link btn-1" />
-                            </th>
-                        }
-                        @if (transaction.TransactionStatus.Name == "Open")
-                        {
-                            <th>
-                                Action
-                            </th>
-                        }
+                        <th>
+                            <input type="submit" name="actionButton" value="Quantity to Return" class="btn btn-link btn-1" />
+                        </th>
+                        <th>
+                            Action
+                        </th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -199,25 +194,17 @@
                             <td>
                                 @Html.DisplayFor(modelItem => item.Quantity)
                             </td>
-                            @if (transaction.TransactionStatus.Name == "Returned")
-                            {
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ReturnedQuantity)
-                                </td>
-                            }
-                            @if (transaction.TransactionStatus.Name == "Open")
-                            {
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ReturnedQuantity)
+                            </td>
                             <td>
                                 
-                                    <a asp-controller="EventItems" asp-action="Edit" asp-route-id="@item.ID">
+                                    <a asp-controller="EventItems" asp-action="EditReturned" asp-route-id="@item.ID">
                                         <span class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="Edit Item">&#x270D;</span>
                                     </a>
-                                    <a asp-controller="EventItems" asp-action="Delete" asp-route-id="@item.ID">
-                                        <span class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Delete Item">&#x274C;</span>
-                                    </a>
-
+                                   
                                 </td>
-                            }
+                            
                         </tr>
                     }
                 </tbody>
@@ -228,13 +215,10 @@
 </form>
 <div>
     <p>
-    @if (transaction.TransactionStatus.Name == "Open")
-    {
-            <a asp-action="Edit" asp-controller="Events" asp-route-id="@transaction.ID" class="btn btn-primary">Edit</a>
-            <a asp-action="Release" asp-controller="Events" asp-route-id="@transaction.ID" class="btn btn-info">Release</a>
-    }
-
-    <a asp-action="Index" asp-controller="Events" class="btn btn-secondary">Back to Transaction List</a>
+    
+    <a asp-action="Return" asp-controller="Events" asp-route-id="@transaction.ID" class="btn btn-info">Return Items</a>
+    
+    <a asp-action="Index" asp-controller="Events" class="btn btn-secondary">Back to Events List</a>
     </p>
 </div>
 @section Scripts {

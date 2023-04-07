@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using caa_mis.Data;
 
@@ -11,10 +10,9 @@ using caa_mis.Data;
 namespace caa_mis.Data.CAAMigrations
 {
     [DbContext(typeof(InventoryContext))]
-    [Migration("20230406030807_Initial")]
-    partial class Initial
+    partial class InventoryContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.15");
@@ -180,6 +178,9 @@ namespace caa_mis.Data.CAAMigrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("DateReturned")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("EmployeeID")
                         .HasColumnType("INTEGER");
 
@@ -218,6 +219,9 @@ namespace caa_mis.Data.CAAMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ReturnedQuantity")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ID");

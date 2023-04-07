@@ -94,10 +94,14 @@
                                 <a asp-action="Edit" asp-route-id="@item.ID">[ Edit ]</a>
 
                             }
-                            <a asp-action="Index" asp-controller="EventItems" asp-route-EventID="@item.ID">[ Details ]</a> |
+                            <a asp-action="Index" asp-controller="EventItems" asp-route-EventID="@item.ID">[ Details ]</a>
                             @if (item.TransactionStatus.Name == "Open")
                             {
                                 <a asp-action="Delete" asp-route-id="@item.ID">[ Delete ]</a>
+                            }
+                            @if (item.TransactionStatus.Name == "Released")
+                            {
+                                <a asp-action="Return" asp-controller="EventItems" asp-route-EventID="@item.ID">[ Return Items ]</a>
                             }
                         </div>
                     </div>
@@ -144,7 +148,7 @@
                             
                             <td>
 
-                                @if (item.TransactionStatus.Name == "Open")
+                                @if (item.TransactionStatus.Name == "Open" )
                                 {
                                     <a asp-action="Edit" asp-route-id="@item.ID">[ Edit ]</a>
 
@@ -153,6 +157,10 @@
                                 @if (item.TransactionStatus.Name == "Open")
                                 {
                                     <a asp-action="Delete" asp-route-id="@item.ID">[ Delete ]</a>
+                                }
+                                @if (item.TransactionStatus.Name == "Released")
+                                {
+                                    <a asp-action="Return" asp-controller="EventItems" asp-route-EventID="@item.ID">[ Return Items ]</a>
                                 }
                             </td>
                         </tr>

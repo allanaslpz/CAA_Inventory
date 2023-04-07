@@ -143,6 +143,114 @@ namespace caa_mis.Controllers
             return View(pagedData);
         }
 
+        public async Task<IActionResult> Return(int? EventID, string sortDirectionCheck, string sortFieldID, int? ItemID,
+           int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Product Name")
+        {
+            //Clear the sort/filter/paging URL Cookie for Controller
+            CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
+
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
+            ViewDataReturnURL();
+
+            if (!EventID.HasValue)
+            {
+                //Go back to the proper return URL for the Transactions controller
+                return Redirect(ViewData["returnURL"].ToString());
+            }
+
+            //List of sort options.
+            //NOTE: make sure this array has matching values to the column headings
+            string[] sortOptions = new[] { "Product Name", "Quantity" };
+
+            PopulateDropDownLists();
+
+            var item = from a in _context.EventItems
+                .Include(b => b.Event)
+                .Include(t => t.Item)
+                       where a.EventID == EventID.GetValueOrDefault()
+                       select a;
+
+            var transactions = _context.Events
+                .Include(b => b.Branch)
+                .Include(b => b.Employee)
+                .Include(b => b.TransactionStatus)
+                .Where(p => p.ID == EventID.GetValueOrDefault())
+                .AsNoTracking()
+                .FirstOrDefault();
+
+            ViewBag.Transactions = transactions;
+
+            if (ItemID.HasValue)
+            {
+                item = item.Where(p => p.ItemID == ItemID);
+                ViewData["Filtering"] = "btn-danger";
+            }
+
+            //Before we sort, see if we have called for a change of filtering or sorting
+            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
+            {
+                page = 1;//Reset page to start
+
+                if (sortOptions.Contains(actionButton))//Change of sort is requested
+                {
+                    if (actionButton == sortField) //Reverse order on same field
+                    {
+                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
+                    }
+                    sortField = actionButton;//Sort by the button clicked
+                }
+                else //Sort by the controls in the filter area
+                {
+                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
+                    sortField = sortFieldID;
+                }
+            }
+
+
+            //Now we know which field and direction to sort by
+            if (sortField == "Quantity")
+            {
+                if (sortDirection == "asc")
+                {
+                    item = item
+                        .OrderBy(p => p.Quantity);
+                }
+                else
+                {
+                    item = item
+                        .OrderByDescending(p => p.Quantity);
+                }
+            }
+            else //Sorting by Name
+            {
+                if (sortDirection == "asc")
+                {
+                    item = item
+                        .OrderBy(p => p.Item.Name);
+                }
+                else
+                {
+                    item = item
+                        .OrderByDescending(p => p.Item.Name);
+                }
+            }
+            //Set sort for next time
+            ViewData["sortField"] = sortField;
+            ViewData["sortDirection"] = sortDirection;
+            //SelectList for Sorting Options
+            ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
+
+            //Handle Paging
+            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "EventItems");
+            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
+            var pagedData = await PaginatedList<EventItem>.CreateAsync(item.AsNoTracking(), page ?? 1, pageSize);
+
+
+
+            return View(pagedData);
+        }
         // GET: EventItems/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -188,7 +296,8 @@ namespace caa_mis.Controllers
                 ID = transactionItem.ID,
                 EventID = transactionItem.TransactionID,
                 ItemID = transactionItem.ProductID,
-                Quantity = transactionItem.Quantity
+                Quantity = transactionItem.Quantity,
+                ReturnedQuantity = transactionItem.Quantity
             };
 
             var itemExists = _context.EventItems
@@ -246,7 +355,25 @@ namespace caa_mis.Controllers
             PopulateDropDownLists(EventItem);
             return View(EventItem);
         }
+        // GET: EventItems/Edit/5
+        [BreadCrumb(Title = "Edit Returned Event Item", Order = 1, IgnoreAjaxRequests = true)]
+        public async Task<IActionResult> EditReturned(int? id)
+        {
+            ViewDataReturnURL();
 
+            if (id == null || _context.EventItems == null)
+            {
+                return NotFound();
+            }
+
+            var EventItem = await _context.EventItems.FindAsync(id);
+            if (EventItem == null)
+            {
+                return NotFound();
+            }
+            PopulateDropDownLists(EventItem);
+            return View(EventItem);
+        }
         // POST: EventItems/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -260,6 +387,16 @@ namespace caa_mis.Controllers
             {
                 return NotFound();
             }
+            EventItem bI = new EventItem
+            {
+                ID = EventItem.ID,
+                EventID = EventItem.EventID,
+                ItemID = EventItem.ItemID,
+                Quantity = EventItem.Quantity,
+                ReturnedQuantity = EventItem.Quantity
+            };
+
+
             if (validateOnHand(EventItem.EventID, EventItem.ItemID, EventItem.Quantity))
             {
                 if (EventItem.Quantity > 0)
@@ -268,7 +405,7 @@ namespace caa_mis.Controllers
                     {
                         try
                         {
-                            _context.Update(EventItem);
+                            _context.Update(bI);
                             await _context.SaveChangesAsync();
                             return Redirect(ViewData["returnURL"].ToString());
                         }
@@ -299,6 +436,51 @@ namespace caa_mis.Controllers
             return View(EventItem);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditReturned(int id, [Bind("ID,ItemID,EventID,Quantity,ReturnedQuantity")] EventItem EventItem)
+        {
+            ViewDataReturnURL();
+
+            if (id != EventItem.ID)
+            {
+                return NotFound();
+            }
+            
+           
+            if (EventItem.Quantity >= 0)
+            {
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        _context.Update(EventItem);
+                        await _context.SaveChangesAsync();
+                        //return Redirect(ViewData["returnURL"].ToString());
+                        return RedirectToAction("Return", new { EventID = EventItem.EventID });
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!EventItemExists(EventItem.ID))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "The changes cannot be saved. Quantity cannot be negative.");
+            }
+            
+            PopulateDropDownLists(EventItem);
+            return View(EventItem);
+        }
         // GET: EventItems/Delete/5
         [BreadCrumb(Title = "Delete", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Delete(int? id)

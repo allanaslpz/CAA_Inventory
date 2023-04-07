@@ -18,5 +18,8 @@ namespace caa_mis.Models
         [Required]
         [Range(0, int.MaxValue)]
         public int Quantity { get; set; }
+
+        [Range(0, int.MaxValue)]
+        public int? ReturnedQuantity { get; set; }
     }
 }
