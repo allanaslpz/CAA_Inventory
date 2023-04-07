@@ -34,6 +34,7 @@ namespace caa_mis.Controllers
     {
         private readonly InventoryContext _context;
         private readonly IMemoryCache _cache;
+        private readonly int cacheTimer = 10; //default 10 minutes
         public ReportsController(InventoryContext context, IMemoryCache memoryCache)
         {
             _context = context;
@@ -239,8 +240,10 @@ namespace caa_mis.Controllers
                 }
             }
 
-            // Save filtered data to cookie
-            CachingFilteredData(sumQ);
+            // Save filtered data to memory cache
+            var toListSumQ = sumQ.ToList();
+            _cache.Set("cachedData", toListSumQ, TimeSpan.FromMinutes(cacheTimer));
+
 
             //Set sort for next time
             ViewData["sortField"] = sortField;
@@ -254,11 +257,6 @@ namespace caa_mis.Controllers
             return View(pagedData);
         }
 
-        private void CachingFilteredData<T>(IQueryable<T> sumQ)
-        {
-            FilteredDataCaching.SaveFilteredData(HttpContext, "filteredData", sumQ, 120);
-        }
-
         private SelectList BranchList(int[] selectedId)
         {
             return new SelectList(_context.Branches
@@ -267,9 +265,15 @@ namespace caa_mis.Controllers
 
         public IActionResult DownloadStockItems()
         {
-            //retrieving filtered data from cookie
-            var items = JsonConvert.DeserializeObject<IEnumerable<StockSummaryByBranchVM>>(
-            Request.Cookies["filteredData"]);
+            //retrieving data from cache            
+            var items = _cache.Get<IEnumerable<StockSummaryByBranchVM>>("cachedData");
+
+            if (items == null)
+            {
+                // If data is not in cache, retrieve it from the database and add it to the cache
+                items = _context.StockSummaryByBranch.AsNoTracking()
+                .ToList();
+            }
 
             int numRows = items.Count();
 
@@ -516,7 +520,7 @@ namespace caa_mis.Controllers
             }
 
             var toListSumQ = sumQ.ToList();
-            _cache.Set("cachedData", toListSumQ, TimeSpan.FromMinutes(10));
+            _cache.Set("cachedData", toListSumQ, TimeSpan.FromMinutes(cacheTimer));
 
             //Set sort for next time
             ViewData["sortField"] = sortField;
@@ -768,11 +772,10 @@ namespace caa_mis.Controllers
             //Set sort for next time
             ViewData["sortField"] = sortField;
             ViewData["sortDirection"] = sortDirection;
-            //SelectList for Sorting Options
-            //ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
+            
+            var toListSumQ = sumQ.ToList();
+            _cache.Set("cachedData", toListSumQ, TimeSpan.FromMinutes(cacheTimer));
 
-            // Save filtered data to cookie
-            CachingFilteredData(sumQ);
 
             int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "TransactionItemSummary");
             ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
@@ -782,9 +785,15 @@ namespace caa_mis.Controllers
 
         public IActionResult DownloadTransactionItems()
         {
-            //retrieving filtered data from cookie
-            var items = JsonConvert.DeserializeObject<IEnumerable<TransactionItemSummaryVM>>(
-            Request.Cookies["filteredData"]);
+            //retrieving data from cache
+            var items = _cache.Get<IEnumerable<TransactionItemSummaryVM>>("cachedData");
+
+            if (items == null)
+            {
+                // If data is not in cache, retrieve it from the database and add it to the cache
+                items = _context.TransactionItemSummary.AsNoTracking()
+                .ToList();
+            }
 
             int numRows = items.Count();
 

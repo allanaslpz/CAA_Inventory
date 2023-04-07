@@ -696,11 +696,5 @@ namespace caa_mis.Controllers
                 .OrderBy(d => d.Name), "ID", "Name", selectedId);
         }
 
-        private void CachingFilteredData<T>(IQueryable<T> sumQ)
-        {
-            FilteredDataCaching.SaveFilteredData(HttpContext, "filteredData", sumQ, 120);
-        }
-        
-
     }
 }

@@ -569,11 +569,7 @@ namespace caa_mis.Controllers
         {
             return new SelectList(_context.Branches
                 .OrderBy(d => d.Name), "ID", "Name", selectedId);
-        }
-        private void CachingFilteredData<T>(IQueryable<T> sumQ)
-        {
-            FilteredDataCaching.SaveFilteredData(HttpContext, "filteredData", sumQ, 120);
-        }
+        }        
 
         private SelectList TransactionList(int? selectedId)
         {
