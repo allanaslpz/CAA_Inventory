@@ -184,6 +184,7 @@ namespace caa_mis.Controllers
                 if (ModelState.IsValid)
                 {
                     _context.Add(Event);
+                    TempData["SuccessMessage"] = "Created Event successfully.";
                     await _context.SaveChangesAsync();
                     return RedirectToAction("Index", "EventItems", new { EventID = Event.ID });
                 }
@@ -245,6 +246,7 @@ namespace caa_mis.Controllers
                 try
                 {
                     _context.Update(Event);
+                    TempData["SuccessMessage"] = "Updated Event details successfully.";
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -303,7 +305,7 @@ namespace caa_mis.Controllers
             {
                 _context.Events.Remove(Event);
             }
-            
+            TempData["SuccessMessage"] = "Deleted Event successfully.";
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -359,6 +361,7 @@ namespace caa_mis.Controllers
                 if (ModelState.IsValid)
                 {
                     _context.Events.Attach(trans).Property(x => x.TransactionStatusID).IsModified = true;
+                    TempData["SuccessMessage"] = "Event release is successful.";
                     _context.SaveChanges();
 
                     return Redirect(ViewData["returnURL"].ToString());

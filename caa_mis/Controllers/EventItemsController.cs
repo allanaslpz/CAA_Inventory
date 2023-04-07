@@ -15,6 +15,7 @@ using OfficeOpenXml.Style;
 using System.Drawing;
 using Microsoft.Extensions.Caching.Memory;
 using Org.BouncyCastle.Utilities;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 
 namespace caa_mis.Controllers
 {
@@ -336,7 +337,7 @@ namespace caa_mis.Controllers
         }
 
         public async Task<IActionResult> EventSummary(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string actionButton,
+                                            string sortFieldID, string Products, string actionButton,
                                             string sortDirection = "asc", string sortField = "Branch",
                                             DateTime? eventStartDate = null, DateTime? eventEndDate = null)
         {
@@ -356,11 +357,6 @@ namespace caa_mis.Controllers
                 ViewData["Filtering"] = "btn-danger";
             }            
 
-            if (!String.IsNullOrEmpty(SearchString))
-            {
-                sumQ = sumQ.Where(i => i.EmployeeName.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-danger";
-            }
             if (eventStartDate != null)
             {
                 sumQ = sumQ.Where(e => e.EventDate >= eventStartDate.Value);
@@ -372,6 +368,27 @@ namespace caa_mis.Controllers
                 sumQ = sumQ.Where(e => e.EventDate <= eventEndDate.Value);
                 ViewData["Filtering"] = "btn-danger";
             }
+
+            if (!string.IsNullOrEmpty(Products))
+            {
+                List<string> pr = Products.Split(',').Select(t => t.Trim()).ToList();
+                pr.Remove("");
+                try
+                {
+                    var filteredItems = _context.Items
+                    .Where(item => pr.Contains(item.Name))
+                    .Select(item => item.Name);
+                    sumQ = sumQ.Where(summary => filteredItems.Contains(summary.ItemName));
+                }
+                catch
+                {
+                    TempData["ErrorMessage"] = "Invalid Format Submitted. Product must be separated with comma ex. Chair, Table,...";
+                    return View();
+                }
+
+                ViewData["Filtering"] = "btn-danger";
+            }
+
 
             ViewData["BranchID"] = BranchList(BranchID);            
 

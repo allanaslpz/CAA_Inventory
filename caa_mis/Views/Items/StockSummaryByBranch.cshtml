@@ -21,6 +21,10 @@
         <button class="btn @(ViewData["Filtering"]) btn-toolbar float-left" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
             Filter/Search
         </button>
+        @if (!Model.Any())
+        {
+            <p><b>No records found</b></p>
+        }
         <div class="collapse" id="collapseFilter">
             <div class="card card-body bg-light">
                 <div class="row">
@@ -32,7 +36,9 @@
 
                     <div class="form-group col-md-4">
                         <label class="control-label">Search Product:</label>
-                        @Html.TextBox("SearchString", null, new { @class = "form-control p-2" })
+                        @Html.TextBox("Products", null, new { @name="Products", @id="Products", @class = "form-control p-2" })
+                        <input type="hidden" name="ProductIDs" id="ProductIDs" />
+
                     </div>
                     <div class="form-group col-md-4 align-self-end">
                         <input type="submit" name="actionButton" value="Apply" class="btn btn-outline-primary" />
@@ -87,3 +93,65 @@
     </table>
     <partial name="_PagingNavBar" />
 </form>
+@section Scripts {
+    <script type="text/javascript">
+        function split(val) {
+            return val.split(/,\s*/);
+        }
+        function extractLast(term) {
+            return split(term).pop();
+        }
+        jQuery("#clr").click(function () {
+            $("#Products").val("");
+        });
+        $('#Products')
+            .on("keydown", function (event) {
+                if (event.keyCode === $.ui.keyCode.TAB &&
+                    $(this).autocomplete("instance").menu.active) {
+                    event.preventDefault();
+                }
+            })
+            .autocomplete({
+                source: function (request, response) {
+
+                    $.ajax({
+                        url: '/TransactionItems/SearchProduct/',
+                        dataType: 'json',
+                        data: { BranchID: 1, term: extractLast(request.term) },
+                        success: function (data) {
+                            var result = $.map(data, function (item) {
+                                return {
+                                    label: item.name,
+                                    value: item.id
+                                };
+                            });
+                            return response(result);
+                        }
+                    });
+                },
+                focus: function () {
+                    // prevent value inserted on focus
+                    return false;
+                },
+                select: function (event, ui) {
+
+                    var terms = split(this.value);
+                    // remove the current input
+                    terms.pop();
+
+                    // add the selected item
+                    terms.push(ui.item.label);
+                    // add placeholder to get the comma-and-space at the end
+                    terms.push("");
+                    this.value = terms.join(", ");
+                    return false;
+
+                },
+                minLength: 0,
+            }).focus(function () {
+                // trigger the search when the input field receives focus
+                $(this).autocomplete("search", "");
+            });
+
+    </script>
+}

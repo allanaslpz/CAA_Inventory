@@ -254,6 +254,7 @@ namespace caa_mis.Controllers
                 {
                     await AddPicture(item, thePicture);
                     _context.Add(item);
+                    TempData["SuccessMessage"] = "Added product successfully.";
                     await _context.SaveChangesAsync();
                     return RedirectToAction("Details", "Items", new { id = item.ID });
                     //return Redirect(ViewData["returnURL"].ToString());
@@ -341,6 +342,7 @@ namespace caa_mis.Controllers
                         await AddPicture(itemToUpdate, thePicture);
                     }
                     //_context.Update(item);
+                    TempData["SuccessMessage"] = "Updated product details successfully.";
                     await _context.SaveChangesAsync();
                     return Redirect(ViewData["returnURL"].ToString());
                 }
@@ -425,6 +427,7 @@ namespace caa_mis.Controllers
             
             if (item != null)
             {
+                TempData["SuccessMessage"] = "Deleted product successfully.";
                 await _context.SaveChangesAsync();
             }
 
@@ -433,7 +436,7 @@ namespace caa_mis.Controllers
         }
         
         public async Task<IActionResult> StockSummaryByBranch(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "BranchName")
+                                            string sortFieldID, string Products, string actionButton, string sortDirection = "asc", string sortField = "BranchName")
         {
             //List of sort options.
             //NOTE: make sure this array has matching values to the column headings
@@ -450,9 +453,24 @@ namespace caa_mis.Controllers
                 ViewData["Filtering"] = "btn-danger";
             }
 
-            if (!String.IsNullOrEmpty(SearchString))
+            
+            if (!string.IsNullOrEmpty(Products))
             {
-                sumQ = sumQ.Where(i => i.ItemName.ToUpper().Contains(SearchString.ToUpper()));
+                List<string> pr = Products.Split(',').Select(t => t.Trim()).ToList();
+                pr.Remove("");
+                try
+                {
+                    var filteredItems = _context.Items
+                    .Where(item => pr.Contains(item.Name))
+                    .Select(item => item.Name);
+                    sumQ = sumQ.Where(summary => filteredItems.Contains(summary.ItemName));
+                }
+                catch
+                {
+                    TempData["ErrorMessage"] = "Invalid Format Submitted. Product must be separated with comma ex. Chair, Table,...";
+                    return View();
+                }
+
                 ViewData["Filtering"] = "btn-danger";
             }
 
