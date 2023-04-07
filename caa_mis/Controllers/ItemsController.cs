@@ -254,6 +254,7 @@ namespace caa_mis.Controllers
                 {
                     await AddPicture(item, thePicture);
                     _context.Add(item);
+                    TempData["SuccessMessage"] = "Added product successfully.";
                     await _context.SaveChangesAsync();
                     return RedirectToAction("Details", "Items", new { id = item.ID });
                     //return Redirect(ViewData["returnURL"].ToString());
@@ -341,6 +342,7 @@ namespace caa_mis.Controllers
                         await AddPicture(itemToUpdate, thePicture);
                     }
                     //_context.Update(item);
+                    TempData["SuccessMessage"] = "Updated product details successfully.";
                     await _context.SaveChangesAsync();
                     return Redirect(ViewData["returnURL"].ToString());
                 }
@@ -425,6 +427,7 @@ namespace caa_mis.Controllers
             
             if (item != null)
             {
+                TempData["SuccessMessage"] = "Deleted product successfully.";
                 await _context.SaveChangesAsync();
             }
 
