@@ -4,10 +4,10 @@
     ViewData["Title"] = "Stock In";
 }
 
-<h1>Stock Ins</h1>
+<h1>Stock Items</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary float-left">Create New Stock In</a>
+    <a asp-action="Create" class="btn btn-primary float-left">Add New Stock Item</a>
     <button class="btn @(ViewData["Filtering"]) btn-toolbar float-end" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
         Filter/Search
     </button>
@@ -116,19 +116,19 @@
                 <thead>
                     <tr>
                         <th>
-                            <input type="submit" name="actionButton" value="Description" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Description" class="btn btn-link btn-1" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Origin" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Origin" class="btn btn-link btn-1" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Destination" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Destination" class="btn btn-link btn-1" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Date" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Date" class="btn btn-link btn-1" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Status" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Status" class="btn btn-link btn-1" />
                         </th>
                         <th></th>
                     </tr>
