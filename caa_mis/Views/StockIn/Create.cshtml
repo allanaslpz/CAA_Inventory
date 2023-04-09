@@ -4,7 +4,7 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create New Stock In</h1>
+<h1>Add New Stock Item</h1>
 <hr />
 
 <form asp-action="Create">
@@ -67,15 +67,11 @@
     <div class="col-md-4 mb-3">
         <div class="form-group">
             <input type="submit" value="Create" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
         </div>
     </div>
 </form>
 
-
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

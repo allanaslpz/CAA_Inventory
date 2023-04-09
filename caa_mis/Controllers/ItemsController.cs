@@ -23,10 +23,12 @@ using Microsoft.AspNetCore.Authorization;
 using NuGet.Versioning;
 using Microsoft.Extensions.Caching.Memory;
 using System.Drawing.Printing;
+using DNTBreadCrumb.Core;
 
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin, Supervisor")]
+    [BreadCrumb(Title = "Products", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class ItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -37,7 +39,7 @@ namespace caa_mis.Controllers
             _cache = memoryCache;
         }
 
-        // GET: Items
+       
         public async Task<IActionResult> Index(string sortDirectionCheck, string sortFieldID, string SearchString, string SearchSKU, int? CategoryID, int? ItemStatusID,
             int? ManufacturerID, int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Name")
         {
@@ -190,8 +192,7 @@ namespace caa_mis.Controllers
             //SelectList for Sorting Options
             ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
 
-            // Save filtered data to cookie
-            //CachingFilteredData(inventory);
+            // Save filtered data to cache
             var toListInventory = inventory.ToList();
             _cache.Set("cachedData", toListInventory, TimeSpan.FromMinutes(10));
 
@@ -205,6 +206,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Items/Details/5
+        [BreadCrumb(Title = "Details", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Details(int? id)
         {
             //URL with the last filter, sort and page parameters for this controller
@@ -244,6 +246,7 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [BreadCrumb(Title = "Create", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Create([Bind("ID,CategoryID,SKUNumber,Name,Description,Scale,Cost,MinLevel,ManufacturerID,ItemStatusID")] Item item, IFormFile thePicture)
         {
             ViewDataReturnURL();
@@ -280,6 +283,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Items/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
             //URL with the last filter, sort and page parameters for this controller
@@ -375,6 +379,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Items/Delete/5
+        [BreadCrumb(Title = "Disable", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Delete(int? id)
         {
             ViewDataReturnURL();
@@ -435,190 +440,19 @@ namespace caa_mis.Controllers
             return RedirectToAction(nameof(Index));
         }
         
-        public async Task<IActionResult> StockSummaryByBranch(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "BranchName")
-        {
-            //List of sort options.
-            //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Branch", "Product", "Cost", "Quantity", "Min Level" };
+       
 
-            //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-primary";
+       
 
-            IQueryable<StockSummaryByBranchVM> sumQ = _context.StockSummaryByBranch;
-
-            if (BranchID != null && BranchID.Length > 0)
-            {
-                sumQ = sumQ.Where(s => BranchID.Contains(s.BranchID));
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-            if (!String.IsNullOrEmpty(SearchString))
-            {
-                sumQ = sumQ.Where(i => i.ItemName.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-            ViewData["BranchID"] = BranchList(BranchID);            
-
-            //Before we sort, see if we have called for a change of filtering or sorting
-            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
-            {
-                page = 1;//Reset page to start
-
-                if (sortOptions.Contains(actionButton))//Change of sort is requested
-                {
-                    if (actionButton == sortField) //Reverse order on same field
-                    {
-                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
-                    }
-                    sortField = actionButton;//Sort by the button clicked
-                }
-                else //Sort by the controls in the filter area
-                {
-                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
-                    sortField = sortFieldID;
-                }
-            }
-
-            //Now we know which field and direction to sort by
-            if (sortField == "Branch")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.BranchName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.BranchName);
-                }
-            }
-            else if (sortField == "Product")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.ItemName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.ItemName);
-                }
-            }
-            else if (sortField == "Cost")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.ItemCost);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.ItemCost);
-                }
-            }
-            else if (sortField == "Quantity")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.Quantity);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.Quantity);
-                }
-            }
-            else if (sortField == "Min Level")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.MinLevel);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.MinLevel);
-                }
-            }
-            else //Sorting by Name
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.ItemName)
-                        .ThenBy(p => p.Quantity);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.ItemName)
-                        .ThenByDescending(p => p.Quantity);
-                }
-            }
-
-            // Save filtered data to cookie
-            CachingFilteredData(sumQ);
-
-            //Set sort for next time
-            ViewData["sortField"] = sortField;
-            ViewData["sortDirection"] = sortDirection;
-            //SelectList for Sorting Options
-            //ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
-
-            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "StockItemSummary");
-            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
-            var pagedData = await PaginatedList<StockSummaryByBranchVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
-            return View(pagedData);
-        }
-
-        public IActionResult GenerateBarcode()
-        {
-            return View();
-        }
-
-        public IActionResult Print(string sku, string name)
+        public IActionResult Print(string sku, string name, int id)
         {
             ViewData["sku"] = sku;
             ViewData["name"] = name;
+            ViewData["id"] = id;
             return View();
         }
 
-        [HttpPost, ActionName("PrintBarcode")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PrintBarcode(string Products, string actionButton)
-        {
-            var toPrint = await _context.Items.ToListAsync();
-
-            if (actionButton == "Generate Filtered")
-            {
-               
-                List<string> pr = Products.Split(',').ToList();
-                pr = pr.Select(t => t.Trim()).ToList();
-                pr.Remove(" ");
-                try
-                {
-                    var filteredOrders = from order in _context.Items
-                                         where pr.Contains(order.SKUNumber)
-                                         select order;
-                    return View(filteredOrders);
-                }
-                catch
-                {
-                    TempData["ErrorMessage"] = "Invalid Format Submitted. SKU must be separated with comma ex. CAA1234, CAA2345, CAA3245";
-                    return View();
-                }
-            }
-           
-            
-            return View(toPrint);
-        }
+        
         private SelectList CategorySelectList(int? selectedId)
         {
             return new SelectList(_context.Categories
@@ -663,10 +497,7 @@ namespace caa_mis.Controllers
             ViewData["returnURL"] = MaintainURL.ReturnURL(HttpContext, ControllerName());
         }
 
-        private void CachingFilteredData<T>(IQueryable<T> sumQ)
-        {
-            FilteredDataCaching.SaveFilteredData(HttpContext, "filteredData", sumQ, 120);
-        }
+        
         private async Task AddPicture(Item item, IFormFile thePicture)
         {
             //Get the picture and save it with the Patient (2 sizes)
@@ -813,70 +644,7 @@ namespace caa_mis.Controllers
             }
             return NotFound("No data.");
         }
-        public IActionResult DownloadStockItems()
-        {
-            //retrieving filtered data from cookie
-            var items = JsonConvert.DeserializeObject<IEnumerable<StockSummaryByBranchVM>>(
-            Request.Cookies["filteredData"]);
-
-            int numRows = items.Count();
-
-            if (numRows > 0)
-            {
-                using ExcelPackage excel = new();
-                var workSheet = excel.Workbook.Worksheets.Add("StockProducts");
-
-                workSheet.Cells[3, 1].LoadFromCollection(items, true);
-
-                //Set Style and backgound colour of headings
-                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 7])
-                {
-                    headings.Style.Font.Bold = true;
-                    var fill = headings.Style.Fill;
-                    fill.PatternType = ExcelFillStyle.Solid;
-                    fill.BackgroundColor.SetColor(Color.LightCyan);
-                }
-
-                //Autofit columns
-                workSheet.Cells.AutoFitColumns();
-
-                //Add a title and timestamp at the top of the report
-                workSheet.Cells[1, 1].Value = "Stock Product Report";
-                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 7])
-                {
-                    Rng.Merge = true; //Merge columns start and end range
-                    Rng.Style.Font.Bold = true; //Font should be bold
-                    Rng.Style.Font.Size = 18;
-                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                }
-                //Since the time zone where the server is running can be different, adjust to 
-                //Local for us.
-                DateTime utcDate = DateTime.UtcNow;
-                TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-                DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
-                using (ExcelRange Rng = workSheet.Cells[2, 7])
-                {
-                    Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
-                        localDate.ToShortDateString();
-
-                    Rng.Style.Font.Size = 12;
-                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                }
-
-                try
-                {
-                    Byte[] theData = excel.GetAsByteArray();
-                    string filename = "StockProducts.xlsx";
-                    string mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    return File(theData, mimeType, filename);
-                }
-                catch (Exception)
-                {
-                    return BadRequest("Could not build and download the file.");
-                }
-            }
-            return NotFound("No data.");
-        }
+       
         public async Task<IActionResult> GetBranchStock(int itemID)
         {
             var inventory = await _context.Stocks

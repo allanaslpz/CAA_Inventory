@@ -16,10 +16,12 @@ using System.Drawing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
+using DNTBreadCrumb.Core;
 
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin, Supervisor")]
+    [BreadCrumb(Title = "Stock Items", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class StockInController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -194,6 +196,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Transactions/Details/5
+        [BreadCrumb(Title = "Details", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Details(int? id)
         {
             ViewDataReturnURL();
@@ -219,6 +222,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Transactions/Create
+        [BreadCrumb(Title = "Create", Order = 1, IgnoreAjaxRequests = true)]
         public IActionResult Create()
         {
             PopulateDropDownLists();
@@ -230,6 +234,7 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        
         public async Task<IActionResult> Create([Bind("ID,EmployeeID,TransactionStatusID,TransactionTypeID,OriginID,DestinationID,TransactionDate,ReceivedDate,Description,Shipment")] Transaction transaction)
         {
             ViewDataReturnURL();
@@ -245,6 +250,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Transactions/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
             ViewDataReturnURL();
@@ -301,6 +307,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Transactions/Delete/5
+        [BreadCrumb(Title = "Delete", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Delete(int? id)
         {
             ViewDataReturnURL();
@@ -343,8 +350,9 @@ namespace caa_mis.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        
+
         // GET: Transactions/Release/5
+        [BreadCrumb(Title = "Release", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Release(int? id)
         {
             ViewDataReturnURL();

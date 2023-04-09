@@ -13,10 +13,12 @@ using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Identity;
 using caa_mis.ViewModels;
+using DNTBreadCrumb.Core;
 
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin")]
+    [BreadCrumb(Title = "Employees", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class EmployeesController : Controller
     {
         private readonly InventoryContext _context;
@@ -64,6 +66,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Employee/Create
+        [BreadCrumb(Title = "Create", Order = 1, IgnoreAjaxRequests = true)]
         public IActionResult Create()
         {
             EmployeeAdminVM employee = new EmployeeAdminVM();
@@ -148,6 +151,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Employees/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

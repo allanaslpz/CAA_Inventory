@@ -51,7 +51,7 @@
 </div>
 <form asp-action="Index" method="get">
     <div class="form-horizontal">
-        <input type="hidden" name="TransactionID" value="@transaction.ID" />
+        <input type="hidden" name="EventID" value="@transaction.ID" />
         <button class="btn btn-toolbar @(ViewData["Filtering"])" type="button" data-bs-toggle="collapse" id="filterToggle" data-bs-target="#collapseFilter" aria-expanded="false" aria-controls="collapseFilter">
                 Filter/Search
             </button>
@@ -126,7 +126,7 @@
 <form asp-action="Index" method="get">
     <input type="hidden" name="sortDirection" value="@ViewData["sortDirection"]" />
     <input type="hidden" name="sortField" value="@ViewData["sortField"]" />
-    <input type="hidden" name="TransactionID" value="@transaction.ID" />
+    <input type="hidden" name="EventID" value="@transaction.ID" />
     <div class="container-fluid d-block d-lg-none">
         <div class="row">
             @foreach (var item in Model)
@@ -164,14 +164,20 @@
                 <thead>
                     <tr>
                         <th>
-                            <input type="submit" name="actionButton" value="SKU" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="SKU" class="btn btn-link btn-1" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Product Name" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Product Name" class="btn btn-link btn-1" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Quantity" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Quantity" class="btn btn-link btn-1" />
                         </th>
+                        @if (transaction.TransactionStatus.Name == "Returned")
+                        {
+                            <th>
+                                <input type="submit" name="actionButton" value="Returned Quantity" class="btn btn-link btn-1" />
+                            </th>
+                        }
                         @if (transaction.TransactionStatus.Name == "Open")
                         {
                             <th>
@@ -193,6 +199,12 @@
                             <td>
                                 @Html.DisplayFor(modelItem => item.Quantity)
                             </td>
+                            @if (transaction.TransactionStatus.Name == "Returned")
+                            {
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ReturnedQuantity)
+                                </td>
+                            }
                             @if (transaction.TransactionStatus.Name == "Open")
                             {
                             <td>

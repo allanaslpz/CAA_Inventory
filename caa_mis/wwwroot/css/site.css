@@ -159,3 +159,7 @@ main {
 .ml-1 {
     margin-left: 2px !important;
 }
+
+.btn-1 {
+    --bs-btn-padding-x: 0 !important;
+}

@@ -5,10 +5,12 @@ using caa_mis.Data;
 using caa_mis.Models;
 using caa_mis.Utilities;
 using Microsoft.AspNetCore.Authorization;
+using DNTBreadCrumb.Core;
 
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin, Supervisor")]
+    [BreadCrumb(Title = "Branches", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class BranchesController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -171,6 +173,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Branch/Details/5
+        [BreadCrumb(Title = "Details", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Branches == null)
@@ -189,6 +192,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Branch/Create
+        [BreadCrumb(Title = "Create", Order = 1, IgnoreAjaxRequests = true)]
         public IActionResult Create()
         {
             return View();
@@ -211,6 +215,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Branch/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Branches == null)
@@ -262,6 +267,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Branch/Archive/5
+        [BreadCrumb(Title = "Archive", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Archive(int? id)
         {
             if (id == null || _context.Branches == null)

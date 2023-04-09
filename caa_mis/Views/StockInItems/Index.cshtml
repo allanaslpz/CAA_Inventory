@@ -5,7 +5,7 @@
     caa_mis.Models.Transaction transaction = (caa_mis.Models.Transaction)ViewBag.Transactions;
 
 }
-<h1>Stock In Details</h1>
+<h1>Stock Item Details</h1>
 <hr />
 <div class="row">
     <div class="col-6">
@@ -193,13 +193,13 @@
                 <thead>
                     <tr>
                         <th>
-                            <input type="submit" name="actionButton" value="SKU" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="SKU" class="btn btn-link btn-1" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Product Name" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Product Name" class="btn btn-link btn-1" />
                         </th>
                         <th>
-                            <input type="submit" name="actionButton" value="Quantity" class="btn btn-link" />
+                            <input type="submit" name="actionButton" value="Quantity" class="btn btn-link btn-1" />
                         </th>
                         @if (transaction.TransactionStatus.Name == "Open")
                         {

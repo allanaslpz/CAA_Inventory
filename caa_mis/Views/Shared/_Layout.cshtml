@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -28,7 +29,7 @@
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 @*<li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Incoming">Receive Transfers</a></li>*@
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Items" asp-action="Index">Products</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="StockIn" asp-action="Index">Stock Ins</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="StockIn" asp-action="Index">Add Stock Item</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="Index">Transfers</a></li>
                             </ul>
                         </li>
@@ -84,11 +85,17 @@
             </div>
         </nav>
     </header>
+  
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        <div class="alert alert-success" role="alert">@TempData["SuccessMessage"]</div>
     }
     <div class="container">
+        <br />
+        <breadcrumb asp-homepage-title="Home"
+                    asp-homepage-url="@Url.Action("Index", "Home", values: new { area = "" })"
+                    asp-bootstrap-version="V4"
+                    asp-homepage-glyphicon="glyphicon glyphicon-home" ></breadcrumb>
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

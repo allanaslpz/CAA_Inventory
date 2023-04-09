@@ -27,6 +27,11 @@ namespace caa_mis.Models
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
 
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime? DateReturned { get; set; }
+
+
         public ICollection<EventItem> EventItems { get; set; } = new HashSet<EventItem>();
     }
 }

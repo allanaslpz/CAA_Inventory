@@ -15,10 +15,14 @@ using OfficeOpenXml.Style;
 using System.Drawing;
 using Microsoft.Extensions.Caching.Memory;
 using Org.BouncyCastle.Utilities;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+using DNTBreadCrumb.Core;
+using System.Security.Policy;
 
 namespace caa_mis.Controllers
 {
-    
+    [BreadCrumb(Title = "Events", Order = 0, IgnoreAjaxRequests = true, Url = "Transactions")]
+    [BreadCrumb(Title = "Event Details", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class EventItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -139,6 +143,114 @@ namespace caa_mis.Controllers
             return View(pagedData);
         }
 
+        public async Task<IActionResult> Return(int? EventID, string sortDirectionCheck, string sortFieldID, int? ItemID,
+           int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Product Name")
+        {
+            //Clear the sort/filter/paging URL Cookie for Controller
+            CookieHelper.CookieSet(HttpContext, ControllerName() + "URL", "", -1);
+
+            //Change colour of the button when filtering by setting this default
+            ViewData["Filtering"] = "btn-outline-primary";
+
+            ViewDataReturnURL();
+
+            if (!EventID.HasValue)
+            {
+                //Go back to the proper return URL for the Transactions controller
+                return Redirect(ViewData["returnURL"].ToString());
+            }
+
+            //List of sort options.
+            //NOTE: make sure this array has matching values to the column headings
+            string[] sortOptions = new[] { "Product Name", "Quantity" };
+
+            PopulateDropDownLists();
+
+            var item = from a in _context.EventItems
+                .Include(b => b.Event)
+                .Include(t => t.Item)
+                       where a.EventID == EventID.GetValueOrDefault()
+                       select a;
+
+            var transactions = _context.Events
+                .Include(b => b.Branch)
+                .Include(b => b.Employee)
+                .Include(b => b.TransactionStatus)
+                .Where(p => p.ID == EventID.GetValueOrDefault())
+                .AsNoTracking()
+                .FirstOrDefault();
+
+            ViewBag.Transactions = transactions;
+
+            if (ItemID.HasValue)
+            {
+                item = item.Where(p => p.ItemID == ItemID);
+                ViewData["Filtering"] = "btn-danger";
+            }
+
+            //Before we sort, see if we have called for a change of filtering or sorting
+            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
+            {
+                page = 1;//Reset page to start
+
+                if (sortOptions.Contains(actionButton))//Change of sort is requested
+                {
+                    if (actionButton == sortField) //Reverse order on same field
+                    {
+                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
+                    }
+                    sortField = actionButton;//Sort by the button clicked
+                }
+                else //Sort by the controls in the filter area
+                {
+                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
+                    sortField = sortFieldID;
+                }
+            }
+
+
+            //Now we know which field and direction to sort by
+            if (sortField == "Quantity")
+            {
+                if (sortDirection == "asc")
+                {
+                    item = item
+                        .OrderBy(p => p.Quantity);
+                }
+                else
+                {
+                    item = item
+                        .OrderByDescending(p => p.Quantity);
+                }
+            }
+            else //Sorting by Name
+            {
+                if (sortDirection == "asc")
+                {
+                    item = item
+                        .OrderBy(p => p.Item.Name);
+                }
+                else
+                {
+                    item = item
+                        .OrderByDescending(p => p.Item.Name);
+                }
+            }
+            //Set sort for next time
+            ViewData["sortField"] = sortField;
+            ViewData["sortDirection"] = sortDirection;
+            //SelectList for Sorting Options
+            ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
+
+            //Handle Paging
+            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "EventItems");
+            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
+            var pagedData = await PaginatedList<EventItem>.CreateAsync(item.AsNoTracking(), page ?? 1, pageSize);
+
+
+
+            return View(pagedData);
+        }
         // GET: EventItems/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -184,7 +296,8 @@ namespace caa_mis.Controllers
                 ID = transactionItem.ID,
                 EventID = transactionItem.TransactionID,
                 ItemID = transactionItem.ProductID,
-                Quantity = transactionItem.Quantity
+                Quantity = transactionItem.Quantity,
+                ReturnedQuantity = transactionItem.Quantity
             };
 
             var itemExists = _context.EventItems
@@ -224,6 +337,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: EventItems/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
             ViewDataReturnURL();
@@ -241,7 +355,25 @@ namespace caa_mis.Controllers
             PopulateDropDownLists(EventItem);
             return View(EventItem);
         }
+        // GET: EventItems/Edit/5
+        [BreadCrumb(Title = "Edit Returned Event Item", Order = 1, IgnoreAjaxRequests = true)]
+        public async Task<IActionResult> EditReturned(int? id)
+        {
+            ViewDataReturnURL();
 
+            if (id == null || _context.EventItems == null)
+            {
+                return NotFound();
+            }
+
+            var EventItem = await _context.EventItems.FindAsync(id);
+            if (EventItem == null)
+            {
+                return NotFound();
+            }
+            PopulateDropDownLists(EventItem);
+            return View(EventItem);
+        }
         // POST: EventItems/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -255,6 +387,16 @@ namespace caa_mis.Controllers
             {
                 return NotFound();
             }
+            EventItem bI = new EventItem
+            {
+                ID = EventItem.ID,
+                EventID = EventItem.EventID,
+                ItemID = EventItem.ItemID,
+                Quantity = EventItem.Quantity,
+                ReturnedQuantity = EventItem.Quantity
+            };
+
+
             if (validateOnHand(EventItem.EventID, EventItem.ItemID, EventItem.Quantity))
             {
                 if (EventItem.Quantity > 0)
@@ -263,7 +405,7 @@ namespace caa_mis.Controllers
                     {
                         try
                         {
-                            _context.Update(EventItem);
+                            _context.Update(bI);
                             await _context.SaveChangesAsync();
                             return Redirect(ViewData["returnURL"].ToString());
                         }
@@ -294,7 +436,53 @@ namespace caa_mis.Controllers
             return View(EventItem);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditReturned(int id, [Bind("ID,ItemID,EventID,Quantity,ReturnedQuantity")] EventItem EventItem)
+        {
+            ViewDataReturnURL();
+
+            if (id != EventItem.ID)
+            {
+                return NotFound();
+            }
+            
+           
+            if (EventItem.Quantity >= 0)
+            {
+                if (ModelState.IsValid)
+                {
+                    try
+                    {
+                        _context.Update(EventItem);
+                        await _context.SaveChangesAsync();
+                        //return Redirect(ViewData["returnURL"].ToString());
+                        return RedirectToAction("Return", new { EventID = EventItem.EventID });
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!EventItemExists(EventItem.ID))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "The changes cannot be saved. Quantity cannot be negative.");
+            }
+            
+            PopulateDropDownLists(EventItem);
+            return View(EventItem);
+        }
         // GET: EventItems/Delete/5
+        [BreadCrumb(Title = "Delete", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Delete(int? id)
         {
             ViewDataReturnURL();
@@ -335,260 +523,8 @@ namespace caa_mis.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> EventSummary(int? page, int? pageSizeID, int[] BranchID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string actionButton,
-                                            string sortDirection = "asc", string sortField = "Branch",
-                                            DateTime? eventStartDate = null, DateTime? eventEndDate = null)
-        {
-            //List of sort options.
-            //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "Employee", "Branch", "Transfer Status", "Event",
-                                            "Event Date", "Product", "Quantity"};
-
-            //Change colour of the button when filtering by setting this default
-            ViewData["Filtering"] = "btn-outline-primary";
-            
-            IQueryable<EventSummaryVM> sumQ = _context.EventSummary;
-
-            if (BranchID != null && BranchID.Length > 0)
-            {
-                sumQ = sumQ.Where(s => BranchID.Contains(s.BranchID));
-                ViewData["Filtering"] = "btn-danger";
-            }            
-
-            if (!String.IsNullOrEmpty(SearchString))
-            {
-                sumQ = sumQ.Where(i => i.EmployeeName.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-danger";
-            }
-            if (eventStartDate != null)
-            {
-                sumQ = sumQ.Where(e => e.EventDate >= eventStartDate.Value);
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-            if (eventEndDate != null)
-            {
-                sumQ = sumQ.Where(e => e.EventDate <= eventEndDate.Value);
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-            ViewData["BranchID"] = BranchList(BranchID);            
-
-            //Before we sort, see if we have called for a change of filtering or sorting
-            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
-            {
-                page = 1;//Reset page to start
-
-                if (sortOptions.Contains(actionButton))//Change of sort is requested
-                {
-                    if (actionButton == sortField) //Reverse order on same field
-                    {
-                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
-                    }
-                    sortField = actionButton;//Sort by the button clicked
-                }
-                else //Sort by the controls in the filter area
-                {
-                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
-                    sortField = sortFieldID;
-                }
-            }
-
-            //Now we know which field and direction to sort by
-            if (sortField == "Employee")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.EmployeeName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.EmployeeName);
-                }
-            }
-            else if (sortField == "Branch")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.BranchName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.BranchName);
-                }
-            }
-            
-            else if (sortField == "Transfer Status")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.TransactionStatusName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.TransactionStatusName);
-                }
-            }
-            else if (sortField == "Event")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.EventName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.EventName);
-                }
-            }
-            else if (sortField == "Event Date")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.EventDate);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.EventDate);
-                }
-            }
-            else if (sortField == "Product")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.ItemName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.ItemName);
-                }
-            }
-            else if (sortField == "Quantity")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.EventQuantity);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.ItemName);
-                }
-            }
-            else //Sorting by Name
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.BranchName)
-                        .ThenBy(p => p.EventDate);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.BranchName)
-                        .ThenByDescending(p => p.EventDate);
-                }
-            }
-            
-            var toListSumQ = sumQ.ToList();
-            _cache.Set("cachedData", toListSumQ, TimeSpan.FromMinutes(10));
-
-            //Set sort for next time
-            ViewData["sortField"] = sortField;
-            ViewData["sortDirection"] = sortDirection;
-
-            // Set the ViewData variables
-            ViewData["eventStartDate"] = eventStartDate;
-            ViewData["eventEndDate"] = eventEndDate;
-
-            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "EventSummary");
-            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
-            var pagedData = await PaginatedList<EventSummaryVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
-            return View(pagedData);
-        }
-        public IActionResult DownloadEventItems()
-        {
-            var items = _cache.Get<IEnumerable<EventSummaryVM>>("cachedData");            
-
-            if (items == null)
-            {
-                // If data is not in cache, retrieve it from the database and add it to the cache
-                items = _context.EventSummary.AsNoTracking()
-                .ToList();
-            }
-
-            int numRows = items.Count();
-
-            if (numRows > 0)
-            {
-                using ExcelPackage excel = new();
-                var workSheet = excel.Workbook.Worksheets.Add("EventProducts");
-
-                workSheet.Cells[3, 1].LoadFromCollection(items, true);
-                workSheet.Column(10).Style.Numberformat.Format = "yyyy-mm-dd";
-                //Set Style and backgound colour of headings
-                using (ExcelRange headings = workSheet.Cells[3, 1, 3, 13])
-                {
-                    headings.Style.Font.Bold = true;
-                    var fill = headings.Style.Fill;
-                    fill.PatternType = ExcelFillStyle.Solid;
-                    fill.BackgroundColor.SetColor(Color.LightCyan);
-                }
-
-                //Autofit columns
-                workSheet.Cells.AutoFitColumns();
-
-                //Add a title and timestamp at the top of the report
-                workSheet.Cells[1, 1].Value = "Event Product Report";
-                using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 13])
-                {
-                    Rng.Merge = true; //Merge columns start and end range
-                    Rng.Style.Font.Bold = true; //Font should be bold
-                    Rng.Style.Font.Size = 18;
-                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                }
-                //Since the time zone where the server is running can be different, adjust to 
-                //Local for us.
-                DateTime utcDate = DateTime.UtcNow;
-                TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-                DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
-                using (ExcelRange Rng = workSheet.Cells[2, 13])
-                {
-                    Rng.Value = "Created: " + localDate.ToShortTimeString() + " on " +
-                        localDate.ToShortDateString();
-
-                    Rng.Style.Font.Size = 12;
-                    Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-                }
-
-                try
-                {
-                    Byte[] theData = excel.GetAsByteArray();
-                    string filename = "EventProducts.xlsx";
-                    string mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                    return File(theData, mimeType, filename);
-                }
-                catch (Exception)
-                {
-                    return BadRequest("Could not build and download the file.");
-                }
-            }
-            return NotFound("No data.");
-        }
+       
+       
 
         public bool validateOnHand(int TransactionID, int ProductID, int Quantity)
         {
@@ -633,11 +569,7 @@ namespace caa_mis.Controllers
         {
             return new SelectList(_context.Branches
                 .OrderBy(d => d.Name), "ID", "Name", selectedId);
-        }
-        private void CachingFilteredData<T>(IQueryable<T> sumQ)
-        {
-            FilteredDataCaching.SaveFilteredData(HttpContext, "filteredData", sumQ, 120);
-        }
+        }        
 
         private SelectList TransactionList(int? selectedId)
         {

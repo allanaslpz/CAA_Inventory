@@ -11,10 +11,12 @@ using caa_mis.Utilities;
 using caa_mis.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.Storage;
+using DNTBreadCrumb.Core;
 
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin, Supervisor")]
+    [BreadCrumb(Title = "Events", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class EventsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
@@ -142,6 +144,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Events/Details/5
+        [BreadCrumb(Title = "Details", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Details(int? id)
         {
             ViewDataReturnURL();
@@ -165,6 +168,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Events/Create
+        [BreadCrumb(Title = "Create", Order = 1, IgnoreAjaxRequests = true)]
         public IActionResult Create()
         {
             PopulateDropDownLists();
@@ -209,6 +213,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Events/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
 
@@ -267,6 +272,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: Events/Delete/5
+        [BreadCrumb(Title = "Delete", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Delete(int? id)
         {
             ViewDataReturnURL();
@@ -309,8 +315,10 @@ namespace caa_mis.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        
+
         // GET: Transactions/Release/5
+
+        [BreadCrumb(Title = "Release", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Release(int? id)
         {
             ViewDataReturnURL();
@@ -420,7 +428,121 @@ namespace caa_mis.Controllers
             }
             return true;
         }
+        [BreadCrumb(Title = "Return", Order = 1, IgnoreAjaxRequests = true)]
+        public async Task<IActionResult> Return(int? id)
+        {
+            ViewDataReturnURL();
+            if (id == null || _context.Transactions == null)
+            {
+                return NotFound();
+            }
 
+            var transaction = await _context.Events
+                .Include(b => b.Branch)
+                .Include(b => b.Employee)
+                .Include(b => b.TransactionStatus)
+                .FirstOrDefaultAsync(m => m.ID == id);
+
+            var items = from a in _context.EventItems
+                .Include(t => t.Item)
+                .OrderBy(t => t.Item.Name)
+                        where a.EventID == id.GetValueOrDefault()
+                        select a;
+
+            ViewBag.Items = items.AsNoTracking();
+
+            if (transaction == null)
+            {
+                return NotFound();
+            }
+
+            return View(transaction);
+        }
+
+        // POST: Transactions/Release/5
+        [HttpPost, ActionName("Return")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReturnConfirmed(int id)
+        {
+            ViewDataReturnURL();
+            if (_context.Events == null)
+            {
+                return Problem("Entity set 'InventoryContext.Event'  is null.");
+            }
+
+            var status = await _context.TransactionStatuses
+                .FirstOrDefaultAsync(m => m.Name == "Returned");
+
+            var trans = new Event { ID = id, TransactionStatusID = status.ID };
+            if (ReturnEvent(id))
+            {
+                if (ModelState.IsValid)
+                {
+                    _context.Events.Attach(trans).Property(x => x.TransactionStatusID).IsModified = true;
+                    TempData["SuccessMessage"] = "Return Event Item Success.";
+                    _context.SaveChanges();
+
+                    return Redirect(ViewData["returnURL"].ToString());
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Cannot Release this event, there are Items that are currently out of stock.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public bool ReturnEvent(int id)
+        {
+            //get the transaction details
+            var Event = _context.Events
+                .AsNoTracking()
+               .FirstOrDefault(m => m.ID == id);
+            //get the transaction items
+            var EventItems = _context.EventItems
+                .Where(m => m.EventID == id)
+                .AsNoTracking();
+
+
+            //do stock in
+            foreach (var item in EventItems)
+            {
+                //no need to deduct item if it is from head office or supplier
+                if (Event.BranchID != 1)
+                {
+                    //check if stock record already have the item
+                    var stockItem = _context.Stocks.AsNoTracking()
+                    .FirstOrDefault(s => s.BranchID == Event.BranchID && s.ItemID == item.ItemID);
+
+                    int newQty =(int)item.ReturnedQuantity;
+
+                    if (stockItem == null)
+                    {
+                        //create a new record
+                        Stock stock = new Stock
+                        {
+                            ID = 0,
+                            BranchID = (int)Event.BranchID,
+                            ItemID = item.ItemID,
+                            Quantity = newQty
+                        };
+
+                        _context.Stocks.Add(stock);
+                        _context.SaveChanges();
+                    }
+                    else
+                    {
+                        //update the existing one. add the item quantity to the current quantity
+                        var updateStock = new Stock { ID = stockItem.ID, Quantity = stockItem.Quantity + newQty };
+                        _context.Stocks.Attach(updateStock).Property(x => x.Quantity).IsModified = true;
+                        _context.SaveChanges();
+                    }
+                }
+
+            }
+            return true;
+        }
         private bool EventExists(int id)
         {
           return _context.Events.Any(e => e.ID == id);

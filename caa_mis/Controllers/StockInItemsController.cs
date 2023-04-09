@@ -15,20 +15,27 @@ using OfficeOpenXml;
 using System.Drawing;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.CodeAnalysis.Operations;
+using DNTBreadCrumb.Core;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace caa_mis.Controllers
 {
     [Authorize(Roles = "Admin, Supervisor")]
+    [BreadCrumb(Title = "Stock Items", Order = 0, IgnoreAjaxRequests = true, Url = "StockIn")]
+    [BreadCrumb(Title = "Stock Items Detail", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
     public class StockInItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;
-
-        public StockInItemsController(InventoryContext context)
+        private readonly IMemoryCache _cache;
+        private readonly int cacheTimer = 10; //default 10 minutes
+        public StockInItemsController(InventoryContext context, IMemoryCache memoryCache)
         {
             _context = context;
+            _cache = memoryCache;
         }
 
         // GET: TransactionItems
+
         public async Task<IActionResult> Index(int? TransactionID, string sortDirectionCheck, string sortFieldID, int? ItemID,
             int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Product Name")
         {
@@ -255,6 +262,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: TransactionItems/Edit/5
+        [BreadCrumb(Title = "Edit", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Edit(int? id)
         {
             ViewDataReturnURL();
@@ -276,6 +284,7 @@ namespace caa_mis.Controllers
         }
 
         // GET: TransactionItems/Edit/5
+       
         public async Task<IActionResult> EditIncoming(int? id)
         {
             ViewDataReturnURL();
@@ -301,6 +310,7 @@ namespace caa_mis.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+       
         public async Task<IActionResult> Edit(int id, [Bind("ID,ItemID,TransactionID,Quantity")] TransactionItem transactionItem)
         {
             ViewDataReturnURL();
@@ -401,6 +411,7 @@ namespace caa_mis.Controllers
             return View(transactionItem);
         }
         // GET: TransactionItems/Delete/5
+        [BreadCrumb(Title = "Delete", Order = 1, IgnoreAjaxRequests = true)]
         public async Task<IActionResult> Delete(int? id)
         {
             ViewDataReturnURL();
@@ -537,166 +548,7 @@ namespace caa_mis.Controllers
             return Json(result);
         }
 
-            public async Task<IActionResult> TransactionItemSummary(int? page, int? pageSizeID, int[] OriginID, int[] DestinationID, string sortDirectionCheck,
-                                            string sortFieldID, string SearchString, string actionButton, string sortDirection = "asc", string sortField = "OriginName")
-        {
-            //List of sort options.
-            //NOTE: make sure this array has matching values to the column headings
-            string[] sortOptions = new[] { "EmployeeName", "OriginName", "DestinationName", 
-                                            "TransactionStatusName", "ItemName", "Quantity"};
-
-            IQueryable<TransactionItemSummaryVM> sumQ = _context.TransactionItemSummary;
-
-            if (OriginID != null && OriginID.Length > 0)
-            {
-                sumQ = sumQ.Where(s => OriginID.Contains(s.OriginID));
-                ViewData["Filtering"] = "btn-danger";
-            }
-            if (DestinationID != null && DestinationID.Length > 0)
-            {
-                sumQ = sumQ.Where(s => DestinationID.Contains(s.OriginID));
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-            if (!String.IsNullOrEmpty(SearchString))
-            {
-                sumQ = sumQ.Where(i => i.EmployeeName.ToUpper().Contains(SearchString.ToUpper()));
-                ViewData["Filtering"] = "btn-danger";
-            }
-
-            ViewData["OriginID"] = BranchList(OriginID);
-            ViewData["DestinationID"] = BranchList(DestinationID);
-            // Save filtered data to cookie
-            CachingFilteredData(sumQ);
-
-            //Before we sort, see if we have called for a change of filtering or sorting
-            if (!String.IsNullOrEmpty(actionButton)) //Form Submitted!
-            {
-                page = 1;//Reset page to start
-
-                if (sortOptions.Contains(actionButton))//Change of sort is requested
-                {
-                    if (actionButton == sortField) //Reverse order on same field
-                    {
-                        sortDirection = sortDirection == "asc" ? "desc" : "asc";
-                    }
-                    sortField = actionButton;//Sort by the button clicked
-                }
-                else //Sort by the controls in the filter area
-                {
-                    sortDirection = String.IsNullOrEmpty(sortDirectionCheck) ? "asc" : "desc";
-                    sortField = sortFieldID;
-                }
-            }
-
-            //Now we know which field and direction to sort by
-            if (sortField == "EmployeeName")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.EmployeeName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.EmployeeName);
-                }
-            }
-            else if (sortField == "OriginName")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.OriginName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.OriginName);
-                }
-            }
-            else if (sortField == "DestinationName")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.DestinationName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.DestinationName);
-                }
-            }
-            else if (sortField == "TransactionStatusName")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.TransactionStatusName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.TransactionStatusName);
-                }
-            }
-            else if (sortField == "ItemName")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.ItemName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.ItemName);
-                }
-            }
-            else if (sortField == "Quantity")
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.Quantity);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.Quantity);
-                }
-            }
-            else //Sorting by Name
-            {
-                if (sortDirection == "asc")
-                {
-                    sumQ = sumQ
-                        .OrderBy(p => p.OriginName)
-                        .ThenBy(p => p.DestinationName);
-                }
-                else
-                {
-                    sumQ = sumQ
-                        .OrderByDescending(p => p.OriginName)
-                        .ThenByDescending(p => p.DestinationName);
-                }
-            }
-
-            //Set sort for next time
-            ViewData["sortField"] = sortField;
-            ViewData["sortDirection"] = sortDirection;
-            //SelectList for Sorting Options
-            //ViewBag.sortFieldID = new SelectList(sortOptions, sortField.ToString());
-
-            int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "TransactionItemSummary");
-            ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
-            var pagedData = await PaginatedList<TransactionItemSummaryVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
-            return View(pagedData);
-        }
-
-
+        
         //Incoming stock items
         public async Task<IActionResult> Incoming(int? TransactionID, string sortDirectionCheck, string sortFieldID, int? ItemID,
             int? page, int? pageSizeID, string actionButton, string sortDirection = "asc", string sortField = "Product Name")
@@ -849,15 +701,17 @@ namespace caa_mis.Controllers
                 .OrderBy(d => d.Name), "ID", "Name", selectedId);
         }
 
-        private void CachingFilteredData<T>(IQueryable<T> sumQ)
-        {
-            FilteredDataCaching.SaveFilteredData(HttpContext, "filteredData", sumQ, 120);
-        }
         public IActionResult DownloadTransactionItems()
         {
-            //retrieving filtered data from cookie
-            var items = JsonConvert.DeserializeObject<IEnumerable<TransactionItemSummaryVM>>(
-            Request.Cookies["filteredData"]);
+            //retrieving data from cache            
+            var items = _cache.Get<IEnumerable<TransactionItemSummaryVM>>("cachedData");
+
+            if (items == null)
+            {
+                // If data is not in cache, retrieve it from the database and add it to the cache
+                items = _context.TransactionItemSummary.AsNoTracking()
+                .ToList();
+            }
 
             int numRows = items.Count();
 
