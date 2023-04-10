@@ -102,9 +102,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-// Reference Seed Data //
-CAAInitializer.Seed(app);
-ApplicationDbInitializer.Seed(app);
 
 // Redirect to login page
 app.Use(async (context, next) =>
@@ -124,6 +121,8 @@ app.Use(async (context, next) =>
     await next.Invoke();
 });
 
-
+// Reference Seed Data //
+CAAInitializer.Seed(app);
+ApplicationDbInitializer.Seed(app);
 
 app.Run();
