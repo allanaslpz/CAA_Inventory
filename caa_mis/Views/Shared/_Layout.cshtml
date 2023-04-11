@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/caa_mis.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/table-styles.css" asp-append-version="true" />
+    <link rel="manifest" href="~/manifest.json" />
 </head>
 <body>
     <header>
@@ -72,6 +73,7 @@
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Bulks" asp-action="Index">Inventory Reset</a></li>
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Employees" asp-action="Index">Manage Employees</a></li>
+                                <li><button id="installButton" class="dropdown-item">Install App</button></li>
                             </ul>
                         </li>
 
@@ -118,6 +120,20 @@
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        })
+        .catch(error => {
+          console.log('ServiceWorker registration failed: ', error);
+        });
+    });
+  }
+</script>
+
 
     @await RenderSectionAsync("Scripts", required: false)
 
