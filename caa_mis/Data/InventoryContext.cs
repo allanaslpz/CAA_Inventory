@@ -38,6 +38,7 @@ namespace caa_mis.Data
         public DbSet<Subscription> Subscriptions { get; set; }
 
         public DbSet<ProductListVM> ProductList { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Item>()

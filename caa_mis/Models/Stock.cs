@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using caa_mis.Data;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace caa_mis.Models
@@ -25,5 +27,6 @@ namespace caa_mis.Models
         [Range(0, int.MaxValue)]
         public int MinLevel { get; set; }
         public ICollection<TransactionItem> TransactionItems { get; set; } = new HashSet<TransactionItem>();
+
     }
 }

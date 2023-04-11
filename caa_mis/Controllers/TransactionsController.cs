@@ -422,6 +422,7 @@ namespace caa_mis.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReleaseConfirmed(int id)
         {
+
             ViewDataReturnURL();
             if (_context.Transactions == null)
             {
@@ -435,6 +436,7 @@ namespace caa_mis.Controllers
 
             if(ReleaseTransaction(id))
             {
+
                 if (ModelState.IsValid)
                 {
                     _context.Transactions.Attach(trans).Property(x => x.TransactionStatusID).IsModified = true;
@@ -448,6 +450,7 @@ namespace caa_mis.Controllers
             {
                 TempData["ErrorMessage"] = "Cannot Release this transfer, there are Items that are currently out of stock.";
             }
+
 
             return RedirectToAction(nameof(Index));
         }
@@ -829,6 +832,6 @@ namespace caa_mis.Controllers
             ViewData["TransactionStatusID"] = TransactionStatusList(transaction?.TransactionStatusID);
             ViewData["TransactionTypeID"] = TransactionTypeList(transaction?.TransactionTypeID);
         }
-        
+
     }
 }

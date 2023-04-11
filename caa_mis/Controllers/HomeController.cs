@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.Operations;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using OfficeOpenXml.Style;
+using SkiaSharp;
 using SQLitePCL;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -30,6 +32,7 @@ namespace caa_mis.Controllers
 
         public IActionResult Index()
         {
+
             //Dashboard information
             var Item = _inventoryContext.Items.Include(s => s.Stocks).ToList();
             var Category = _inventoryContext.Categories.ToList();
@@ -138,7 +141,6 @@ namespace caa_mis.Controllers
             }
             ViewBag.BarLabel = barLabel;
             ViewBag.BarValue = barValue;
-
 
             return View();
         }
@@ -312,6 +314,5 @@ namespace caa_mis.Controllers
 
             return File(data, contentType, fileName);
         }
-
     }
 }
