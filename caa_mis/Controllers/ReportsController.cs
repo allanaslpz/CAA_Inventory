@@ -400,12 +400,14 @@ namespace caa_mis.Controllers
             {
                 sumQ = sumQ.Where(e => e.EventDate >= eventStartDate.Value);
                 ViewData["Filtering"] = "btn-danger";
+                //eventStartDate = null;
             }
 
             if (eventEndDate != null)
             {
                 sumQ = sumQ.Where(e => e.EventDate <= eventEndDate.Value);
                 ViewData["Filtering"] = "btn-danger";
+                //eventEndDate = null;
             }
 
             if (!string.IsNullOrEmpty(Products))
@@ -427,7 +429,6 @@ namespace caa_mis.Controllers
 
                 ViewData["Filtering"] = "btn-danger";
             }
-
 
             ViewData["BranchID"] = BranchList(BranchID);
 
@@ -541,7 +542,7 @@ namespace caa_mis.Controllers
                 else
                 {
                     sumQ = sumQ
-                        .OrderByDescending(p => p.ItemName);
+                        .OrderByDescending(p => p.EventQuantity);
                 }
             }
             else //Sorting by Name
@@ -565,15 +566,12 @@ namespace caa_mis.Controllers
 
             //Set sort for next time
             ViewData["sortField"] = sortField;
-            ViewData["sortDirection"] = sortDirection;
-
-            // Set the ViewData variables
-            ViewData["eventStartDate"] = eventStartDate;
-            ViewData["eventEndDate"] = eventEndDate;
+            ViewData["sortDirection"] = sortDirection;            
 
             int pageSize = PageSizeHelper.SetPageSize(HttpContext, pageSizeID, "EventSummary");
             ViewData["pageSizeID"] = PageSizeHelper.PageSizeList(pageSize);
             var pagedData = await PaginatedList<EventSummaryVM>.CreateAsync(sumQ.AsNoTracking(), page ?? 1, pageSize);
+
             return View(pagedData);
         }
 
