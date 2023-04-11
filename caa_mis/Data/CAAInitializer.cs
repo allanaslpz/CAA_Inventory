@@ -280,7 +280,7 @@ namespace caa_mis.Data
                     },
                     new Category
                     {
-                        Name = "Event Materials ",
+                        Name = "Event Materials",
                         Description = "Event Materials"
                     });
                     context.SaveChanges();
@@ -377,7 +377,7 @@ namespace caa_mis.Data
                     {
                         Name = "Sunglasses",
                         SKUNumber = "CAA685349",
-                        Cost = 20,
+                        Cost = 60,
                         Description = "Cool and trending sunglasses",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Swag").ID,
@@ -387,7 +387,7 @@ namespace caa_mis.Data
                     {
                         Name = "Pen",
                         SKUNumber = "CAA780017",
-                        Cost = 5,
+                        Cost = 10,
                         Description = "Clickable pen",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Swag").ID,
@@ -397,10 +397,10 @@ namespace caa_mis.Data
                     {
                         Name = "Towel",
                         SKUNumber = "CAA814972",
-                        Cost = 15,
+                        Cost = 10,
                         Description = "100% Cotton Towels",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
-                        CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Swag").ID,
+                        CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Event Materials").ID,
                         ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Costco Wholesale").ID,
                     },
                     new Item
@@ -427,10 +427,10 @@ namespace caa_mis.Data
                     {
                         Name = "Table",
                         SKUNumber = "CAA399773",
-                        Cost = 120,
+                        Cost = 50,
                         Description = "White long foldable table",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
-                        CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Equipment").ID,
+                        CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Event Materials").ID,
                         ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "RONA").ID,
                     },
                     new Item
@@ -447,20 +447,30 @@ namespace caa_mis.Data
                     {
                         Name = "Roll-up Poster",
                         SKUNumber = "CAA610986",
-                        Cost = 40,
+                        Cost = 300,
                         Description = "Large Poster of CAA",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
-                        CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Equipment").ID,
+                        CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Printed Marketing Materials").ID,
+                        ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Test CAA Site").ID,
+                    },
+                    new Item
+                    {
+                        Name = "Banner",
+                        SKUNumber = "CAA369420",
+                        Cost = 500,
+                        Description = "Printed CAA Banner",
+                        ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
+                        CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Printed Marketing Materials").ID,
                         ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Test CAA Site").ID,
                     },
                     new Item
                     {
                         Name = "Sticker",
                         SKUNumber = "CAA216285",
-                        Cost = 5,
+                        Cost = 200,
                         Description = "Giveaway Stickers with CAA brand",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
-                        CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Swag").ID,
+                        CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Printed Marketing Materials").ID,
                         ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Staples").ID,
                     },
                     new Item
@@ -470,14 +480,14 @@ namespace caa_mis.Data
                         Cost = 40,
                         Description = "Foldable Chair",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
-                        CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Equipment").ID,
+                        CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Event Materials").ID,
                         ManufacturerID = context.Manufacturers.FirstOrDefault(m => m.Name == "Costco Wholesale").ID,
                     },
                     new Item
                     {
                         Name = "Laptop",
                         SKUNumber = "CAA480919",
-                        Cost = 1500,
+                        Cost = 500,
                         Description = "2023 Lenovo T480 ThinkPad",
                         ItemStatusID = context.ItemStatuses.FirstOrDefault(s => s.Name == "Active").ID,
                         CategoryID = context.Categories.FirstOrDefault(c => c.Name == "Equipment").ID,
@@ -517,14 +527,14 @@ namespace caa_mis.Data
                         BranchID = context.Branches.FirstOrDefault(b => b.Location == "Niagara Falls").ID,
                         ItemID = context.Items.FirstOrDefault(i => i.Name == "T-Shirt").ID,
                         MinLevel = 50,
-                        Quantity = 40,
+                        Quantity = 300,
                     },
                     new Stock
                     {
                         BranchID = context.Branches.FirstOrDefault(b => b.Location == "St. Catharines").ID,
                         ItemID = context.Items.FirstOrDefault(i => i.Name == "Sticker").ID,
                         MinLevel = 50,
-                        Quantity = 20,
+                        Quantity = 90,
                     },
                     new Stock
                     {
@@ -559,7 +569,7 @@ namespace caa_mis.Data
                          BranchID = context.Branches.FirstOrDefault(b => b.Location == "St. Catharines").ID,
                          ItemID = context.Items.FirstOrDefault(i => i.Name == "Sunglasses").ID,
                          MinLevel = 50,
-                         Quantity = 50,
+                         Quantity = 150,
 
                      },
                     new Stock
