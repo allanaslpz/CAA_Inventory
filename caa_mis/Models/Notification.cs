@@ -2,9 +2,8 @@
 {
     public class Notification
     {
-        public int ID { get; set; }
-        public string ItemName { get; set; }
-        public int Quantity { get; set; }
-        public string BranchName { get; set; }
+        public int Id { get; set; }
+        public string Message { get; set; }
+        public bool IsRead { get; set; }
     }
 }

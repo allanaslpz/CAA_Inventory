@@ -163,3 +163,9 @@ main {
 .btn-1 {
     --bs-btn-padding-x: 0 !important;
 }
+
+/*notification menu*/
+.notifications-menu {
+    overflow-y: scroll; /* Enable scrolling for overflowed items */
+    font-size: 14px;
+}

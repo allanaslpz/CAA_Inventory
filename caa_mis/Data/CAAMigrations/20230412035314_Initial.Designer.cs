@@ -11,11 +11,7 @@ using caa_mis.Data;
 namespace caa_mis.Data.CAAMigrations
 {
     [DbContext(typeof(InventoryContext))]
-<<<<<<<< HEAD:caa_mis/Data/CAAMigrations/20230410234448_Initial.Designer.cs
-    [Migration("20230410234448_Initial")]
-========
-    [Migration("20230408055246_Initial")]
->>>>>>>> origin/Development:caa_mis/Data/CAAMigrations/20230408055246_Initial.Designer.cs
+    [Migration("20230412035314_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -431,6 +427,23 @@ namespace caa_mis.Data.CAAMigrations
                     b.ToTable("Manufacturers");
                 });
 
+            modelBuilder.Entity("caa_mis.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("caa_mis.Models.Stock", b =>
                 {
                     b.Property<int>("ID")
@@ -438,6 +451,9 @@ namespace caa_mis.Data.CAAMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("BranchID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsRead")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("ItemID")

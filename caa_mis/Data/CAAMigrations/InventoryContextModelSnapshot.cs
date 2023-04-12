@@ -425,6 +425,23 @@ namespace caa_mis.Data.CAAMigrations
                     b.ToTable("Manufacturers");
                 });
 
+            modelBuilder.Entity("caa_mis.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("caa_mis.Models.Stock", b =>
                 {
                     b.Property<int>("ID")
@@ -432,6 +449,9 @@ namespace caa_mis.Data.CAAMigrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("BranchID")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsRead")
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("ItemID")

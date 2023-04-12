@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Information;
 using DNTBreadCrumb.Core;
+using System.Text;
 
 namespace caa_mis.Controllers
 {
@@ -436,6 +437,36 @@ namespace caa_mis.Controllers
 
             if(ReleaseTransaction(id))
             {
+                // Check if any items have hit the minimum level
+                var items = await _context.Items
+                    .Include(i => i.Stocks)
+                    .Where(i => i.Stocks.Any(s => s.BranchID == trans.DestinationID && s.Quantity <= i.MinLevel))
+                    .ToListAsync();
+
+                if (items.Any())
+                {
+                    // Create the notification message
+                    string message = "The following items have hit the minimum level:";
+                    foreach (var item in items)
+                    {
+                        message += $" {item.Name},";
+                    }
+                    message = message.TrimEnd(',') + ".";
+
+                    // Add the notification to the user's session
+                    List<string> notifications;
+                    if (HttpContext.Session.TryGetValue("Notifications", out byte[] data))
+                    {
+                        notifications = JsonConvert.DeserializeObject<List<string>>(Encoding.UTF8.GetString(data));
+                    }
+                    else
+                    {
+                        notifications = new List<string>();
+                    }
+                    notifications.Add(message);
+                    HttpContext.Session.Set("Notifications", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(notifications)));
+                }
+
 
                 if (ModelState.IsValid)
                 {
@@ -450,7 +481,6 @@ namespace caa_mis.Controllers
             {
                 TempData["ErrorMessage"] = "Cannot Release this transfer, there are Items that are currently out of stock.";
             }
-
 
             return RedirectToAction(nameof(Index));
         }

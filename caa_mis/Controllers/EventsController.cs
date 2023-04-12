@@ -12,6 +12,8 @@ using caa_mis.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.Storage;
 using DNTBreadCrumb.Core;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace caa_mis.Controllers
 {
@@ -366,6 +368,37 @@ namespace caa_mis.Controllers
             var trans = new Event { ID = id, TransactionStatusID = status.ID };
             if (ReleaseTransaction(id))
             {
+                // Check if any items have hit the minimum level
+                var items = await _context.Items
+                    .Include(i => i.Stocks)
+                    .Where(i => i.Stocks.Any(s => s.BranchID == trans.BranchID && s.Quantity <= i.MinLevel))
+                    .ToListAsync();
+
+                if (items.Any())
+                {
+                    // Create the notification message
+                    string message = "The following items have hit the minimum level:";
+                    foreach (var item in items)
+                    {
+                        message += $" {item.Name},";
+                    }
+                    message = message.TrimEnd(',') + ".";
+
+                    // Add the notification to the user's session
+                    List<string> notifications;
+                    if (HttpContext.Session.TryGetValue("Notifications", out byte[] data))
+                    {
+                        notifications = JsonConvert.DeserializeObject<List<string>>(Encoding.UTF8.GetString(data));
+                    }
+                    else
+                    {
+                        notifications = new List<string>();
+                    }
+                    notifications.Add(message);
+                    HttpContext.Session.Set("Notifications", Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(notifications)));
+                }
+
+
                 if (ModelState.IsValid)
                 {
                     _context.Events.Attach(trans).Property(x => x.TransactionStatusID).IsModified = true;

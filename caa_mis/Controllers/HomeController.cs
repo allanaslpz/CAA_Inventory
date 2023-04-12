@@ -33,6 +33,7 @@ namespace caa_mis.Controllers
         public IActionResult Index()
         {
 
+
             //Dashboard information
             var Item = _inventoryContext.Items.Include(s => s.Stocks).ToList();
             var Category = _inventoryContext.Categories.ToList();
@@ -296,8 +297,7 @@ namespace caa_mis.Controllers
 
             worksheet.Cells.AutoFitColumns();
 
-            //Since the time zone where the server is running can be different, adjust to 
-            //Local for us.
+
             DateTime utcDate = DateTime.UtcNow;
             TimeZoneInfo esTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
             DateTime localDate = TimeZoneInfo.ConvertTimeFromUtc(utcDate, esTimeZone);
@@ -314,5 +314,75 @@ namespace caa_mis.Controllers
 
             return File(data, contentType, fileName);
         }
+
+        public IActionResult GetNotifications()
+        {
+            // check if the "notificationsSeen" cookie is set
+            bool notificationsSeen = Request.Cookies["notificationsSeen"] == "true";
+
+            var notifications = _inventoryContext.Stocks
+                .Where(s => s.Quantity <= s.MinLevel && !s.IsRead)
+                .Include(b => b.Branch)
+                .Include(s => s.Item)
+                .ToList()
+                .Select(s => new
+                {
+                    id = s.ID, // new property
+                    itemId = s.Item.ID,
+                    itemName = s.Item.Name,
+                    branchName = s.Branch.Location,
+                    message = $"{s.Branch.Location} - {s.Item.Name} low in stock. Quantity: {s.Quantity}, MinLevel: {s.MinLevel}."
+                })
+                .ToList();
+
+            // update the IsRead property of the stocks
+            var stocksToMarkAsRead = _inventoryContext.Stocks.Where(s => notifications.Any(n => n.itemId == s.ItemID && n.branchName == s.Branch.Location));
+            foreach (var stock in stocksToMarkAsRead)
+            {
+                stock.IsRead = true;
+            }
+            _inventoryContext.SaveChanges();
+
+            // update the notification count cookie
+            int newCount = notificationsSeen ? 0 : notifications.Count;
+            Response.Cookies.Append("notificationCount", newCount.ToString());
+
+            // set a cookie called "notificationsSeen"
+            Response.Cookies.Append("notificationsSeen", "true");
+
+            // set a cookie called "lastReadNotificationId"
+            int lastNotificationId = stocksToMarkAsRead.Any() ? stocksToMarkAsRead.Max(s => s.ID) : 0;
+            Response.Cookies.Append("lastReadNotificationId", lastNotificationId.ToString());
+
+            return Json(notifications);
+        }
+
+        [HttpPost]
+        public IActionResult MarkNotificationAsRead()
+        {
+            var stocks = _inventoryContext.Stocks.Where(s => s.Quantity <= s.MinLevel && !s.IsRead).ToList();
+            foreach (var stock in stocks)
+            {
+                stock.IsRead = true;
+            }
+
+            _inventoryContext.SaveChanges();
+
+            // update the notification count cookie
+            int newCount = stocks.Count;
+            Response.Cookies.Append("notificationCount", newCount.ToString());
+
+            // set a cookie called "notificationsSeen"
+            Response.Cookies.Append("notificationsSeen", "true");
+
+            // set a cookie called "lastReadNotificationId"
+            int lastNotificationId = stocks.Any() ? stocks.Max(s => s.ID) : 0;
+            Response.Cookies.Append("lastReadNotificationId", lastNotificationId.ToString());
+
+            return Ok();
+        }
+
+
+
     }
 }

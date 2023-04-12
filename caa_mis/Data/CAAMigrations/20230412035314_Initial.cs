@@ -96,6 +96,20 @@ namespace caa_mis.Data.CAAMigrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Message = table.Column<string>(type: "TEXT", nullable: true),
+                    IsRead = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Suppliers",
                 columns: table => new
                 {
@@ -403,7 +417,8 @@ namespace caa_mis.Data.CAAMigrations
                     BranchID = table.Column<int>(type: "INTEGER", nullable: false),
                     ItemID = table.Column<int>(type: "INTEGER", nullable: false),
                     Quantity = table.Column<int>(type: "INTEGER", nullable: false),
-                    MinLevel = table.Column<int>(type: "INTEGER", nullable: false)
+                    MinLevel = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsRead = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -686,6 +701,9 @@ namespace caa_mis.Data.CAAMigrations
 
             migrationBuilder.DropTable(
                 name: "ItemThumbnails");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "Subscriptions");

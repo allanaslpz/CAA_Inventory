@@ -26,6 +26,8 @@ namespace caa_mis.Models
         [Required]
         [Range(0, int.MaxValue)]
         public int MinLevel { get; set; }
+
+        public bool IsRead { get; set; }
         public ICollection<TransactionItem> TransactionItems { get; set; } = new HashSet<TransactionItem>();
 
     }

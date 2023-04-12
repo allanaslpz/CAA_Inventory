@@ -1,0 +1,94 @@
+﻿@using Microsoft.EntityFrameworkCore;
+@using caa_mis.Models
+@using caa_mis.Data
+@inject InventoryContext _context
+
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.0/dist/js.cookie.min.js"></script>
+
+@{
+    var notifications = _context.Stocks.Where(s => s.Quantity <= s.MinLevel)
+                                       .Include(b => b.Branch)
+                                       .Include(s => s.Item)
+                                       .ToList()
+                                       .Select(s => new
+                                       {
+                                           id = s.ID,
+                                           itemId = s.Item.ID,
+                                           itemName = s.Item.Name,
+                                           branchName = s.Branch.Location,
+                                           message = $"{s.Branch.Location} - {s.Item.Name} low in stock. Quantity: {s.Quantity}, MinLevel: {s.MinLevel}."
+                                       })
+                                       .ToList();
+}
+
+<a class="nav-link dropdown-toggle" id="notificationsDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onclick="removeBadge()">
+    <i class="fas fa-bell"></i>
+    @if (notifications.Count > 0)
+    {
+        <span class="badge bg-danger" id="notificationBadge">@notifications.Count</span>
+    }
+</a>
+<div class="dropdown-menu notifications-menu" aria-labelledby="navbarDropdown">
+    @if (notifications.Count == 0)
+    {
+        <a class="dropdown-item" href="#">No notifications</a>
+    }
+    else
+    {
+        @foreach (var notification in notifications)
+        {
+            <a class="dropdown-item" href="#">@notification.message</a>
+        }
+    }
+</div>
+
+<script>
+    var notifications = [];
+
+    $(document).ready(function () {
+        var notificationsSeen = localStorage.getItem('notificationsSeen') || Cookies.get('notificationsSeen') || 'false';
+        if (notificationsSeen !== 'true') {
+            var currentCount = parseInt(localStorage.getItem('notificationCount')) || parseInt(Cookies.get('notificationCount')) || 0;
+            if (currentCount > 0) {
+                $("#notificationsDropdown").append("<span class='badge bg-danger' id='notificationBadge'>" + currentCount + "</span>");
+            }
+            var lastReadNotificationId = parseInt(localStorage.getItem('lastReadNotificationId')) || parseInt(Cookies.get('lastReadNotificationId')) || 0;
+            $.ajax({
+                url: "/Home/GetNotifications",
+                type: "GET",
+                success: function (data) {
+                    notifications = data;
+                    var newNotifications = notifications.filter(function (n) {
+                        return n.id > lastReadNotificationId;
+                    });
+                    var newCount = newNotifications.length;
+                    if (newCount > 0) {
+                        $("#notificationsDropdown").append("<span class='badge bg-danger' id='notificationBadge'>" + newCount + "</span>");
+                    }
+                    localStorage.setItem('notificationCount', newCount);
+                    Cookies.set('notificationCount', newCount);
+                },
+                complete: function () {
+                    setTimeout(checkNotifications, 5000);
+                }
+            });
+        }
+    });
+
+function removeBadge() {
+    $.post("/Home/MarkNotificationAsRead", function () {
+        // remove the badge
+        $("#notificationBadge").remove();
+
+        // set the notificationsSeen flag to true in localStorage and cookie
+        localStorage.setItem('notificationsSeen', 'true');
+        Cookies.set('notificationsSeen', 'true');
+
+        // update the notification count in localStorage and cookie to 0
+        var lastNotificationId = notifications.length > 0 ? notifications[notifications.length - 1].id : 0;
+        localStorage.setItem('lastReadNotificationId', lastNotificationId);
+        Cookies.set('lastReadNotificationId', lastNotificationId);
+    });
+}
+
+</script>
