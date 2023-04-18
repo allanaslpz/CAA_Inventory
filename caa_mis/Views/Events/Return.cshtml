@@ -12,7 +12,7 @@
 <form asp-action="Return">
     <input type="hidden" asp-for="@Model.ID" />
     <input type="submit" value="Return Items" class="btn btn-primary" />
-    <a asp-action="Index" asp-controller="EventItems" asp-route-TransactionID="@Model.ID" class="btn btn-danger">Back to Details Page</a>
+    <a asp-action="Return" asp-controller="EventItems" asp-route-EventID="@Model.ID" class="btn btn-danger">Back to Details Page</a>
 </form>
 <hr />
 @if (TempData.ContainsKey("ErrorMessage"))
