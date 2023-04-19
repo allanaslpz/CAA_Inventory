@@ -56,16 +56,6 @@
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Manufacturers" asp-action="Index">Vendors</a></li>
                             </ul>
                         </li>
-                        @*<li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Report
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" asp-area="" asp-controller="Items" asp-action="StockSummaryByBranch">Stock Summary By Branch</a></li>
-                        <li><a class="dropdown-item" asp-area="" asp-controller="Transactions" asp-action="TransactionSummary">Transfer Summary</a></li>
-                        <li><a class="dropdown-item" asp-area="" asp-controller="TransactionItems" asp-action="TransactionItemSummary">Transferred Product Summary</a></li>
-                        </ul>
-                        </li>*@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Setting
@@ -279,10 +269,9 @@
                   <ul>
                     <li><b>INVENTORY</b> for creating new Products, Transfers, and Receiving of items.</li>
                     <li><b>EVENT</b> for creating Events, EventItems and Assign to Other Branches.</li>
-                    <li><b>REPORT</b> for viewing and generating of Products Transaction, Transferred Products, and Stock Summary reports.</li>
+                    <li><b>REPORTS</b> for viewing and generating of Products Transaction, Transferred Products, and Stock Summary reports.</li>
                     <li><b>ADMINISTRATION</b> for creating Branches, Employees, Event Types, Inventory Statuses, Vendors, Product Categories, and Statuses.</li>
                     <li><b>SETTING</b> for editing User Roles information and archiving of existing employees.</li>
-                    <li><b>REGISTER</b> for creating new application logins of new employees.</li>
                     <li><b>LOGIN</b> for signing in of registered users, resetting of passwords, and resending of email confirmations.</li>
                   </ul>
                 `;
@@ -319,10 +308,6 @@
             title: "THE HOME PAGE",
             html: true,
             content: ""
-        });
-        //$(document).on("click", ".popover .close" , function(){
-        //      $(this).parents(".popover").popover('hide');
-        //  });
+        });        
     });
-
 </script>

@@ -17,12 +17,7 @@
             <select asp-for="EmployeeID" class="form-control form-select" asp-items="ViewBag.EmployeeID"></select>
             
         </div>
-        @*<div class="col-md-4 mb-3">
-            <label asp-for="TransactionTypeID" class="control-label">Type</label>
-            <select asp-for="TransactionTypeID" class="form-control form-select" asp-items="ViewBag.TransactionTypeID"></select>
-            
-        </div>*@
-       
+               
         <div class="col-md-4 mb-3">
                 <label asp-for="TransactionDate" class="control-label">Date</label>
             <input asp-for="TransactionDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" required/>
@@ -53,7 +48,7 @@
        <div class="col-md-4 mb-3">
             <div class="form-group">
                 <label asp-for="Shipment" class="control-label">Shipment Details</label>
-                <input asp-for="Shipment" class="form-control" />
+                <input asp-for="Shipment" class="form-control" placeholder="e.g. ships, truck, own vehicle" />
 
                 <span asp-validation-for="Shipment" class="text-danger"></span>
             </div>
@@ -61,7 +56,7 @@
         <div class="col-md-4 mb-3">
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <textarea asp-for="Description" class="form-control">
+                <textarea asp-for="Description" class="form-control" placeholder="e.g. This is temporary item for spring ceremony...">
 
                 </textarea>
                

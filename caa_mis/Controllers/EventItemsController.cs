@@ -21,8 +21,8 @@ using System.Security.Policy;
 
 namespace caa_mis.Controllers
 {
-    [BreadCrumb(Title = "Events", Order = 0, IgnoreAjaxRequests = true, Url = "Transactions")]
-    [BreadCrumb(Title = "Event Details", UseDefaultRouteUrl = true, Order = 0, IgnoreAjaxRequests = true)]
+    [BreadCrumb(Title = "Events", Order = 0, IgnoreAjaxRequests = true, Url = "/Events")]
+    [BreadCrumb(Title = "Event Details", Order = 0, IgnoreAjaxRequests = true)]
     public class EventItemsController : CustomControllers.CognizantController
     {
         private readonly InventoryContext _context;

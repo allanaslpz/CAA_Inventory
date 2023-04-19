@@ -438,12 +438,7 @@ namespace caa_mis.Controllers
 
             //await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-        
-       
-
-       
-
+        }  
         public IActionResult Print(string sku, string name, int id)
         {
             ViewData["sku"] = sku;
@@ -451,8 +446,7 @@ namespace caa_mis.Controllers
             ViewData["id"] = id;
             return View();
         }
-
-        
+      
         private SelectList CategorySelectList(int? selectedId)
         {
             return new SelectList(_context.Categories
@@ -605,7 +599,6 @@ namespace caa_mis.Controllers
                 //Autofit columns
                 workSheet.Cells.AutoFitColumns();
 
-
                 //Add a title and timestamp at the top of the report
                 workSheet.Cells[1, 1].Value = "Product Report";
                 using (ExcelRange Rng = workSheet.Cells[1, 1, 1, 7])
@@ -643,8 +636,7 @@ namespace caa_mis.Controllers
                 }
             }
             return NotFound("No data.");
-        }
-       
+        }       
         public async Task<IActionResult> GetBranchStock(int itemID)
         {
             var inventory = await _context.Stocks

@@ -39,7 +39,7 @@
 </div>
 
 <div>
-    <a href='@ViewData["returnURL"]'>Back to List</a>
+    <a asp-controller="EventItems" asp-action="Return" asp-route-EventID="@Model.EventID">Back to List</a>
 </div>
 
 @section Scripts {
