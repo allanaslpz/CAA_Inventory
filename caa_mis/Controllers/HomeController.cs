@@ -60,16 +60,16 @@ namespace caa_mis.Controllers
                                  group stock by new { item.Name, stock.BranchID } into t
                                  let minLevel = t.Min(s => s.MinLevel)
                                  let totalStock = t.Sum(s => s.Quantity)
-                                 where totalStock < minLevel // Filter out items not low in stock
+                                 where totalStock == 0 // Filter out items not low in stock
                                  select new
                                  {
                                      ItemName = t.Key.Name,
                                      BranchID = t.Key.BranchID,
                                      MinLevel = minLevel,
                                      TotalStock = totalStock,
-                                     Percentage = 1 - ((double)minLevel / (double)totalStock)
+                                     Percentage = ((double)totalStock / (double)minLevel)
                                  };
-                ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage);
+                ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage); ;
             }
             else
             {
@@ -79,15 +79,15 @@ namespace caa_mis.Controllers
                                  group stock by item.Name into t
                                  let minLevel = t.Min(s => s.MinLevel)
                                  let totalStock = t.Sum(s => s.Quantity)
-                                 where totalStock < minLevel // Filter out items not low in stock
+                                 where totalStock == 0
                                  select new
                                  {
                                      ItemName = t.Key,
                                      MinLevel = minLevel,
                                      TotalStock = totalStock,
-                                     Percentage = 1 - ((double)minLevel / (double)totalStock)
+                                     Percentage = ((double)totalStock / (double)minLevel)
                                  };
-                ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage);
+                ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage); ;
             }
 
             ViewBag.CurrentBranchID = branchID;
@@ -180,7 +180,7 @@ namespace caa_mis.Controllers
                                  group stock by new { item.Name, stock.BranchID, b.Location } into t
                                  let minLevel = t.Min(s => s.MinLevel)
                                  let totalStock = t.Sum(s => s.Quantity)
-                                 where totalStock < minLevel // Filter out items not low in stock
+                                 where totalStock == 0 // Filter out items not low in stock
                                  select new
                                  {
                                      BranchName = t.Key.Location,
@@ -188,7 +188,7 @@ namespace caa_mis.Controllers
                                      BranchID = t.Key.BranchID,
                                      MinLevel = minLevel,
                                      TotalStock = totalStock,
-                                     Percentage = 1 - ((double)minLevel / (double)totalStock)
+                                     Percentage = ((double)totalStock / (double)minLevel)
                                  };
                 ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage);
             }
@@ -201,7 +201,7 @@ namespace caa_mis.Controllers
                                  group stock by new { item.Name, b.Location } into t
                                  let minLevel = t.Min(s => s.MinLevel)
                                  let totalStock = t.Sum(s => s.Quantity)
-                                 where totalStock < minLevel // Filter out items not low in stock
+                                 where totalStock == 0 // Filter out items not low in stock
                                  select new
                                  {
 
@@ -209,7 +209,7 @@ namespace caa_mis.Controllers
                                      ItemName = t.Key.Name,
                                      MinLevel = minLevel,
                                      TotalStock = totalStock,
-                                     Percentage = 1 - ((double)minLevel / (double)totalStock)
+                                     Percentage = ((double)totalStock / (double)minLevel)
                                  };
                 ViewBag.TableItem = tableItems.OrderBy(s => s.Percentage);
             }
